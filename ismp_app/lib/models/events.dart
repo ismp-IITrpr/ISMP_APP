@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../screens/events_screen.dart';
 
 class EventModel {
   final String title;

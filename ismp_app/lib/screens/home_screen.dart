@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/blog.dart';
+import '../services/firebase_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,21 +12,38 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   BlogTag? _activeTag; // null = All
 
-  List<BlogPost> get _filteredPosts => _activeTag == null
-      ? blogPosts
-      : blogPosts.where((p) => p.tag == _activeTag).toList();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            _buildHeader(),
-            _buildTagFilter(),
-            _buildBlogList(),
-          ],
+        child: StreamBuilder<List<BlogPost>>(
+          stream: FirebaseService.instance.streamBlogPosts(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            final posts = snapshot.data ?? [];
+            final filteredPosts = _activeTag == null
+                ? posts
+                : posts.where((p) => p.tag == _activeTag).toList();
+
+            return CustomScrollView(
+              slivers: [
+                _buildHeader(),
+                _buildTagFilter(),
+                _buildBlogList(filteredPosts),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -97,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: isSelected ? color : bgColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? color : color.withOpacity(0.3),
+            color: isSelected ? color : color.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -113,8 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBlogList() {
-    final posts = _filteredPosts;
+  Widget _buildBlogList(List<BlogPost> posts) {
     if (posts.isEmpty) {
       return SliverFillRemaining(
         child: Center(
@@ -151,7 +168,7 @@ class _BlogCard extends StatelessWidget {
           color: const Color(0xFF1C1C23),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: post.tag.color.withOpacity(0.15),
+            color: post.tag.color.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -199,7 +216,7 @@ class _BlogCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 13,
-                    backgroundColor: post.tag.color.withOpacity(0.25),
+                    backgroundColor: post.tag.color.withValues(alpha: 0.25),
                     child: Text(
                       post.author[0],
                       style: TextStyle(
@@ -255,7 +272,7 @@ class _TagBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: tag.bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: tag.color.withOpacity(0.4), width: 1),
+        border: Border.all(color: tag.color.withValues(alpha: 0.4), width: 1),
       ),
       child: Text(
         tag.label,
@@ -311,7 +328,7 @@ class _BlogDetailScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor: post.tag.color.withOpacity(0.25),
+                  backgroundColor: post.tag.color.withValues(alpha: 0.25),
                   child: Text(
                     post.author[0],
                     style: TextStyle(
@@ -345,7 +362,7 @@ class _BlogDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            Container(height: 1, color: Colors.white.withOpacity(0.06)),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.06)),
             const SizedBox(height: 24),
             Text(
               post.content,

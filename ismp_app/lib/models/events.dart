@@ -18,6 +18,30 @@ class EventModel {
     required this.description,
     required this.dotColor,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'time': time,
+      'venue': venue,
+      'type': type,
+      'groupNo': groupNo,
+      'description': description,
+      'dotColor': dotColor.toARGB32(),
+    };
+  }
+
+  factory EventModel.fromMap(Map<String, dynamic> map) {
+    return EventModel(
+      title: map['title'] ?? '',
+      time: map['time'] ?? '',
+      venue: map['venue'] ?? '',
+      type: map['type'] ?? '',
+      groupNo: List<int>.from(map['groupNo'] ?? []),
+      description: map['description'] ?? '',
+      dotColor: Color(map['dotColor'] ?? 0xFF4A3AFF),
+    );
+  }
 }
 
 final Map<int, List<EventModel>> eventsData = {

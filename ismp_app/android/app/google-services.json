@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "231730406983",
+    "project_id": "iit-ropar-ismp-app",
+    "storage_bucket": "iit-ropar-ismp-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231730406983:android:244e9e51786108bb817362",
+        "android_client_info": {
+          "package_name": "ismp.iitropar.ismp_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcoMqURpYa8DQaAfbGFhXv7140ItEcGFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

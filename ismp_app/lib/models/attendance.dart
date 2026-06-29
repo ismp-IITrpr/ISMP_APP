@@ -16,6 +16,28 @@ class AttendanceRecord {
     required this.isPresent,
     required this.iconColor,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'date': date,
+      'time': time,
+      'venue': venue,
+      'isPresent': isPresent,
+      'iconColor': iconColor.toARGB32(),
+    };
+  }
+
+  factory AttendanceRecord.fromMap(Map<String, dynamic> map) {
+    return AttendanceRecord(
+      title: map['title'] ?? '',
+      date: map['date'] ?? '',
+      time: map['time'] ?? '',
+      venue: map['venue'] ?? '',
+      isPresent: map['isPresent'] ?? false,
+      iconColor: Color(map['iconColor'] ?? 0xFF4A3AFF),
+    );
+  }
 }
 
 final List<AttendanceRecord> recentSessions = [

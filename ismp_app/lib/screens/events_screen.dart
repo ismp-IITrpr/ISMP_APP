@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/events.dart';
+import '../services/firebase_service.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -18,7 +19,6 @@ class _EventsScreenState extends State<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dailyEvents = eventsData[_selectedDay] ?? [];
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
@@ -72,7 +72,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFF4A3AFF).withOpacity(0.5),
+                            color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -103,7 +103,7 @@ class _EventsScreenState extends State<EventsScreen> {
                             'AUG',
                             style: TextStyle(
                               color: isSelected
-                                  ? Colors.white.withOpacity(0.9)
+                                  ? Colors.white.withValues(alpha: 0.9)
                                   : Colors.grey.shade700,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -119,114 +119,127 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: dailyEvents.isEmpty
-                  ? const Center(
-                child: Text(
-                  'No events scheduled for this day.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              )
-                  : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                itemCount: dailyEvents.length,
-                itemBuilder: (context, index) {
-                  final event = dailyEvents[index];
-                  final isLast = index == dailyEvents.length - 1;
+              child: StreamBuilder<List<EventModel>>(
+                stream: FirebaseService.instance.streamEventsForDay(_selectedDay),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                  }
+                  final dailyEvents = snapshot.data ?? [];
+                  if (dailyEvents.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No events scheduled for this day.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    itemCount: dailyEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = dailyEvents[index];
+                      final isLast = index == dailyEvents.length - 1;
 
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(
-                          width: 24,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 24),
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                    color: event.dotColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: event.dotColor.withOpacity(0.4),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      )
-                                    ]
-                                ),
+                      return IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 24),
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                        color: event.dotColor,
+                                        borderRadius: BorderRadius.circular(4),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: event.dotColor.withValues(alpha: 0.4),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ]
+                                    ),
+                                  ),
+                                  if (!isLast)
+                                    Expanded(
+                                      child: Container(
+                                        width: 2,
+                                        color: event.dotColor.withValues(alpha: 0.4),
+                                      ),
+                                    ),
+                                ],
                               ),
-                              if (!isLast)
-                                Expanded(
-                                  child: Container(
-                                    width: 2,
-                                    color: event.dotColor.withOpacity(0.4),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1C1C23),
-                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  event.time,
-                                  style: TextStyle(
-                                    color: event.dotColor,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1C1C23),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  event.title,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  event.venue,
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildBadge(event.type,
-                                        const Color(0xFF3A3A4A)),
+                                    Text(
+                                      event.time,
+                                      style: TextStyle(
+                                        color: event.dotColor,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      event.title,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      event.venue,
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        _buildBadge(event.type,
+                                            const Color(0xFF3A3A4A)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      event.description,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  event.description,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   );
-                },
+                }
               ),
             ),
           ],

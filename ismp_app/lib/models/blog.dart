@@ -69,6 +69,35 @@ class BlogPost {
     required this.readMinutes,
     required this.tag,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'summary': summary,
+      'content': content,
+      'author': author,
+      'date': date,
+      'readMinutes': readMinutes,
+      'tag': tag.name,
+    };
+  }
+
+  factory BlogPost.fromMap(Map<String, dynamic> map, String documentId) {
+    return BlogPost(
+      id: documentId,
+      title: map['title'] ?? '',
+      summary: map['summary'] ?? '',
+      content: map['content'] ?? '',
+      author: map['author'] ?? '',
+      date: map['date'] ?? '',
+      readMinutes: map['readMinutes'] ?? 0,
+      tag: BlogTag.values.firstWhere(
+        (t) => t.name == map['tag'],
+        orElse: () => BlogTag.cluv,
+      ),
+    );
+  }
 }
 
 final List<BlogPost> blogPosts = [

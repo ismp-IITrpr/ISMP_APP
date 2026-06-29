@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/attendance.dart';
-import 'dart:math';
+import '../models/events.dart';
+import '../services/mock_attendance_service.dart';
+import 'student_scanner_screen.dart';
+import 'detailed_attendance_screen.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -10,123 +12,31 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
+  final String currentStudentId = "student_123"; // Mock student ID
+  List<EventModel> clubSessions = [];
 
-  void _openMockScanner() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadClubSessions();
+  }
 
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pop(context);
-
-      bool isSuccess = Random().nextBool();
-      if (isSuccess) {
-        _showSuccessDialog();
-      } else {
-        _showFailedDialog();
-      }
+  void _loadClubSessions() {
+    // Flatten all events across all days and filter for 'Club Session'
+    final allEvents = eventsData.values.expand((events) => events).toList();
+    setState(() {
+      clubSessions = allEvents.where((e) => e.type == 'Club Session').toList();
     });
   }
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _buildResultDialog(
-        isSuccess: true,
-        icon: Icons.check_circle_outline,
-        iconColor: const Color(0xFF4CAF50),
-        title: 'Success!',
-        message: 'Your attendance has been\nmarked successfully.',
-        buttonText: 'Great!',
-      ),
-    );
-  }
-
-  void _showFailedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _buildResultDialog(
-        isSuccess: false,
-        icon: Icons.cancel_outlined,
-        iconColor: const Color(0xFFF44336),
-        title: 'Failed!',
-        message: 'Unable to mark attendance.\nPlease try again.',
-        buttonText: 'Try Again',
-      ),
-    );
-  }
-
-  Widget _buildResultDialog({
-    required bool isSuccess,
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String message,
-    required String buttonText,
-  }) {
-    return Dialog(
-      backgroundColor: const Color(0xFF1C1C23),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            Icon(
-              icon,
-              size: 80,
-              color: iconColor,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A3AFF),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _openScanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => StudentScannerScreen(studentId: currentStudentId)),
+    ).then((_) {
+      // Refresh the screen when returning from the scanner
+      setState(() {}); 
+    });
   }
 
   Widget _buildStatItem(String label, String value, Color color) {
@@ -155,6 +65,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final attendanceService = MockAttendanceService();
+    int presentCount = 0;
+    
+    for (var session in clubSessions) {
+      if (attendanceService.isPresent(session.id, currentStudentId)) {
+        presentCount++;
+      }
+    }
+    
+    final totalCount = clubSessions.length;
+    final absentCount = totalCount - presentCount;
+    final attendancePercentage = totalCount == 0 ? 0.0 : presentCount / totalCount;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       appBar: AppBar(
@@ -164,7 +87,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
-            onPressed: _openMockScanner,
+            onPressed: _openScanner,
           ),
         ],
       ),
@@ -176,76 +99,138 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF14141A),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFF23232D)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF2A2A3D),
+                      const Color(0xFF14141A),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                  border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4A3AFF).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.bar_chart,
-                            color: Color(0xFF8B78FF),
-                            size: 20,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.bar_chart,
+                                color: Color(0xFF8B78FF),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            const Text(
+                              'Attendance Overview',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Attendance Overview',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                        // View Details Button
+                        IconButton(
+                          onPressed: () {
+                          },
+                          icon: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.05),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildStatItem('Total', '12', Colors.white),
-                        _buildStatItem('Present', '9', const Color(0xFF4CAF50)),
-                        _buildStatItem('Absent', '3', const Color(0xFFF44336)),
+                        _buildStatItem('Total', totalCount.toString(), Colors.white),
+                        _buildStatItem('Present', presentCount.toString(), const Color(0xFF4CAF50)),
+                        _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: const LinearProgressIndicator(
-                        value: 9 / 12, // 75%
-                        backgroundColor: Color(0xFF23232D),
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
-                        minHeight: 8,
+                      borderRadius: BorderRadius.circular(12),
+                      child: LinearProgressIndicator(
+                        value: attendancePercentage,
+                        backgroundColor: const Color(0xFF0F0F13),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
+                        minHeight: 10,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Overall attendance',
-                          style: TextStyle(color: Colors.grey, fontSize: 13),
-                        ),
-                        Text(
-                          '75%',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                            color: Colors.white70, 
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${(attendancePercentage * 100).toInt()}%',
+                            style: const TextStyle(
+                              color: Color(0xFF8B78FF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    // View in Detail Text Button
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DetailedAttendanceScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.dashboard_customize_outlined, size: 18, color: Color(0xFF8B78FF)),
+                        label: const Text(
+                          'View Club Trophy Boards',
+                          style: TextStyle(
+                            color: Color(0xFF8B78FF),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -259,22 +244,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Recent Sessions',
+                    'Club Sessions History',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'View All',
-                      style: TextStyle(
-                        color: Color(0xFF8B78FF),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
                     ),
                   ),
                 ],
@@ -285,9 +259,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                itemCount: recentSessions.length,
+                itemCount: clubSessions.length,
                 itemBuilder: (context, index) {
-                  final record = recentSessions[index];
+                  final session = clubSessions[index];
+                  final isPresent = attendanceService.isPresent(session.id, currentStudentId);
+                  
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
@@ -300,12 +276,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: record.iconColor.withOpacity(0.1),
+                            color: session.dotColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
                             Icons.calendar_today,
-                            color: record.iconColor,
+                            color: session.dotColor,
                             size: 24,
                           ),
                         ),
@@ -315,7 +291,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                record.title,
+                                session.title,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -324,7 +300,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${record.date} • ${record.time}\n${record.venue}',
+                                '${session.date} • ${session.time}\n',
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
@@ -340,9 +316,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             Row(
                               children: [
                                 Text(
-                                  record.isPresent ? 'Present' : 'Absent',
+                                  isPresent ? 'Present' : 'Absent',
                                   style: TextStyle(
-                                    color: record.isPresent
+                                    color: isPresent
                                         ? const Color(0xFF4CAF50)
                                         : const Color(0xFFF44336),
                                     fontSize: 12,
@@ -351,10 +327,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Icon(
-                                  record.isPresent
+                                  isPresent
                                       ? Icons.check_circle_outline
                                       : Icons.cancel_outlined,
-                                  color: record.isPresent
+                                  color: isPresent
                                       ? const Color(0xFF4CAF50)
                                       : const Color(0xFFF44336),
                                   size: 16,

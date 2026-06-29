@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventModel {
-  final String title;
+  final String id;
+  final String title; // Represents the club name or event name
+  final String date;  // Format: 'yyyy-MM-dd' e.g. '2024-05-21'
   final String time;
   final String venue;
   final String type;
@@ -10,7 +13,9 @@ class EventModel {
   final Color dotColor;
 
   EventModel({
+    required this.id,
     required this.title,
+    required this.date,
     required this.time,
     required this.venue,
     required this.type,
@@ -18,12 +23,26 @@ class EventModel {
     required this.description,
     required this.dotColor,
   });
+
+  // Helper method to convert the string date and time into a Dart DateTime object.
+  // Example: date = '2024-05-21', time = '09:30 AM'
+  DateTime getParsedDateTime() {
+    try {
+      final dateTimeString = '$date $time';
+      return DateFormat('yyyy-MM-dd hh:mm a').parse(dateTimeString);
+    } catch (e) {
+      // Fallback if formatting is wrong
+      return DateTime.now();
+    }
+  }
 }
 
 final Map<int, List<EventModel>> eventsData = {
   1: [
     EventModel(
+      id: 'evt_orient_1',
       title: 'Orientation Session',
+      date: '2024-07-21',
       time: '09:30 AM',
       venue: 'Main Auditorium',
       type: 'Event',
@@ -32,7 +51,9 @@ final Map<int, List<EventModel>> eventsData = {
       dotColor: const Color(0xFF8B78FF),
     ),
     EventModel(
-      title: 'Maths Club Meeting',
+      id: 'evt_math_1',
+      title: 'Maths Club',
+      date: '2024-07-21',
       time: '11:00 AM',
       venue: 'LH-307',
       type: 'Club Session',
@@ -41,7 +62,9 @@ final Map<int, List<EventModel>> eventsData = {
       dotColor: const Color(0xFF8BC34A),
     ),
     EventModel(
-      title: 'Arduino Workshop',
+      id: 'evt_ard_1',
+      title: 'Robotics Club',
+      date: '2024-07-21',
       time: '02:00 PM',
       venue: 'Workshop Room',
       type: 'Club Session',
@@ -52,7 +75,9 @@ final Map<int, List<EventModel>> eventsData = {
   ],
   2: [
     EventModel(
-      title: 'Football Practice',
+      id: 'evt_fb_1',
+      title: 'Sports Club - Football',
+      date: '2024-07-22',
       time: '04:30 PM',
       venue: 'Sports Complex',
       type: 'Club Session',
@@ -61,7 +86,9 @@ final Map<int, List<EventModel>> eventsData = {
       dotColor: const Color(0xFFFF9800),
     ),
     EventModel(
-      title: 'Music Club Jamming',
+      id: 'evt_music_1',
+      title: 'Music Club',
+      date: '2024-07-22',
       time: '07:00 PM',
       venue: 'Music Room',
       type: 'Club Session',
@@ -72,10 +99,12 @@ final Map<int, List<EventModel>> eventsData = {
   ],
   3: [
     EventModel(
-      title: 'Coding Contest',
+      id: 'evt_code_1',
+      title: 'Coding Club',
+      date: '2024-07-23',
       time: '09:00 PM',
       venue: 'Online',
-      type: 'Event',
+      type: 'Event', // Notice this is 'Event' not 'Club Session', testing the filter
       groupNo: [1,3],
       description: 'First competitive programming contest for freshers.',
       dotColor: const Color(0xFFE91E63),

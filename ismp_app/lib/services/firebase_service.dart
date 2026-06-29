@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import '../models/blog.dart';
 import '../models/events.dart';
@@ -9,6 +11,60 @@ class FirebaseService {
   FirebaseService._init();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Google Sign-In with @iitrpr.ac.in domain restriction
+  Future<User?> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+      );
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return null; // User cancelled
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final user = userCredential.user;
+
+      if (user != null) {
+        final email = user.email;
+        if (email != null && email.endsWith('@iitrpr.ac.in')) {
+          return user;
+        } else {
+          // If domain doesn't match, sign out immediately and throw an error
+          await signOut();
+          throw FirebaseAuthException(
+            code: 'invalid-email-domain',
+            message: 'Access Denied: Only IIT Ropar email addresses (@iitrpr.ac.in) are allowed.',
+          );
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error during Google Sign-in: $e');
+      rethrow;
+    }
+  }
+
+  // Sign out helper
+  Future<void> signOut() async {
+    await _auth.signOut();
+    try {
+      await GoogleSignIn(
+        clientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+      ).signOut();
+    } catch (_) {}
+  }
+
+  // Get current user helper
+  User? get currentUser => _auth.currentUser;
+
 
   // Stream blog posts from Firestore in real-time
   Stream<List<BlogPost>> streamBlogPosts() {

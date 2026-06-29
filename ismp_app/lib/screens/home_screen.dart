@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/blog.dart';
+import '../models/team_member.dart';
+import 'core_team_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,23 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
-      appBar: AppBar(
-        title: const Text(
-          'Home',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-        backgroundColor: const Color(0xFF090A0F),
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            _buildCoreTeam(),
             _buildHeader(),
             _buildTagFilter(),
             _buildBlogList(),
@@ -149,8 +139,214 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
+  Widget _buildCoreTeam() {
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+            child: Row(
+              children: [
+                const Text(
+                  'ISMP Core Team',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const CoreTeamScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'View All →',
+                    style: TextStyle(
+                      color: Color(0xFF4A3AFF),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 800.ms).slideX(begin: -0.05, curve: Curves.easeOutQuad),
+          SizedBox(
+            height: 190,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: coreTeamMembers.length,
+              itemBuilder: (context, index) {
+                return _teamMemberCard(coreTeamMembers[index])
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: (index * 100).ms)
+                    .slideY(begin: 0.15, curve: Curves.easeOutQuad)
+                    .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutQuad);
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  void _showBioDialog(BuildContext context, TeamMember member) {
+    if (member.bio == null || member.bio!.isEmpty) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF15151A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          title: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: AssetImage(member.image),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      member.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      member.role,
+                      style: const TextStyle(
+                        color: Color(0xFF00FFCC),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            member.bio!,
+            style: TextStyle(
+              color: Colors.grey.shade300,
+              fontSize: 14,
+              height: 1.6,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Color(0xFF00FFCC)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _teamMemberCard(TeamMember member) {
+    bool isFaculty = member.role.contains('FACULTY');
+    return GestureDetector(
+      onTap: () => _showBioDialog(context, member),
+      child: Container(
+        width: 140,
+      margin: const EdgeInsets.only(right: 16),
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 45),
+            padding: const EdgeInsets.fromLTRB(8, 82, 8, 12),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  member.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                  Text(
+                    member.role.toUpperCase(),
+                    style: TextStyle(
+                      color: isFaculty ? const Color(0xFF00FFCC) : const Color(0xFFB4B0FF),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          Container(
+            margin: const EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: isFaculty
+                    ? [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withOpacity(0.1)]
+                    : [const Color(0xFF4A3AFF), const Color(0xFF00FFCC).withOpacity(0.5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (isFaculty ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 52,
+              backgroundImage: AssetImage(member.image),
+              backgroundColor: const Color(0xFF15151A),
+            ),
+          ),
+        ],
+      ),
+    ),
+    );
+  }
+}
 class _BlogCard extends StatelessWidget {
   const _BlogCard({required this.post});
   final BlogPost post;

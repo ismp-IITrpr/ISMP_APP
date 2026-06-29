@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../models/attendance.dart';
 import '../models/events.dart';
+import '../models/mock_data/events_mock.dart';
 import '../services/firebase_service.dart';
 import '../widgets/scanner_viewfinder.dart';
 import 'detailed_attendance_screen.dart';

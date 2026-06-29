@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import '../models/blog.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
+import '../models/mock_data/blog_mock.dart';
+import '../models/mock_data/events_mock.dart';
+import '../models/mock_data/attendance_mock.dart';
 
 class FirebaseService {
   static final FirebaseService instance = FirebaseService._init();

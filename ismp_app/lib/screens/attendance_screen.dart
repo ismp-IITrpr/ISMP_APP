@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../models/attendance.dart';
+import '../models/events.dart';
 import '../services/firebase_service.dart';
 import '../widgets/scanner_viewfinder.dart';
-import 'dart:math';
+import 'detailed_attendance_screen.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -12,6 +14,22 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
+  final String currentStudentId = "student_123"; // Mock student ID
+  List<EventModel> clubSessions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClubSessions();
+  }
+
+  void _loadClubSessions() {
+    // Flatten all events across all days and filter for 'Club Session'
+    final allEvents = eventsData.values.expand((events) => events).toList();
+    setState(() {
+      clubSessions = allEvents.where((e) => e.type == 'Club Session').toList();
+    });
+  }
 
   void _openMockScanner() {
     showDialog(
@@ -148,7 +166,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   buttonText,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -158,6 +177,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       ),
     );
   }
+
+
 
   Widget _buildStatItem(String label, String value, Color color) {
     return Column(
@@ -214,7 +235,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             final presentCount = records.where((r) => r.isPresent).length;
             final absentCount = totalCount - presentCount;
             final attendancePercentage = totalCount == 0 ? 0.0 : (presentCount / totalCount);
-            final attendancePercentageString = '${(attendancePercentage * 100).toStringAsFixed(0)}%';
+            final attendancePercentageString = '${(attendancePercentage * 100).toInt()}%';
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,41 +244,68 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF14141A),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF23232D)),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF2A2A3D),
+                          Color(0xFF14141A),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                      border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4A3AFF).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.bar_chart,
-                                color: Color(0xFF8B78FF),
-                                size: 20,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.bar_chart,
+                                    color: Color(0xFF8B78FF),
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                const Text(
+                                  'Attendance Overview',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Attendance Overview',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.white.withOpacity(0.05),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 32),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -266,40 +314,70 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 32),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                           child: LinearProgressIndicator(
                             value: attendancePercentage,
-                            backgroundColor: const Color(0xFF23232D),
+                            backgroundColor: const Color(0xFF0F0F13),
                             valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
-                            minHeight: 8,
+                            minHeight: 10,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
                               'Overall attendance',
-                              style: TextStyle(color: Colors.grey, fontSize: 13),
-                            ),
-                            Text(
-                              attendancePercentageString,
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.white70, 
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                attendancePercentageString,
+                                style: const TextStyle(
+                                  color: Color(0xFF8B78FF),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DetailedAttendanceScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.dashboard_customize_outlined, size: 18, color: Color(0xFF8B78FF)),
+                            label: const Text(
+                              'View Club Trophy Boards',
+                              style: TextStyle(
+                                color: Color(0xFF8B78FF),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // Recent Sessions Header
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Row(
@@ -327,8 +405,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     ],
                   ),
                 ),
-
-                // Recent Sessions List
                 Expanded(
                   child: records.isEmpty
                       ? const Center(
@@ -354,7 +430,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: record.iconColor.withValues(alpha: 0.1),
+                                      color: record.iconColor.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(

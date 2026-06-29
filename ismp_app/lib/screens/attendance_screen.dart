@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/events.dart';
+import '../models/attendance.dart';
 import '../services/mock_attendance_service.dart';
 import 'student_scanner_screen.dart';
 import 'detailed_attendance_screen.dart';
@@ -22,11 +23,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   void _loadClubSessions() {
-    // Flatten all events across all days and filter for 'Club Session'
+    // Flatten all events across all days and filter for Club Sessions ('C')
     final allEvents = eventsData.values.expand((events) => events).toList();
     setState(() {
-      clubSessions = allEvents.where((e) => e.type == 'Club Session').toList();
+      clubSessions = allEvents.where((e) => e.type == 'C').toList();
     });
+  }
+
+  bool _isStudentPresent(String eventId, MockAttendanceService service) {
+    // 1. Check live scanner data
+    if (service.isPresent(eventId, currentStudentId)) return true;
+    
+    // 2. Check historical dummy data
+    try {
+      final record = recentSessions.firstWhere((r) => r.eventId == eventId);
+      return record.isPresent;
+    } catch (e) {
+      return false;
+    }
   }
 
   void _openScanner() {
@@ -69,7 +83,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     int presentCount = 0;
     
     for (var session in clubSessions) {
-      if (attendanceService.isPresent(session.id, currentStudentId)) {
+      if (_isStudentPresent(session.id, attendanceService)) {
         presentCount++;
       }
     }
@@ -81,9 +95,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       appBar: AppBar(
-        title: const Text('Attendance'),
-        backgroundColor: const Color(0xFF0F0F13),
+        title: const Text(
+          'Attendance',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: const Color(0xFF090A0F),
         elevation: 0,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
@@ -151,15 +174,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             ),
                           ],
                         ),
-                        // View Details Button
-                        IconButton(
-                          onPressed: () {
-                          },
-                          icon: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.05),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 32),
@@ -167,47 +181,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildStatItem('Total', totalCount.toString(), Colors.white),
-                        _buildStatItem('Present', presentCount.toString(), const Color(0xFF4CAF50)),
-                        _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: LinearProgressIndicator(
-                        value: attendancePercentage,
-                        backgroundColor: const Color(0xFF0F0F13),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
-                        minHeight: 10,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Overall attendance',
-                          style: TextStyle(
-                            color: Colors.white70, 
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4A3AFF).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '${(attendancePercentage * 100).toInt()}%',
-                            style: const TextStyle(
-                              color: Color(0xFF8B78FF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        _buildStatItem('Present', presentCount.toString(), Colors.white),
+                        _buildStatItem('Absent', absentCount.toString(), Colors.white),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -262,7 +237,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 itemCount: clubSessions.length,
                 itemBuilder: (context, index) {
                   final session = clubSessions[index];
-                  final isPresent = attendanceService.isPresent(session.id, currentStudentId);
+                  final isPresent = _isStudentPresent(session.id, attendanceService);
                   
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),

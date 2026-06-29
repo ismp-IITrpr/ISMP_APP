@@ -1,48 +1,35 @@
-import 'package:flutter/material.dart';
-
 class AttendanceRecord {
-  final String title;
-  final String date;
-  final String time;
+  final String eventId;
+  final String eventType;
   final bool isPresent;
-  final Color iconColor;
 
   AttendanceRecord({
-    required this.title,
-    required this.date,
-    required this.time,
+    required this.eventId,
+    required this.eventType,
     required this.isPresent,
-    required this.iconColor,
   });
 }
 
+// Dummy historical data linked strictly to Club Session IDs in events.dart
 final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
-    title: 'Maths Club Meeting',
-    date: '21 May 2024',
-    time: '11:00 AM',
+    eventId: 'C_math_1',
+    eventType: 'C',
     isPresent: true,
-    iconColor: const Color(0xFF8B78FF), // Purple
   ),
   AttendanceRecord(
-    title: 'Arduino Workshop',
-    date: '21 May 2024',
-    time: '02:00 PM',
+    eventId: 'C_ard_1',
+    eventType: 'C',
     isPresent: true,
-    iconColor: const Color(0xFF2196F3), // Blue
   ),
   AttendanceRecord(
-    title: 'Football Practice',
-    date: '21 May 2024',
-    time: '04:30 PM',
+    eventId: 'C_fb_1',
+    eventType: 'C',
     isPresent: false,
-    iconColor: const Color(0xFFFF9800), // Orange
   ),
   AttendanceRecord(
-    title: 'Music Club Jamming',
-    date: '21 May 2024',
-    time: '07:00 PM',
+    eventId: 'C_music_1',
+    eventType: 'C',
     isPresent: true,
-    iconColor: const Color(0xFFE91E63), // Pink
   ),
 ];

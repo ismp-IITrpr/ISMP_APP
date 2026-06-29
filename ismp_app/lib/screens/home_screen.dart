@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/blog.dart';
 
@@ -9,7 +10,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  BlogTag? _activeTag; // null = All
+  BlogTag? _activeTag;
+
+  // Variable list of slideshow photos — add or swap asset paths here
+  static const List<String> _slideshowPhotos = [
+    'assets/Theme images/college.png',
+    'assets/Theme images/login_bg.png',
+    'assets/Theme images/G.png',
+  ];
 
   List<BlogPost> get _filteredPosts => _activeTag == null
       ? blogPosts
@@ -22,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            _buildISMP26Banner(),
+            _buildPhotoSlideshow(),
             _buildHeader(),
             _buildTagFilter(),
             _buildBlogList(),
@@ -31,10 +41,106 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildISMP26Banner() {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 180,
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          image: const DecorationImage(
+            image: AssetImage('assets/Theme images/login_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                const Color(0xFF4A3AFF).withOpacity(0.88),
+                Colors.black.withOpacity(0.45),
+              ],
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/Theme images/ismp_logo.png',
+                height: 64,
+                width: 64,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 18),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'ISMP',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 5,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Text(
+                      "'26",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'IIT Ropar  ·  Batch 2026',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoSlideshow() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: _PhotoSlideshow(photos: _slideshowPhotos),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -133,6 +239,100 @@ class _HomeScreenState extends State<HomeScreen> {
           childCount: posts.length,
         ),
       ),
+    );
+  }
+}
+
+class _PhotoSlideshow extends StatefulWidget {
+  const _PhotoSlideshow({required this.photos});
+  final List<String> photos;
+
+  @override
+  State<_PhotoSlideshow> createState() => _PhotoSlideshowState();
+}
+
+class _PhotoSlideshowState extends State<_PhotoSlideshow> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.photos.length > 1) _startAutoPlay();
+  }
+
+  void _startAutoPlay() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      final next = (_currentPage + 1) % widget.photos.length;
+      _pageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.photos.isEmpty) return const SizedBox.shrink();
+    return Column(
+      children: [
+        SizedBox(
+          height: 210,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (i) => setState(() => _currentPage = i),
+            itemCount: widget.photos.length,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  widget.photos[index],
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1C1C23),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.image_outlined, color: Colors.white24, size: 40),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            widget.photos.length,
+            (i) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: _currentPage == i ? 20 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: _currentPage == i
+                    ? const Color(0xFF4A3AFF)
+                    : Colors.white.withOpacity(0.22),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

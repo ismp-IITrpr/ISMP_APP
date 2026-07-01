@@ -3,6 +3,8 @@ import '../attendance.dart';
 
 final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
+    eventId: 'C_math_1',
+    eventType: 'C',
     title: 'Maths Club Meeting',
     date: '21 May 2024',
     time: '11:00 AM',
@@ -10,6 +12,8 @@ final List<AttendanceRecord> recentSessions = [
     iconColor: const Color(0xFF8B78FF), // Purple
   ),
   AttendanceRecord(
+    eventId: 'C_ard_1',
+    eventType: 'C',
     title: 'Arduino Workshop',
     date: '21 May 2024',
     time: '02:00 PM',
@@ -17,6 +21,8 @@ final List<AttendanceRecord> recentSessions = [
     iconColor: const Color(0xFF2196F3), // Blue
   ),
   AttendanceRecord(
+    eventId: 'C_fb_1',
+    eventType: 'C',
     title: 'Football Practice',
     date: '21 May 2024',
     time: '04:30 PM',
@@ -24,6 +30,8 @@ final List<AttendanceRecord> recentSessions = [
     iconColor: const Color(0xFFFF9800), // Orange
   ),
   AttendanceRecord(
+    eventId: 'C_music_1',
+    eventType: 'C',
     title: 'Music Club Jamming',
     date: '21 May 2024',
     time: '07:00 PM',

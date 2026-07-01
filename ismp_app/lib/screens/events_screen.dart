@@ -23,10 +23,18 @@ class _EventsScreenState extends State<EventsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       appBar: AppBar(
-        title: const Text('Events'),
-        backgroundColor: const Color(0xFF0F0F13),
-        elevation: 1,
-        centerTitle: false,
+        title: const Text(
+          'Events',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: const Color(0xFF090A0F),
+        elevation: 0,
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Column(

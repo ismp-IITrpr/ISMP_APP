@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../models/attendance.dart';
-import '../models/events.dart';
-import '../models/mock_data/events_mock.dart';
 import '../services/firebase_service.dart';
-import '../widgets/scanner_viewfinder.dart';
+import 'student_scanner_screen.dart';
 import 'detailed_attendance_screen.dart';
 
 class AttendanceScreen extends StatefulWidget {
@@ -16,70 +13,23 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   final String currentStudentId = "student_123"; // Mock student ID
-  List<EventModel> clubSessions = [];
 
   @override
   void initState() {
     super.initState();
-    _loadClubSessions();
   }
 
-  void _loadClubSessions() {
-    // Flatten all events across all days and filter for 'Club Session'
-    final allEvents = eventsData.values.expand((events) => events).toList();
-    setState(() {
-      clubSessions = allEvents.where((e) => e.type == 'Club Session').toList();
+  void _openScanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => StudentScannerScreen(studentId: currentStudentId)),
+    ).then((_) {
+      // Refresh the screen when returning from the scanner
+      setState(() {}); 
     });
   }
 
-  void _openMockScanner() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => ScannerViewfinder(
-        onCancel: () {
-          Navigator.pop(dialogContext);
-        },
-        onScanComplete: () {
-          if (!mounted) return;
-          Navigator.pop(dialogContext); // Close scanner viewfinder
 
-          bool isSuccess = Random().nextBool();
-          if (isSuccess) {
-            final titles = [
-              'Coding Contest',
-              'AI Seminar Meeting',
-              'Robotics Lab Session',
-              'IIT Ropar Hackathon'
-            ];
-            final venues = ['Online', 'LH-307', 'Workshop Room', 'Main Auditorium'];
-            final randomIndex = Random().nextInt(4);
-            final record = AttendanceRecord(
-              title: titles[randomIndex],
-              date: '29 Jun 2026',
-              time: '02:00 PM',
-              venue: venues[randomIndex],
-              isPresent: true,
-              iconColor: [
-                const Color(0xFF8B78FF),
-                const Color(0xFF8BC34A),
-                const Color(0xFF2196F3),
-                const Color(0xFFFF9800)
-              ][randomIndex],
-            );
-
-            FirebaseService.instance.addAttendanceRecord(record).then((_) {
-              if (mounted) _showSuccessDialog();
-            }).catchError((e) {
-              if (mounted) _showFailedDialog();
-            });
-          } else {
-            if (mounted) _showFailedDialog();
-          }
-        },
-      ),
-    );
-  }
 
   void _showSuccessDialog() {
     showDialog(
@@ -179,8 +129,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
-
-
   Widget _buildStatItem(String label, String value, Color color) {
     return Column(
       children: [
@@ -210,13 +158,23 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       appBar: AppBar(
-        title: const Text('Attendance'),
-        backgroundColor: const Color(0xFF0F0F13),
+        title: const Text(
+          'Attendance',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: const Color(0xFF090A0F),
         elevation: 0,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
-            onPressed: _openMockScanner,
+            onPressed: _openScanner,
+            tooltip: 'Scan QR Code',
           ),
         ],
       ),

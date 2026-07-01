@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AttendanceRecord {
+  final String eventId;
+  final String eventType;
   final String title;
   final String date;
   final String time;
@@ -9,6 +11,8 @@ class AttendanceRecord {
   final Color iconColor;
 
   AttendanceRecord({
+    this.eventId = '',
+    this.eventType = '',
     required this.title,
     required this.date,
     required this.time,
@@ -19,6 +23,8 @@ class AttendanceRecord {
 
   Map<String, dynamic> toMap() {
     return {
+      'eventId': eventId,
+      'eventType': eventType,
       'title': title,
       'date': date,
       'time': time,
@@ -30,6 +36,8 @@ class AttendanceRecord {
 
   factory AttendanceRecord.fromMap(Map<String, dynamic> map) {
     return AttendanceRecord(
+      eventId: map['eventId'] ?? '',
+      eventType: map['eventType'] ?? '',
       title: map['title'] ?? '',
       date: map['date'] ?? '',
       time: map['time'] ?? '',
@@ -39,4 +47,3 @@ class AttendanceRecord {
     );
   }
 }
-

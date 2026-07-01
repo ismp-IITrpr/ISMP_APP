@@ -88,23 +88,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text(
                     'Institute Student',
                     style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.white,
+                      fontSize: 26,
+                      color: Color(0xFFE6E6FA),
+                      fontWeight: FontWeight.bold
+
                     ),
                   ),
                   const Text(
                     'Mentorship Program',
                     style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.white,
+                      fontSize: 26,
+                      color: Color(0xFFE6E6FA),
+                      fontWeight: FontWeight.bold
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 15),
                   const Text(
                     'IIT Ropar',
                     style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.deepPurpleAccent,
+                      fontSize: 40,
+                      color: Color(0xFFE6E6FA),
+                      fontWeight: FontWeight.bold
                     ),
                   ),
                 ]
@@ -125,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Colors.black,
                     Colors.transparent
                   ],
-                  stops: [0.0, 0.3, 0.8, 1.0],
+                  stops: [0.0, 0.3, 0.6, 1.0],
                 ).createShader(bounds);
               },
               blendMode: BlendMode.dstIn,

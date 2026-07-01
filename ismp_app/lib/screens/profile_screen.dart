@@ -1,47 +1,65 @@
 import 'package:flutter/material.dart';
+import '../models/profile_data.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  static const Color backgroundColor = Color(0xFF0F0F13);
-  static const Color cardColor = Color(0xFF1C1C23);
-  static const Color borderColor = Color(0xFF23232D);
-  static const Color accentColor = Color(0xFF8B78FF);
-  static const Color deepAccentColor = Color(0xFF4A3AFF);
+  static const int TOTAL_STICKERS = 36;
 
-  static const String name = 'Rohan Sharma';
-  static const String entryNumber = '24CS1001';
-  static const String degree = 'B.Tech';
-  static const String branch = 'Computer Science & Engineering';
-  static const String groupNumber = 'Group 07';
-  static const String stickersCollected = '12/36';
-
-  static const String mentorName = 'Aarav Mehta';
-  static const String mentorEntryNumber = '22CS1045';
-  static const String mentorEnrollmentNumber = 'IITRPR/2022/CSE/1045';
-  static const String mentorPhone = '+91 98765 43210';
+  // Colors based on reference images
+  static const Color bgColor = Color(0xFF090A0F); // Very dark navy/black
+  static const Color surfaceColor = Color(0xFF12131A);
+  static const Color iconBgColor = Color(0xFF1C1C23); // Dark background for icons
+  static const Color primaryPurple = Color(0xFF8B78FF); // Vibrant purple for icons/text
+  static const Color textGray = Color(0xFF8B8B9B);
+  static const Color dividerColor = Color(0xFF1A1A24);
 
   @override
   Widget build(BuildContext context) {
+    final user = dummyUser;
+
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('My Profile'),
-        backgroundColor: backgroundColor,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: bgColor,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStudentCard(),
-              const SizedBox(height: 20),
-              _buildSectionTitle('Mentor Details'),
-              const SizedBox(height: 12),
-              _buildMentorCard(),
+              // Mentor Profile Section
+              if (user.mentor != null) ...[
+                _buildSectionHeader('YOUR MENTOR'),
+                const SizedBox(height: 16),
+                _buildMentorContainer(user.mentor!),
+                const SizedBox(height: 40),
+              ],
+
+              // User Profile Section
+              _buildSectionHeader('YOUR PROFILE'),
+              const SizedBox(height: 16),
+              _buildUserContainer(user),
+              
+              const SizedBox(height: 48),
+
+              // Logout Button
+              _buildLogoutButton(context),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -49,226 +67,187 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildAvatar(radius: 52, iconSize: 56),
-              const SizedBox(width: 20),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      entryNumber,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.workspace_premium_outlined,
-                          color: Color(0xFFFFC107),
-                          size: 20,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          stickersCollected,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          "Stickers",
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 26),
-          _buildDetailRow(
-            Icons.school_outlined,
-            'Degree',
-            degree,
-          ),
-          _buildDetailRow(
-            Icons.account_tree_outlined,
-            'Branch',
-            branch,
-          ),
-          _buildDetailRow(
-            Icons.groups_2_outlined,
-            'Group Number',
-            groupNumber,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMentorCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              _buildAvatar(radius: 34, iconSize: 36),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      mentorName,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      mentorEntryNumber,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          _buildDetailRow(
-            Icons.badge_outlined,
-            'Enrollment Number',
-            mentorEnrollmentNumber,
-          ),
-          _buildDetailRow(
-            Icons.phone_outlined,
-            'Phone',
-            mentorPhone,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
+  // Header with text and a line in the same row
+  Widget _buildSectionHeader(String title) {
     return Row(
       children: [
-        Container(
-          height: 28,
-          width: 4,
-          decoration: BoxDecoration(
-            color: accentColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        const SizedBox(width: 10),
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
+            color: textGray,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(width: 16),
+        const Expanded(
+          child: Divider(
+            color: dividerColor,
+            thickness: 1,
+            height: 1,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildAvatar({required double radius, required double iconSize}) {
+  // Mentor Profile Container
+  Widget _buildMentorContainer(MentorProfile mentor) {
     return Container(
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [accentColor, deepAccentColor],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: accentColor.withOpacity(0.24),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
       ),
-      child: CircleAvatar(
-        radius: radius,
-        backgroundColor: const Color(0xFF2A2A35),
-        child: Icon(Icons.person, size: iconSize, color: Colors.white70),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMentorHeader(mentor),
+          const SizedBox(height: 24),
+          _buildDetailRow(Icons.badge_outlined, 'Roll Number', mentor.rollNo),
+          _buildListDivider(),
+          _buildDetailRow(Icons.phone_outlined, 'Contact', mentor.contactNo),
+        ],
       ),
     );
   }
 
-  Widget _buildDetailRow(
-      IconData icon,
-      String label,
-      String value,
-      ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
-      child: Row(
+  // User Profile Container
+  Widget _buildUserContainer(UserProfile user) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 46,
-            child: Icon(
-              icon,
-              color: Colors.grey.shade500,
-              size: 30,
+          _buildUserHeader(user),
+          const SizedBox(height: 24),
+          _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
+          _buildListDivider(),
+          _buildDetailRow(Icons.school_outlined, 'Degree', user.degree),
+          _buildListDivider(),
+          _buildDetailRow(Icons.account_tree_outlined, 'Branch', user.branch),
+          _buildListDivider(),
+          _buildDetailRow(Icons.groups_2_outlined, 'Group No.', "${user.groupNo}"),
+        ],
+      ),
+    );
+  }
+
+  // Mentor Header (Centered Avatar with Name below)
+  Widget _buildMentorHeader(MentorProfile mentor) {
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildAvatar(
+            name: mentor.name,
+            url: mentor.profileUrl,
+            radius: 40,
+            fontSize: 32,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            mentor.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.5,
             ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Mentor',
+            style: TextStyle(
+              color: primaryPurple,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // User Header (Avatar, Name, Sticker Pill - without "Student" text)
+  Widget _buildUserHeader(UserProfile user) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildAvatar(
+          name: user.name,
+          url: user.profileUrl,
+          radius: 36,
+          fontSize: 28,
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Pill showing Stickers collected
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.workspace_premium_outlined, color: primaryPurple, size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${user.stickersCollected}/$TOTAL_STICKERS Stickers',
+                      style: const TextStyle(
+                        color: textGray,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Detail Row
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: primaryPurple, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -277,26 +256,94 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
+                  style: const TextStyle(
+                    color: textGray,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   value,
                   style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Divider inside the list
+  Widget _buildListDivider() {
+    return const Padding(
+      padding: EdgeInsets.only(left: 60), // Align divider with text, skip icon
+      child: Divider(
+        color: dividerColor,
+        height: 16,
+        thickness: 1,
+      ),
+    );
+  }
+
+  // Helper for Avatars
+  Widget _buildAvatar({
+    required String name,
+    required String url,
+    required double radius,
+    required double fontSize,
+  }) {
+    final String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: iconBgColor,
+      backgroundImage: url.isNotEmpty ? (url.startsWith('http') ? NetworkImage(url) : AssetImage(url) as ImageProvider) : null,
+      child: url.isEmpty
+          ? Text(
+              initial,
+              style: TextStyle(
+                color: primaryPurple,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: TextButton(
+        onPressed: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+        },
+        style: TextButton.styleFrom(
+          backgroundColor: const Color(0xFFF44336).withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Text(
+          'Log Out',
+          style: TextStyle(
+            color: Color(0xFFF44336),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

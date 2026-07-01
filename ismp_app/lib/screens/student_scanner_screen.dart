@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/mock_attendance_service.dart';
+import '../models/mock_data/events_mock.dart';
+import '../models/attendance.dart';
+import '../services/firebase_service.dart';
 
 class StudentScannerScreen extends StatefulWidget {
   final String studentId;
@@ -26,7 +29,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
         _isProcessing = true;
       });
 
-      // The QR code should contain the Event ID, e.g., 'evt_math_1'
+      // The QR code should contain the Event ID, e.g., 'evt_math_1' or 'C_math_1'
       final String eventId = scannedCode.trim();
 
       // Run our 2-minute time window logic
@@ -37,6 +40,23 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       cameraController.stop();
 
       if (success) {
+        try {
+          final allEvents = eventsData.values.expand((events) => events).toList();
+          final event = allEvents.firstWhere((e) => e.id == eventId);
+          final record = AttendanceRecord(
+            eventId: event.id,
+            eventType: event.type,
+            title: event.title,
+            date: event.date,
+            time: event.time,
+            venue: event.venue,
+            isPresent: true,
+            iconColor: event.dotColor,
+          );
+          await FirebaseService.instance.addAttendanceRecord(record);
+        } catch (e) {
+          debugPrint('Error writing scanned attendance to Firestore: $e');
+        }
         _showSuccessDialog();
       } else {
         _showFailedDialog();

@@ -7,7 +7,7 @@ class EventModel {
   final String date;  // Format: 'yyyy-MM-dd' e.g. '2024-05-21'
   final String time;
   final String venue;
-  final String type;
+  final String type; // 'E' for Events, 'C' for Club Sessions
   final List<int> groupNo;
   final String description;
   final Color dotColor;
@@ -64,4 +64,3 @@ class EventModel {
     }
   }
 }
-

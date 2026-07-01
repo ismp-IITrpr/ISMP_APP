@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f511fbce-4826-478b-9d03-43c08ef60647" name="Changes" comment="" />
+    <list default="true" id="f511fbce-4826-478b-9d03-43c08ef60647" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ismp_app/lib/services/database_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ismp_app/lib/models/profile_data.dart" beforeDir="false" afterPath="$PROJECT_DIR$/ismp_app/lib/models/profile_data.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,8 +55,9 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/harsh/Downloads/ISMP_app-main",
-    "settings.editor.selected.configurable": "configurable.group.tools"
+    "last_opened_file_path": "C:/Users/chopr/Downloads/ISMP_app-main/ISMP_app",
+    "settings.editor.selected.configurable": "configurable.group.tools",
+    "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
   <component name="TaskManager">

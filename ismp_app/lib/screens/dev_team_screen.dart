@@ -5,8 +5,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/team_member.dart';
 
-class CoreTeamScreen extends StatelessWidget {
-  const CoreTeamScreen({super.key});
+class DevTeamScreen extends StatelessWidget {
+  const DevTeamScreen({super.key});
 
   Future<void> _launchUrl(String? urlString) async {
     if (urlString == null) return;
@@ -113,7 +113,7 @@ class CoreTeamScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // We will use a Container for the gradient
+      backgroundColor: const Color(0xFF0A0A10), // Extremely dark sleek background
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -134,24 +134,10 @@ class CoreTeamScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2B124C), // Shiny Purple
-              Color(0xFF0F0F13), // Midnight Dark
-              Color(0xFF1E103C), // Deep Indigo
-              Color(0xFF0F0F13), // Midnight Dark
-            ],
-            stops: [0.0, 0.4, 0.7, 1.0],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // 1. Creative Glowing Orbs
-            Positioned(
+      body: Stack(
+        children: [
+          // 1. Creative Glowing Orbs
+          Positioned(
             top: -100,
             right: -100,
             child: Container(
@@ -210,7 +196,7 @@ class CoreTeamScreen extends StatelessWidget {
                       ).animate().fadeIn(duration: 800.ms).slideY(begin: -0.5, curve: Curves.easeOutBack),
                       const SizedBox(height: 20),
                       const Text(
-                        'Mentorship\nCore Team',
+                        'Development\nTeam',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -225,67 +211,41 @@ class CoreTeamScreen extends StatelessWidget {
                 ),
               ),
               
-              // Custom Layout for exactly 7 members
-              if (coreTeamMembers.length >= 7)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        // Row 1: Faculty Advisor
-                        _buildCreativeMemberCard(context, coreTeamMembers[0], 0),
-                        // Student Team (Secretary & Co-Secretaries in rows of 2)
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            double itemWidth = (constraints.maxWidth - 16) / 2; 
-                            return Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 16,
-                              runSpacing: 0,
-                              children: [
-                                for (int i = 1; i < coreTeamMembers.length; i++)
-                                  SizedBox(
-                                    width: itemWidth,
-                                    child: _buildCreativeMemberCard(context, coreTeamMembers[i], i, scaleMode: 1),
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else 
-                // Fallback for different counts
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _buildCreativeMemberCard(context, coreTeamMembers[index], index);
-                      },
-                      childCount: coreTeamMembers.length,
-                    ),
+              // Layout for all members (2 per row)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      double itemWidth = (constraints.maxWidth - 16) / 2; 
+                      return Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 16,
+                        runSpacing: 0,
+                        children: [
+                          for (int i = 0; i < devTeamMembers.length; i++)
+                            SizedBox(
+                              width: itemWidth,
+                              child: _buildCreativeMemberCard(context, devTeamMembers[i], i, scaleMode: 1),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
+              ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 80)),
             ],
           ),
         ],
       ),
-      ),
     );
   }
 
   // scaleMode: 0 = Full width, 1 = 2 per row, 2 = 3 per row
   Widget _buildCreativeMemberCard(BuildContext context, TeamMember member, int index, {int scaleMode = 0}) {
-    if (index == 0) {
-      return _buildFacultyCard(context, member);
-    }
-
-    bool isSpecial = index == 0 || index == 1; // Faculty and Secretary get the green accent
+    bool isSpecial = true; // Everyone gets the green accent
     
     // Dynamic sizing based on row capacity
     double avatarRadius = scaleMode == 0 ? 64 : (scaleMode == 1 ? 64 : 64);

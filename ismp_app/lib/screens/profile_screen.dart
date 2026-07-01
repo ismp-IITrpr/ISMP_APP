@@ -304,7 +304,7 @@ class ProfileScreen extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor: iconBgColor,
-      backgroundImage: url.isNotEmpty ? NetworkImage(url) : null,
+      backgroundImage: url.isNotEmpty ? (url.startsWith('http') ? NetworkImage(url) : AssetImage(url) as ImageProvider) : null,
       child: url.isEmpty
           ? Text(
               initial,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/attendance.dart';
 import '../models/events.dart';
+import '../models/mock_data/attendance_mock.dart';
+import '../models/mock_data/events_mock.dart';
 
 /// ---------------------------------------------------------------------
 /// THEME NOTE:

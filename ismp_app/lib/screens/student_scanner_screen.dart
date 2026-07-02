@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../services/mock_attendance_service.dart';
-import '../models/mock_data/events_mock.dart';
-import '../models/attendance.dart';
-import '../services/firebase_service.dart';
+import '../services/attendance_service.dart';
+import '../services/database_service.dart';
 
 class StudentScannerScreen extends StatefulWidget {
   final String studentId;
@@ -29,37 +27,29 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
         _isProcessing = true;
       });
 
-      // The QR code should contain the Event ID, e.g., 'evt_math_1' or 'C_math_1'
-      final String eventId = scannedCode.trim();
+      final String sessionId = scannedCode.trim();
 
-      // Run our 2-minute time window logic
-      final service = MockAttendanceService();
-      final bool success = service.markAttendance(eventId, widget.studentId);
-
-      // Stop camera while showing dialog
+      // Stop camera while processing and showing dialog
       cameraController.stop();
 
+      bool success = false;
+      String errorMessage = 'Unable to mark attendance.\nPlease try again.';
+
+      try {
+        final userProfile = await DatabaseService().getUserProfile(widget.studentId);
+        final studentName = userProfile?.name ?? "Student";
+        
+        await AttendanceService().scanQR(sessionId, widget.studentId, studentName);
+        success = true;
+      } catch (e) {
+        debugPrint('Error marking attendance: $e');
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      }
+
       if (success) {
-        try {
-          final allEvents = eventsData.values.expand((events) => events).toList();
-          final event = allEvents.firstWhere((e) => e.id == eventId);
-          final record = AttendanceRecord(
-            eventId: event.id,
-            eventType: event.type,
-            title: event.title,
-            date: event.date,
-            time: event.time,
-            venue: event.venue,
-            isPresent: true,
-            iconColor: event.dotColor,
-          );
-          await FirebaseService.instance.addAttendanceRecord(record);
-        } catch (e) {
-          debugPrint('Error writing scanned attendance to Firestore: $e');
-        }
         _showSuccessDialog();
       } else {
-        _showFailedDialog();
+        _showFailedDialog(errorMessage);
       }
     }
   }
@@ -79,7 +69,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
     );
   }
 
-  void _showFailedDialog() {
+  void _showFailedDialog([String? message]) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -88,7 +78,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
         icon: Icons.cancel_outlined,
         iconColor: const Color(0xFFF44336),
         title: 'Failed!',
-        message: 'The attendance window for this event has closed (2-minute limit).',
+        message: message ?? 'The attendance window for this event has closed (2-minute limit).',
         buttonText: 'Go Back',
       ),
     );

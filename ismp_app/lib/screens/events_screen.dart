@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/events.dart';
+import '../models/profile_data.dart'; // for dummyUser.rollNo — used for the rep check
+import '../screens/rep_access.dart';
+import 'rep_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -19,6 +22,10 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     final dailyEvents = eventsData[_selectedDay] ?? [];
+
+    // Same login for everyone — no manual role picker. Whether the
+    // "Start Attendance" button shows up is decided purely by this check.
+    final bool isRep = isCurrentUserRep(dummyUser.rollNo);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
@@ -141,6 +148,9 @@ class _EventsScreenState extends State<EventsScreen> {
                   final event = dailyEvents[index];
                   final isLast = index == dailyEvents.length - 1;
 
+                  // Only club sessions ('C') get a "Start Attendance" action.
+                  final bool showStartAttendance = isRep && event.type == 'C';
+
                   return IntrinsicHeight(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -227,6 +237,37 @@ class _EventsScreenState extends State<EventsScreen> {
                                     fontSize: 12,
                                   ),
                                 ),
+                                if (showStartAttendance) ...[
+                                  const SizedBox(height: 14),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                RepAttendanceScreen(event: event),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.qr_code_2_rounded, size: 18),
+                                      label: const Text(
+                                        'Start Attendance',
+                                        style: TextStyle(fontWeight: FontWeight.w600),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF4A3AFF),
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

@@ -17,6 +17,18 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
+    // TEMPORARY BYPASS: Navigate directly to main screen without Google OAuth
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainLayout()),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {

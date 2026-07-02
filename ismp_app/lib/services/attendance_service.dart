@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/attendance.dart';
+import '../models/events.dart';
 
 class AttendanceService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -107,6 +109,18 @@ class AttendanceService {
     required String eventType,
     required List<String> presentRollNos,
   }) async {
+    // Fetch event details to populate title, date, time, venue, iconColor in the student's record
+    EventModel? event;
+    try {
+      final eventQuery = await _db.collection('events').where('id', isEqualTo: eventId).limit(1).get();
+      if (eventQuery.docs.isNotEmpty) {
+        event = EventModel.fromMap(eventQuery.docs.first.data());
+      }
+    } catch (e) {
+      // Fallback in case of query error
+      debugPrint("Error fetching event details: $e");
+    }
+
     final batch = _db.batch();
 
     // Loop through each present roll number and mark present in users/{rollNo}/attendance/{eventId}
@@ -120,7 +134,12 @@ class AttendanceService {
       final record = AttendanceRecord(
         eventId: eventId,
         eventType: eventType,
+        title: event?.title ?? '',
+        date: event?.date ?? '',
+        time: event?.time ?? '',
+        venue: event?.venue ?? '',
         isPresent: true,
+        iconColor: event?.dotColor ?? const Color(0xFF4A3AFF),
         markedAt: DateTime.now(),
       );
 

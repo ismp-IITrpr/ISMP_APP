@@ -256,13 +256,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 ),
                               ],
                             ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
-                              style: IconButton.styleFrom(
-                                backgroundColor: Colors.white.withOpacity(0.05),
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 32),

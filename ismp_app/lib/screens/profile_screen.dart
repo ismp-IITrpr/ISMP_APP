@@ -20,7 +20,8 @@ class ProfileScreen extends StatelessWidget {
     final user = dummyUser;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
           'Profile',
@@ -31,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        backgroundColor: bgColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),

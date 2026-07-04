@@ -5,7 +5,7 @@ final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
     eventId: 'C_math_1',
     eventType: 'C',
-    title: 'Maths Club Meeting',
+    title: 'Coding Club',
     date: '21 May 2024',
     time: '11:00 AM',
     isPresent: true,
@@ -14,7 +14,7 @@ final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
     eventId: 'C_ard_1',
     eventType: 'C',
-    title: 'Arduino Workshop',
+    title: 'Robotics',
     date: '21 May 2024',
     time: '02:00 PM',
     isPresent: true,
@@ -23,7 +23,7 @@ final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
     eventId: 'C_fb_1',
     eventType: 'C',
-    title: 'Football Practice',
+    title: 'Football',
     date: '21 May 2024',
     time: '04:30 PM',
     isPresent: false,
@@ -32,7 +32,7 @@ final List<AttendanceRecord> recentSessions = [
   AttendanceRecord(
     eventId: 'C_music_1',
     eventType: 'C',
-    title: 'Music Club Jamming',
+    title: 'Alankar',
     date: '21 May 2024',
     time: '07:00 PM',
     isPresent: true,

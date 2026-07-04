@@ -1,139 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/attendance.dart';
-import '../models/events.dart';
 import '../models/mock_data/attendance_mock.dart';
-import '../models/mock_data/events_mock.dart';
 
-/// ---------------------------------------------------------------------
-/// THEME NOTE:
-/// These constants mirror the colors already used across Attendance /
-/// Profile / Home screens (sampled from the app itself). If you already
-/// have a shared `AppColors` / `AppTheme` class, just swap these consts
-/// for references to it — the rest of the widget doesn't care where the
-/// colors come from.
-/// ---------------------------------------------------------------------
-class _AppTheme {
-  static const Color bg = Color(0xFF0F0F13); // Scaffold background
-  static const Color card = Color(0xFF1C1C23); // flat card bg (session tiles, nav bar)
-  static const Color cardAlt = Color(0xFF12131A); // flat card bg (profile-style cards)
-  static const Color primary = Color(0xFF4A3AFF); // main indigo accent
-  static const Color primaryLight = Color(0xFF8B78FF); // lighter lavender accent
-  static const Color success = Color(0xFF4CAF50); // "Present" green
-  static const Color error = Color(0xFFF44336); // "Absent" red
-  static const Color border = Colors.white10; // subtle card border
-}
+/// Total stickers that can be collected across all clubs.
+const int TOTAL_STICKERS = 36;
 
 class DetailedAttendanceScreen extends StatelessWidget {
   const DetailedAttendanceScreen({super.key});
 
-  final String currentStudentId = "student_123";
-
-  // All boards now live in the same indigo/violet family as the rest of
-  // the app (varying only in brightness), instead of a multi-hue rainbow.
+  // ── Club data per board ──────────────────────────────────────────────
+  // 'image' is the filename inside assets/images/clubs/
+  // Matching is done by exact club name against attendance record title.
   static const Map<String, List<Map<String, dynamic>>> boardClubs = {
-    'BOSA': [
-      {'name': 'Athletic', 'emoji': '🏃', 'keywords': ['athletic']},
-      {'name': 'Badminton', 'emoji': '🏸', 'keywords': ['badminton']},
-      {'name': 'Basketball', 'emoji': '🏀', 'keywords': ['basketball']},
-      {'name': 'Chess', 'emoji': '♟️', 'keywords': ['chess']},
-      {'name': 'Cricket', 'emoji': '🏏', 'keywords': ['cricket']},
-      {'name': 'Football', 'emoji': '⚽', 'keywords': ['football']},
-      {'name': 'Hockey', 'emoji': '🏑', 'keywords': ['hockey']},
-      {'name': 'Tennis', 'emoji': '🎾', 'keywords': ['tennis']},
-      {'name': 'Table Tennis', 'emoji': '🏓', 'keywords': ['table tennis']},
-      {'name': 'Volleyball', 'emoji': '🏐', 'keywords': ['volleyball']},
-      {'name': 'Weightlifting', 'emoji': '🏋️', 'keywords': ['weightlifting']},
-    ],
     'BOLA': [
-      {'name': 'Alfaaz', 'emoji': '🎤', 'keywords': ['alfaaz']},
-      {'name': 'Alpha', 'emoji': '📖', 'keywords': ['alpha']},
-      {'name': 'DebSoc', 'emoji': '🎙️', 'keywords': ['debate', 'debsoc']},
-      {'name': 'Ennarators', 'emoji': '📝', 'keywords': ['ennarators']},
-      {'name': 'Enigma', 'emoji': '🧩', 'keywords': ['enigma']},
-      {'name': 'Filmski', 'emoji': '🎬', 'keywords': ['film', 'filmski']},
-      {'name': 'MUN', 'emoji': '🌍', 'keywords': ['mun']},
+      {'name': 'Alfaaz', 'image': 'alfaaz.png'},
+      {'name': 'Alpha', 'image': 'alpha.png'},
+      {'name': 'DebSoc', 'image': 'debsoc.png'},
+      {'name': 'Ennarators', 'image': 'enn.png'},
+      {'name': 'Enigma', 'image': 'enigma.png'},
+      {'name': 'Filmski', 'image': 'filmski.png'},
+      {'name': 'MUN', 'image': 'mun.png'},
     ],
     'BOCA': [
-      {'name': 'Alankar', 'emoji': '🎵', 'keywords': ['music', 'alankar']},
-      {'name': 'Arturo', 'emoji': '🎨', 'keywords': ['art', 'arturo']},
-      {'name': "D'Cypher", 'emoji': '💃', 'keywords': ['dance', "d'cypher", 'dcypher']},
-      {'name': 'Epicure', 'emoji': '🍽️', 'keywords': ['epicure', 'food']},
-      {'name': 'Panache', 'emoji': '✨', 'keywords': ['panache', 'fashion']},
-      {'name': 'Undekha', 'emoji': '📸', 'keywords': ['undekha', 'photo']},
-      {'name': 'Vibgyor', 'emoji': '🌈', 'keywords': ['vibgyor']},
+      {'name': 'Alankar', 'image': 'alankar.png'},
+      {'name': 'Arturo', 'image': 'arturo.png'},
+      {'name': "D'Cypher", 'image': 'dcypher.png'},
+      {'name': 'Epicure', 'image': 'epicure.png'},
+      {'name': 'Panache', 'image': 'panache.png'},
+      {'name': 'Undekha', 'image': 'undekha.png'},
+      {'name': 'Vibgyor', 'image': 'vibgyor.png'},
     ],
     'BOST': [
-      {'name': 'Zenith', 'emoji': '🚀', 'keywords': ['zenith']},
-      {'name': 'E-Sportz', 'emoji': '🎮', 'keywords': ['esportz', 'e-sportz', 'gaming']},
-      {'name': 'Monochrome', 'emoji': '📷', 'keywords': ['monochrome']},
-      {'name': 'Robotics', 'emoji': '🤖', 'keywords': ['robotics', 'arduino']},
-      {'name': 'Softcom', 'emoji': '💻', 'keywords': ['softcom']},
-      {'name': 'Coding Club', 'emoji': '⌨️', 'keywords': ['coding', 'maths']},
-      {'name': 'FinCom', 'emoji': '💰', 'keywords': ['fincom', 'finance']},
-      {'name': 'CIM', 'emoji': '📊', 'keywords': ['cim']},
-      {'name': 'Iota Cluster', 'emoji': '⚡', 'keywords': ['iota']},
-      {'name': 'Automotive', 'emoji': '🚗', 'keywords': ['automotive']},
-      {'name': 'Aeromodelling', 'emoji': '✈️', 'keywords': ['aero']},
+      {'name': 'Zenith', 'image': 'zenith.png'},
+      {'name': 'E-Sportz', 'image': 'esportz.png'},
+      {'name': 'Monochrome', 'image': 'monochrome.png'},
+      {'name': 'Robotics', 'image': 'robotics.png'},
+      {'name': 'Softcom', 'image': 'softcom.png'},
+      {'name': 'Coding Club', 'image': 'coding.png'},
+      {'name': 'FinCom', 'image': 'fincom.png'},
+      {'name': 'CIM', 'image': 'cim.png'},
+      {'name': 'Iota Cluster', 'image': 'BOST.png'},
+      {'name': 'Automotive', 'image': 'auto.png'},
+      {'name': 'Aeromodelling', 'image': 'aero.png'},
+    ],
+    'BOSA': [
+      {'name': 'Athletic', 'image': 'BOSA.png'},
+      {'name': 'Badminton', 'image': 'BOSA.png'},
+      {'name': 'Basketball', 'image': 'BOSA.png'},
+      {'name': 'Chess', 'image': 'BOSA.png'},
+      {'name': 'Cricket', 'image': 'BOSA.png'},
+      {'name': 'Football', 'image': 'BOSA.png'},
+      {'name': 'Hockey', 'image': 'BOSA.png'},
+      {'name': 'Tennis', 'image': 'BOSA.png'},
+      {'name': 'Table Tennis', 'image': 'BOSA.png'},
+      {'name': 'Volleyball', 'image': 'BOSA.png'},
+      {'name': 'Weightlifting', 'image': 'BOSA.png'},
     ],
   };
 
+  // Board accent colors — all in the indigo/violet family
   static const Map<String, Color> boardColors = {
-    'BOSA': _AppTheme.primary, // 0xFF4A3AFF
-    'BOLA': Color(0xFF6C5DD3), // deeper violet
-    'BOCA': _AppTheme.primaryLight, // 0xFF8B78FF
-    'BOST': Color(0xFF7A6CF0), // mid indigo
+    'BOSA': Color(0xFF4A3AFF),
+    'BOLA': Color(0xFF6C5DD3),
+    'BOCA': Color(0xFF8B78FF),
+    'BOST': Color(0xFF7A6CF0),
   };
 
-  static const Map<String, IconData> boardIcons = {
-    'BOSA': Icons.sports_soccer_outlined,
-    'BOLA': Icons.menu_book_outlined,
-    'BOCA': Icons.palette_outlined,
-    'BOST': Icons.computer_outlined,
+  // Board full names for display
+  static const Map<String, String> boardFullNames = {
+    'BOSA': 'Board of Sports Activities',
+    'BOLA': 'Board of Literary Activities',
+    'BOCA': 'Board of Cultural Activities',
+    'BOST': 'Board of Science & Technology',
   };
 
-  bool _eventMatchesClub(EventModel event, List<dynamic> keywords) {
-    final title = event.title.toLowerCase();
-    return keywords.any((k) => title.contains((k as String).toLowerCase()));
-  }
-
-  String _getClubStatus(List<dynamic> keywords, List<EventModel> allClubEvents) {
-    EventModel? matchedEvent;
-    for (var e in allClubEvents) {
-      if (_eventMatchesClub(e, keywords)) {
-        matchedEvent = e;
-        break;
+  /// Returns 'present', 'absent', or 'locked' for a club.
+  /// Matches attendance record title exactly with the club name.
+  String _getClubStatus(String clubName) {
+    for (var record in recentSessions) {
+      if (record.title == clubName) {
+        return record.isPresent ? 'present' : 'absent';
       }
     }
-    if (matchedEvent == null) return 'locked';
-    final record = recentSessions.firstWhere(
-          (r) => r.eventId == matchedEvent!.id,
-      orElse: () => AttendanceRecord(eventId: '', eventType: '', isPresent: false),
-    );
-    if (record.eventId.isEmpty) return 'locked';
-    return record.isPresent ? 'present' : 'absent';
+    return 'locked';
+  }
+
+  /// Counts how many stickers are collected (status == 'present') across all boards.
+  int _countCollectedStickers() {
+    int count = 0;
+    for (var clubs in boardClubs.values) {
+      for (var club in clubs) {
+        if (_getClubStatus(club['name'] as String) == 'present') {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   @override
   Widget build(BuildContext context) {
-    final allClubEvents = eventsData.values
-        .expand((e) => e)
-        .where((e) => e.type == 'C')
-        .toList();
-
-    int totalStickers = recentSessions.where((r) => r.isPresent).length;
+    final int collected = _countCollectedStickers();
 
     return Scaffold(
-      backgroundColor: _AppTheme.bg,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: _AppTheme.bg,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
         title: const Text(
-          'Club Trophy Boards',
+          'Sticker Collection',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -143,63 +124,36 @@ class DetailedAttendanceScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              const Text(
-                'ISMP',
-                style: TextStyle(
-                  color: _AppTheme.primary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2,
-                ),
-              ).animate().fadeIn(duration: 600.ms),
-              const SizedBox(height: 4),
-              const Text(
-                'Sticker Collection',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.05),
-              const SizedBox(height: 4),
-              Text(
-                'Attend club sessions to collect stickers & level up!',
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
-              ).animate().fadeIn(duration: 600.ms),
+              // ── Stickers Collected Header ──
+              _buildStickersHeader(collected)
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .slideY(begin: -0.05),
               const SizedBox(height: 20),
 
-              // Rank Card
-              _buildRankCard(totalStickers)
-                  .animate()
-                  .fadeIn(duration: 700.ms, delay: 100.ms)
-                  .slideY(begin: 0.1),
-              const SizedBox(height: 12),
-
-              // Legend
+              // ── Legend ──
               _buildLegend()
                   .animate()
-                  .fadeIn(duration: 600.ms, delay: 200.ms),
-              const SizedBox(height: 20),
+                  .fadeIn(duration: 600.ms, delay: 100.ms),
+              const SizedBox(height: 24),
 
-              // Board sections
-              ...boardColors.keys.toList().asMap().entries.map((entry) {
+              // ── Board Sections ──
+              ...boardClubs.keys.toList().asMap().entries.map((entry) {
                 final index = entry.key;
                 final board = entry.value;
                 return _buildBoardSection(
                   board,
                   boardColors[board]!,
-                  boardIcons[board]!,
                   boardClubs[board]!,
-                  allClubEvents,
                 ).animate().fadeIn(
                   duration: 700.ms,
-                  delay: (300 + index * 100).ms,
-                ).slideY(begin: 0.1);
+                  delay: (200 + index * 120).ms,
+                ).slideY(begin: 0.08);
               }),
             ],
           ),
@@ -208,166 +162,120 @@ class DetailedAttendanceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRankCard(int totalStickers) {
-    // Rank tiers now stay within the app's indigo/violet family
-    // (increasing brightness = higher rank) instead of an
-    // unrelated gold/cyan palette.
-    String tag;
-    Color tagColor;
-    String emoji;
-    String nextRank;
-    int needed;
-
-    if (totalStickers >= 36) {
-      tag = 'Extraordinary'; tagColor = const Color(0xFFAFA3FF);
-      emoji = '⚡'; nextRank = 'Max Rank!'; needed = 0;
-    } else if (totalStickers >= 20) {
-      tag = 'Legend'; tagColor = const Color(0xFF6C5DD3);
-      emoji = '👑'; nextRank = 'Extraordinary'; needed = 36 - totalStickers;
-    } else if (totalStickers >= 12) {
-      tag = 'Achiever'; tagColor = _AppTheme.primaryLight;
-      emoji = '🚀'; nextRank = 'Legend'; needed = 20 - totalStickers;
-    } else if (totalStickers >= 5) {
-      tag = 'Explorer'; tagColor = _AppTheme.primary;
-      emoji = '🌱'; nextRank = 'Achiever'; needed = 12 - totalStickers;
-    } else {
-      tag = 'Joined'; tagColor = _AppTheme.primaryLight;
-      emoji = '👋'; nextRank = 'Explorer'; needed = 5 - totalStickers;
-    }
+  // ── Stickers Collected Header ──────────────────────────────────────
+  Widget _buildStickersHeader(int collected) {
+    final double progress = collected / TOTAL_STICKERS;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _AppTheme.cardAlt,
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _AppTheme.primary.withOpacity(0.25)),
-        boxShadow: [
-          BoxShadow(
-            color: _AppTheme.primary.withOpacity(0.12),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Emoji badge — matches the avatar-circle treatment used on Profile
-          Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [tagColor, tagColor.withOpacity(0.2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          Row(
+            children: [
+              // Sticker icon
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFF4A3AFF).withOpacity(0.3),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: Color(0xFF8B78FF),
+                  size: 28,
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: tagColor.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Stickers Collected',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '$collected',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' / $TOTAL_STICKERS',
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: _AppTheme.card,
-              child: Text(emoji, style: const TextStyle(fontSize: 28)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.white.withOpacity(0.06),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
+              minHeight: 8,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Current Rank',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 11,
-                    letterSpacing: 1,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  tag,
-                  style: TextStyle(
-                    color: tagColor,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: totalStickers / 36,
-                    backgroundColor: Colors.white.withOpacity(0.06),
-                    valueColor: AlwaysStoppedAnimation<Color>(tagColor),
-                    minHeight: 5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$totalStickers / 36 stickers',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '${(progress * 100).toInt()}% complete',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          if (needed > 0)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Next',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 10,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  nextRank,
-                  style: TextStyle(
-                    color: tagColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '$needed more',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );
   }
 
+  // ── Legend ──────────────────────────────────────────────────────────
   Widget _buildLegend() {
     return Row(
       children: [
-        _legendItem(_AppTheme.primary, 'Attended'),
-        const SizedBox(width: 16),
-        _legendItem(Colors.grey.shade700, 'Missed'),
-        const SizedBox(width: 16),
-        _legendItem(Colors.grey.shade900, 'Locked'),
+        _legendDot(const Color(0xFF4A3AFF), 'Collected'),
+        const SizedBox(width: 20),
+        _legendDot(Colors.grey.shade700, 'Missed'),
+        const SizedBox(width: 20),
+        _legendDot(Colors.grey.shade800.withOpacity(0.5), 'Locked'),
       ],
     );
   }
 
-  Widget _legendItem(Color color, String label) {
+  Widget _legendDot(Color color, String label) {
     return Row(
       children: [
         Container(
@@ -375,7 +283,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
           height: 10,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(3),
+            shape: BoxShape.circle,
           ),
         ),
         const SizedBox(width: 6),
@@ -387,16 +295,15 @@ class DetailedAttendanceScreen extends StatelessWidget {
     );
   }
 
+  // ── Board Section ──────────────────────────────────────────────────
   Widget _buildBoardSection(
-      String boardName,
-      Color color,
-      IconData icon,
-      List<Map<String, dynamic>> clubs,
-      List<EventModel> allClubEvents,
-      ) {
+    String boardName,
+    Color color,
+    List<Map<String, dynamic>> clubs,
+  ) {
     int collected = 0;
     for (var club in clubs) {
-      if (_getClubStatus(club['keywords'], allClubEvents) == 'present') {
+      if (_getClubStatus(club['name'] as String) == 'present') {
         collected++;
       }
     }
@@ -404,9 +311,9 @@ class DetailedAttendanceScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: _AppTheme.card,
+        color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _AppTheme.border),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
       ),
       child: Column(
         children: [
@@ -415,14 +322,18 @@ class DetailedAttendanceScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
+                // Board logo in a circular frame
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: color.withOpacity(0.3)),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: color.withOpacity(0.5), width: 2),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.white.withOpacity(0.05),
+                    backgroundImage: AssetImage('assets/images/clubs/$boardName.png'),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -433,13 +344,14 @@ class DetailedAttendanceScreen extends StatelessWidget {
                         boardName,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3,
+                          letterSpacing: 0.5,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        '${clubs.length} clubs',
+                        boardFullNames[boardName] ?? '',
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 11,
@@ -457,7 +369,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
                     border: Border.all(color: color.withOpacity(0.35)),
                   ),
                   child: Text(
-                    '$collected / ${clubs.length} ⭐',
+                    '$collected / ${clubs.length}',
                     style: TextStyle(
                       color: color,
                       fontSize: 12,
@@ -469,19 +381,19 @@ class DetailedAttendanceScreen extends StatelessWidget {
             ),
           ),
 
-          Divider(color: _AppTheme.border, height: 1),
+          Divider(color: Colors.white.withOpacity(0.06), height: 1),
 
-          // Sticker grid
+          // Club stickers grid
           Padding(
             padding: const EdgeInsets.all(14),
             child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 12,
+              runSpacing: 14,
               children: clubs.map((club) {
-                final status = _getClubStatus(club['keywords'], allClubEvents);
+                final status = _getClubStatus(club['name'] as String);
                 return _buildStickerTile(
                   club['name'] as String,
-                  club['emoji'] as String,
+                  club['image'] as String,
                   status,
                   color,
                 );
@@ -493,91 +405,93 @@ class DetailedAttendanceScreen extends StatelessWidget {
     );
   }
 
+  // ── Individual Sticker Tile ────────────────────────────────────────
   Widget _buildStickerTile(
-      String name,
-      String emoji,
-      String status,
-      Color boardColor,
-      ) {
-    Color bgColor;
+    String name,
+    String imagePath,
+    String status,
+    Color boardColor,
+  ) {
+    final bool isPresent = status == 'present';
+    final bool isAbsent = status == 'absent';
+    final bool isLocked = status == 'locked';
+
+    // Colors based on status
     Color borderColor;
-    Color textColor;
-    String displayEmoji;
     List<BoxShadow>? shadow;
 
-    switch (status) {
-      case 'present':
-        bgColor = boardColor.withOpacity(0.12);
-        borderColor = boardColor.withOpacity(0.6);
-        textColor = Colors.white;
-        displayEmoji = emoji;
-        shadow = [
-          BoxShadow(
-            color: boardColor.withOpacity(0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ];
-        break;
-      case 'absent':
-        bgColor = _AppTheme.cardAlt;
-        borderColor = _AppTheme.border;
-        textColor = Colors.grey.shade700;
-        displayEmoji = emoji;
-        shadow = null;
-        break;
-      default: // locked
-        bgColor = _AppTheme.cardAlt.withOpacity(0.6);
-        borderColor = Colors.white.withOpacity(0.04);
-        textColor = Colors.grey.shade800;
-        displayEmoji = '🔒';
-        shadow = null;
+    if (isPresent) {
+      borderColor = boardColor;
+      shadow = [
+        BoxShadow(
+          color: boardColor.withOpacity(0.3),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ];
+    } else if (isAbsent) {
+      borderColor = Colors.grey.shade800;
+      shadow = null;
+    } else {
+      borderColor = Colors.white.withOpacity(0.04);
+      shadow = null;
     }
 
-    return Opacity(
-      opacity: status == 'absent' ? 0.4 : 1.0,
-      child: Container(
-        width: 74,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: borderColor,
-            width: status == 'present' ? 1.5 : 1,
+    return SizedBox(
+      width: 74,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Circular club image
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: borderColor,
+                width: isPresent ? 2.5 : 1.5,
+              ),
+              boxShadow: shadow,
+            ),
+            child: Opacity(
+              opacity: isPresent ? 1.0 : (isAbsent ? 0.3 : 0.15),
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.white.withOpacity(0.05),
+                backgroundImage: AssetImage('assets/images/clubs/$imagePath'),
+              ),
+            ),
           ),
-          boxShadow: shadow,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(displayEmoji, style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 6),
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-              ),
+          const SizedBox(height: 8),
+          // Club name
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isPresent
+                  ? Colors.white
+                  : (isAbsent ? Colors.grey.shade600 : Colors.grey.shade800),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              height: 1.3,
             ),
-            const SizedBox(height: 6),
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: status == 'present'
-                    ? boardColor
-                    : Colors.white.withOpacity(0.1),
-              ),
+          ),
+          const SizedBox(height: 4),
+          // Status indicator dot
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isPresent
+                  ? boardColor
+                  : (isAbsent
+                      ? Colors.grey.shade700
+                      : Colors.white.withOpacity(0.08)),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

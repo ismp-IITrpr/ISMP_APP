@@ -156,7 +156,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
           'Attendance',
@@ -167,7 +168,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             letterSpacing: 0.5,
           ),
         ),
-        backgroundColor: const Color(0xFF090A0F),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -348,17 +349,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'View All',
-                          style: TextStyle(
-                            color: Color(0xFF8B78FF),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
                         ),
                       ),
                     ],

@@ -67,6 +67,7 @@ flutter:
     - assets/Theme images/
     - img/2026/
     - assets/images/carousel/
+    - assets/images/clubs/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

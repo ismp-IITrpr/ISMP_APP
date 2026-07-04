@@ -188,13 +188,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
+        centerTitle: true,
         title: const Text(
           'Home',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
         ),
         actions: [
           IconButton(
@@ -205,254 +207,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: _buildDrawer(context),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2B124C), // Shiny Purple
-              Color(0xFF0F0F13), // Midnight Dark
-              Color(0xFF1E103C), // Deep Indigo
-              Color(0xFF0F0F13), // Midnight Dark
-            ],
-            stops: [0.0, 0.4, 0.7, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              _buildISMP26Banner(),
-              _buildPhotoSlideshow(),
-              _buildCoreTeam(),
-              _buildMomentsHeader(context),
-              _buildMomentsList(),
-              _buildBlogsHeader(context),
-              _buildLatestBlog(),
-              _buildAboutISMP(),
-            ],
-          ),
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            _buildCoreTeam(),
+            _buildMomentsHeader(context),
+            _buildMomentsList(),
+            _buildBlogsHeader(context),
+            _buildLatestBlog(),
+            _buildAboutISMP(),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: const Color(0xFF15111E),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2B124C),
-              Color(0xFF15111E),
-              Color(0xFF1E103C),
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4A3AFF).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.4)),
-                      ),
-                      child: const Text(
-                        'ISMP',
-                        style: TextStyle(
-                          color: Color(0xFF00FFCC),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 3,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Navigate',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Quick access to all pages',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Divider(color: Colors.white.withOpacity(0.1), height: 1),
-              const SizedBox(height: 8),
-              // Navigation Items
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    _drawerItem(
-                      icon: Icons.group_outlined,
-                      label: 'Core Team',
-                      subtitle: 'Meet the ISMP mentors',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const CoreTeamScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      customIcon: const Text(
-                        '</>',
-                        style: TextStyle(
-                          color: Color(0xFF00FFCC),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      label: 'App Developers',
-                      subtitle: 'The team behind the app',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DevTeamScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.event_outlined,
-                      label: 'Events',
-                      subtitle: 'Upcoming activities & sessions',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.article_outlined,
-                      label: 'Blogs',
-                      subtitle: 'Read campus stories & guides',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const BlogsScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.photo_library_outlined,
-                      label: 'Moments',
-                      subtitle: 'Photo memories from campus',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const MomentsScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.notifications_outlined,
-                      label: 'Notifications',
-                      subtitle: 'Alerts & announcements',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.fact_check_outlined,
-                      label: 'Attendance',
-                      subtitle: 'Track your sessions',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const AttendanceScreen()));
-                      },
-                    ),
-                    _drawerItem(
-                      icon: Icons.person_outline,
-                      label: 'Profile',
-                      subtitle: 'Your mentor & info',
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              // Footer
-              Divider(color: Colors.white.withOpacity(0.1), height: 1),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'IIT Ropar ISMP v1.0',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _drawerItem({
-    IconData? icon,
-    Widget? customIcon,
-    required String label,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF4A3AFF).withOpacity(0.15),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.2)),
-          ),
-          child: customIcon ?? Icon(icon, color: const Color(0xFF00FFCC), size: 20),
-        ),
-        title: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.4),
-            fontSize: 11,
-          ),
-        ),
-        trailing: Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.2), size: 18),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      ),
-    );
-  }
 
   Widget _buildMomentsHeader(BuildContext context) {
     return SliverToBoxAdapter(
@@ -540,93 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildISMP26Banner() {
-    return SliverToBoxAdapter(
-      child: Container(
-        height: 180,
-        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          image: const DecorationImage(
-            image: AssetImage('assets/Theme images/login_bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                const Color(0xFF4A3AFF).withOpacity(0.88),
-                Colors.black.withOpacity(0.45),
-              ],
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/Theme images/ismp_logo.png',
-                height: 64,
-                width: 64,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 18),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ISMP',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 5,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Text(
-                      "'26",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 3,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'IIT Ropar  ·  Batch 2026',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBlogsHeader(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
@@ -686,15 +369,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildPhotoSlideshow() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 14),
-        child: _PhotoSlideshow(photos: _slideshowPhotos),
-      ),
     );
   }
 

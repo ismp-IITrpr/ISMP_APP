@@ -21,7 +21,8 @@ class _EventsScreenState extends State<EventsScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
           'Events',
@@ -32,7 +33,7 @@ class _EventsScreenState extends State<EventsScreen> {
             letterSpacing: 0.5,
           ),
         ),
-        backgroundColor: const Color(0xFF090A0F),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/attendance.dart';
+import '../models/events.dart';
 import '../services/firebase_service.dart';
 import 'student_scanner_screen.dart';
 import 'detailed_attendance_screen.dart';
+import 'live_attendance_screen.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({super.key});
+  final bool isRep;
+  final String repClub;
+
+  const AttendanceScreen({
+    super.key,
+    this.isRep = false,
+    this.repClub = '',
+  });
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -155,6 +164,189 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return widget.isRep ? _buildRepView(context) : _buildStudentView(context);
+  }
+
+  Widget _buildRepView(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text(
+          'Take Attendance',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        actions: [
+          if (widget.repClub.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+              ),
+              child: Center(
+                child: Text(
+                  widget.repClub.toUpperCase(),
+                  style: const TextStyle(
+                    color: Color(0xFF8B78FF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+      body: SafeArea(
+        child: StreamBuilder<List<EventModel>>(
+          stream: FirebaseService.instance.streamEventsForClub(widget.repClub),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+            }
+
+            final events = snapshot.data ?? [];
+            if (events.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No upcoming club sessions to take attendance for.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(24.0),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1C1C23),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.groups_rounded,
+                          color: Color(0xFF8B78FF),
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${event.date} • ${event.time}\n${event.venue}',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          // 1. Show loading or just start session
+                          try {
+                            final sessionId = await FirebaseService.instance.startAttendanceSession(
+                              eventName: event.title,
+                              venue: event.venue,
+                              repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                            );
+                            if (context.mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LiveAttendanceScreen(
+                                    sessionId: sessionId,
+                                    eventName: event.title,
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to start session: $e')),
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFF8B78FF)),
+                        label: const Text(
+                          'Start',
+                          style: TextStyle(
+                            color: Color(0xFF8B78FF),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentView(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,

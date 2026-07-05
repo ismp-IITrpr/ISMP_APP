@@ -3,9 +3,13 @@ import '../screens/home_screen.dart';
 import '../screens/events_screen.dart';
 import '../screens/attendance_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/rep_dashboard.dart';
+import '../services/firebase_service.dart';
 
 class MainLayout extends StatefulWidget {
-  const MainLayout({super.key});
+  final bool isRep;
+
+  const MainLayout({super.key, this.isRep = false});
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
@@ -14,12 +18,35 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const EventsScreen(),
-    const AttendanceScreen(),
-    const ProfileScreen(),
-  ];
+  late final List<Widget> _screens;
+  late final List<BottomNavigationBarItem> _navItems;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final repClub = widget.isRep
+        ? FirebaseService.instance.getClubForEmail(
+            FirebaseService.instance.currentUser?.email ?? 'testclub@iitrpr.ac.in')
+        : '';
+
+    _screens = [
+      const HomeScreen(),
+      EventsScreen(isRep: widget.isRep, repClub: repClub),
+      AttendanceScreen(isRep: widget.isRep, repClub: repClub),
+      const ProfileScreen(),
+      if (widget.isRep) const RepDashboard(),
+    ];
+
+    _navItems = [
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+      const BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
+      const BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner), label: 'Attendance'),
+      const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+      if (widget.isRep)
+        const BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Create Event'),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -50,12 +77,7 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
-            BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner), label: 'Attendance'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          ],
+          items: _navItems,
         ),
       ),
     );

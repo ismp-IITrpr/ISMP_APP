@@ -8,6 +8,7 @@ class EventModel {
   final String time;
   final String venue;
   final String type; // 'E' for Events, 'C' for Club Sessions
+  final String club; // Only for type 'C' — which club created this
   final List<int> groupNo;
   final String description;
   final Color dotColor;
@@ -19,6 +20,7 @@ class EventModel {
     required this.time,
     required this.venue,
     required this.type,
+    this.club = '',
     required this.groupNo,
     required this.description,
     required this.dotColor,
@@ -32,6 +34,7 @@ class EventModel {
       'time': time,
       'venue': venue,
       'type': type,
+      'club': club,
       'groupNo': groupNo,
       'description': description,
       'dotColor': dotColor.toARGB32(),
@@ -46,6 +49,7 @@ class EventModel {
       time: map['time'] ?? '',
       venue: map['venue'] ?? '',
       type: map['type'] ?? '',
+      club: map['club'] ?? '',
       groupNo: List<int>.from(map['groupNo'] ?? []),
       description: map['description'] ?? '',
       dotColor: Color(map['dotColor'] ?? 0xFF4A3AFF),

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
+import 'live_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
-  const EventsScreen({super.key});
+  final bool isRep;
+  final String repClub;
+
+  const EventsScreen({
+    super.key,
+    this.isRep = false,
+    this.repClub = '',
+  });
 
   @override
   State<EventsScreen> createState() => _EventsScreenState();
@@ -36,6 +44,29 @@ class _EventsScreenState extends State<EventsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          if (widget.isRep)
+            Container(
+              margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+              ),
+              child: const Center(
+                child: Text(
+                  'REP',
+                  style: TextStyle(
+                    color: Color(0xFF8B78FF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -239,6 +270,58 @@ class _EventsScreenState extends State<EventsScreen> {
                                         fontSize: 12,
                                       ),
                                     ),
+                                    if (widget.isRep && event.type == 'C' && event.club == widget.repClub) ...[
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () async {
+                                            try {
+                                              final sessionId = await FirebaseService.instance.startAttendanceSession(
+                                                eventName: event.title,
+                                                venue: event.venue,
+                                                repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                                              );
+                                              if (context.mounted) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => LiveAttendanceScreen(
+                                                      sessionId: sessionId,
+                                                      eventName: event.title,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Failed to start session: $e')),
+                                                );
+                                              }
+                                            }
+                                          },
+                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFF8B78FF)),
+                                          label: const Text(
+                                            'Start Attendance',
+                                            style: TextStyle(
+                                              color: Color(0xFF8B78FF),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF4A3AFF).withOpacity(0.15),
+                                            elevation: 0,
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                              side: BorderSide(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),

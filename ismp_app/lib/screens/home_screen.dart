@@ -27,12 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentCarouselIndex = 0;
   BlogTag? _activeTag;
 
-  // Variable list of slideshow photos — add or swap asset paths here
-  static const List<String> _slideshowPhotos = [
-    'assets/Theme images/college.png',
-    'assets/Theme images/login_bg.png',
-    'assets/Theme images/G.png',
-  ];
 
   String _getEventsSubtitle() {
     final now = DateTime.now();

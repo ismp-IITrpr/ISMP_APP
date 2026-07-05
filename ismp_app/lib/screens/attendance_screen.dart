@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/attendance.dart';
 import '../services/firebase_service.dart';
 import 'student_scanner_screen.dart';
@@ -267,45 +268,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
                           ],
                         ),
-                        const SizedBox(height: 32),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: LinearProgressIndicator(
-                            value: attendancePercentage,
-                            backgroundColor: const Color(0xFF0F0F13),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
-                            minHeight: 10,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Overall attendance',
-                              style: TextStyle(
-                                color: Colors.white70, 
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4A3AFF).withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                attendancePercentageString,
-                                style: const TextStyle(
-                                  color: Color(0xFF8B78FF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                         const SizedBox(height: 16),
                         Center(
                           child: TextButton.icon(
@@ -437,7 +399,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   ),
                                 ],
                               ),
-                            );
+                            ).animate().fadeIn(duration: 500.ms, delay: (index * 50).ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
                           },
                         ),
                 ),

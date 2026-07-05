@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
 
@@ -11,10 +12,19 @@ class EventsScreen extends StatefulWidget {
 
 class _EventsScreenState extends State<EventsScreen> {
   int _selectedDay = 1;
+  final DateTime _startDate = DateTime(2026, 8, 1);
 
   String _getWeekdayString(int weekday) {
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return weekdays[weekday - 1];
+  }
+
+  String _getMonthString(int month) {
+    const months = [
+      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+    ];
+    return months[month - 1];
   }
 
   @override
@@ -47,17 +57,18 @@ class _EventsScreenState extends State<EventsScreen> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 31,
+                itemCount: 60, // Shows a scrollable buffer of 60 days
                 itemBuilder: (context, index) {
-                  int day = index + 1;
-                  DateTime date = DateTime(2026, 8, day);
+                  int dayIndex = index + 1; // 1-based index for events query
+                  DateTime date = _startDate.add(Duration(days: index));
                   String weekday = _getWeekdayString(date.weekday);
-                  bool isSelected = _selectedDay == day;
+                  String monthName = _getMonthString(date.month);
+                  bool isSelected = _selectedDay == dayIndex;
 
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        _selectedDay = day;
+                        _selectedDay = dayIndex;
                       });
                     },
                     child: Container(
@@ -100,7 +111,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            day.toString(),
+                            date.day.toString(),
                             style: TextStyle(
                               color: isSelected ? Colors.white : Colors.white,
                               fontSize: 20,
@@ -109,7 +120,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'AUG',
+                            monthName,
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white.withValues(alpha: 0.9)
@@ -245,7 +256,7 @@ class _EventsScreenState extends State<EventsScreen> {
                             ),
                           ],
                         ),
-                      );
+                      ).animate().fadeIn(duration: 500.ms, delay: (index * 50).ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
                     },
                   );
                 }

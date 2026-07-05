@@ -5,7 +5,12 @@ import 'login_screen.dart';
 import 'events_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final bool isRep;
+
+  const ProfileScreen({
+    super.key,
+    this.isRep = false,
+  });
 
   static const int TOTAL_STICKERS = 36;
 
@@ -47,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Mentor Profile Section
-              if (user.mentor != null) ...[
+              if (!isRep && user.mentor != null) ...[
                 _buildSectionHeader('YOUR MENTOR'),
                 const SizedBox(height: 16),
                 _buildMentorContainer(user.mentor!),
@@ -194,13 +199,20 @@ class ProfileScreen extends StatelessWidget {
         children: [
           _buildUserHeader(user),
           const SizedBox(height: 24),
-          _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
-          _buildListDivider(),
-          _buildDetailRow(Icons.school_outlined, 'Degree', user.degree),
-          _buildListDivider(),
-          _buildDetailRow(Icons.account_tree_outlined, 'Branch', user.branch),
-          _buildListDivider(),
-          _buildDetailRow(Icons.groups_2_outlined, 'Group No.', "${user.groupNo}"),
+
+          if (isRep) ...[
+            _buildDetailRow(Icons.groups_outlined, 'Club Name', 'Coding Club'),
+            _buildListDivider(),
+            _buildDetailRow(Icons.email_outlined, 'Email', 'codingclub@iitrpr.ac.in'),
+          ] else ...[
+            _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
+            _buildListDivider(),
+            _buildDetailRow(Icons.school_outlined, 'Degree', user.degree),
+            _buildListDivider(),
+            _buildDetailRow(Icons.account_tree_outlined, 'Branch', user.branch),
+            _buildListDivider(),
+            _buildDetailRow(Icons.groups_2_outlined, 'Group No.', "${user.groupNo}"),
+          ],
         ],
       ),
     );
@@ -244,6 +256,30 @@ class ProfileScreen extends StatelessWidget {
 
   // User Header (Avatar, Name, Sticker Pill - without "Student" text)
   Widget _buildUserHeader(UserProfile user) {
+    if (isRep) {
+      const String clubName = "Coding Club"; // baad mein Firebase se aayega
+
+      return Center(
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 36,
+              backgroundColor: iconBgColor,
+              child: Text(
+                clubName[0].toUpperCase(),
+                style: const TextStyle(
+                  color: primaryPurple,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Student ke liye purana UI
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -268,7 +304,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              // Pill showing Stickers collected
+
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
@@ -278,7 +314,11 @@ class ProfileScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.workspace_premium_outlined, color: primaryPurple, size: 14),
+                    const Icon(
+                      Icons.workspace_premium_outlined,
+                      color: primaryPurple,
+                      size: 14,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       '${user.stickersCollected}/$TOTAL_STICKERS Stickers',
@@ -286,7 +326,6 @@ class ProfileScreen extends StatelessWidget {
                         color: textGray,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
                       ),
                     ),
                   ],

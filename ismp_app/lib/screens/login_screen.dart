@@ -3,6 +3,7 @@ import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
 import 'rep_access.dart';
 import '../widgets/rep_main_layout.dart';
+import 'rep_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,8 +42,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
-          // Check if the signed-in user is a rep and route accordingly
-          final isRep = isCurrentUserRep(user.uid);
+          // Check if the signed-in user is a club rep and route accordingly
+          final isRep = FirebaseService.instance.isClubRep(user.email)
+              || isCurrentUserRep(user.uid);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -216,6 +218,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
+                  ),
+                ),
+                // ── DEV ONLY: Remove before production ──
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RepMainLayout(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    '🛠 Dev: Login as Club Rep',
+                    style: TextStyle(
+                      color: Color(0xFF8B78FF),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],

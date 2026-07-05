@@ -4,9 +4,17 @@ import '../models/profile_data.dart'; // for dummyUser.rollNo — used for the r
 import '../screens/rep_access.dart';
 import 'rep_attendance_screen.dart';
 import '../services/firebase_service.dart';
+import 'live_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
-  const EventsScreen({super.key});
+  final bool isRep;
+  final String repClub;
+
+  const EventsScreen({
+    super.key,
+    this.isRep = false,
+    this.repClub = '',
+  });
 
   @override
   State<EventsScreen> createState() => _EventsScreenState();
@@ -25,7 +33,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
     // Same login for everyone — no manual role picker. Whether the
     // "Start Attendance" button shows up is decided purely by this check.
-    final bool isRep = isCurrentUserRep(dummyUser.rollNo);
+    final bool isRep = widget.isRep || isCurrentUserRep(dummyUser.rollNo);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -43,6 +51,29 @@ class _EventsScreenState extends State<EventsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          if (widget.isRep)
+            Container(
+              margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+              ),
+              child: const Center(
+                child: Text(
+                  'REP',
+                  style: TextStyle(
+                    color: Color(0xFF8B78FF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -160,8 +191,10 @@ class _EventsScreenState extends State<EventsScreen> {
                       final event = dailyEvents[index];
                       final isLast = index == dailyEvents.length - 1;
 
-                      // Only club sessions ('C') get a "Start Attendance" action.
-                      final bool showStartAttendance = isRep && event.type == 'C';
+                      // Only club sessions ('C') that match this rep's club get
+                      // a "Start Attendance" action (with Firebase session creation).
+                      final bool showStartAttendance = isRep && event.type == 'C'
+                          && (widget.repClub.isEmpty || event.club == widget.repClub);
 
                       return IntrinsicHeight(
                         child: Row(
@@ -250,31 +283,52 @@ class _EventsScreenState extends State<EventsScreen> {
                                       ),
                                     ),
                                     if (showStartAttendance) ...[
-                                      const SizedBox(height: 14),
-                                      SizedBox(
-                                        width: double.infinity,
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
                                         child: ElevatedButton.icon(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) =>
-                                                    RepAttendanceScreen(event: event),
-                                              ),
-                                            );
+                                          onPressed: () async {
+                                            try {
+                                              final sessionId = await FirebaseService.instance.startAttendanceSession(
+                                                eventName: event.title,
+                                                venue: event.venue,
+                                                repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                                              );
+                                              if (context.mounted) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => LiveAttendanceScreen(
+                                                      sessionId: sessionId,
+                                                      eventName: event.title,
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Failed to start session: $e')),
+                                                );
+                                              }
+                                            }
                                           },
-                                          icon: const Icon(Icons.qr_code_2_rounded, size: 18),
+                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFF8B78FF)),
                                           label: const Text(
                                             'Start Attendance',
-                                            style: TextStyle(fontWeight: FontWeight.w600),
+                                            style: TextStyle(
+                                              color: Color(0xFF8B78FF),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF4A3AFF),
-                                            foregroundColor: Colors.white,
+                                            backgroundColor: const Color(0xFF4A3AFF).withOpacity(0.15),
                                             elevation: 0,
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius: BorderRadius.circular(8),
+                                              side: BorderSide(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
                                             ),
                                           ),
                                         ),

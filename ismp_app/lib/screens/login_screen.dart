@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_layout.dart';
+import 'rep_access.dart';
+import '../widgets/rep_main_layout.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -83,10 +85,15 @@ class LoginScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
+                    String mockRollNo = "24CS1001";
+                    final isRep = isCurrentUserRep(mockRollNo);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const MainLayout()),
+                        builder: (context) => isRep
+                            ? const RepMainLayout()
+                            : const MainLayout(),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(

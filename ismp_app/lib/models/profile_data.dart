@@ -21,6 +21,8 @@ class UserProfile {
   final int stickersCollected;
   final String profileUrl;
   final MentorProfile? mentor;
+  final String? clubName;
+  final String? clubId;
 
   UserProfile({
     required this.name,
@@ -31,6 +33,8 @@ class UserProfile {
     required this.stickersCollected,
     required this.profileUrl,
     this.mentor,
+    this.clubName,
+    this.clubId,
   });
 }
 
@@ -51,4 +55,6 @@ final UserProfile dummyUser = UserProfile(
   stickersCollected: 12,
   profileUrl: '', // Placeholder
   mentor: dummyMentor,
+  clubName: 'Robotics',
+  clubId: 'C_ard_1',
 );

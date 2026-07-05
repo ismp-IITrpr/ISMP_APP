@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -5,9 +6,11 @@ import 'package:flutter/material.dart';
 import '../models/blog.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
+import '../models/moment.dart';
 import '../models/mock_data/blog_mock.dart';
 import '../models/mock_data/events_mock.dart';
 import '../models/mock_data/attendance_mock.dart';
+import '../models/mock_data/moments_mock.dart';
 
 class FirebaseService {
   static final FirebaseService instance = FirebaseService._init();
@@ -67,6 +70,15 @@ class FirebaseService {
 
   // Get current user helper
   User? get currentUser => _auth.currentUser;
+
+  // Get current student's roll number
+  String get currentStudentRollNo {
+    final email = currentUser?.email;
+    if (email != null && email.contains('@')) {
+      return email.split('@')[0].toUpperCase();
+    }
+    return '24CS1001';
+  }
 
 
   // Stream blog posts from Firestore in real-time
@@ -134,6 +146,16 @@ class FirebaseService {
           await _firestore.collection('attendance').add(record.toMap());
         }
       }
+
+      // 4. Seed Moments if empty
+      final momentsSnapshot = await _firestore.collection('moments').limit(1).get();
+      if (momentsSnapshot.docs.isEmpty) {
+        debugPrint('Seeding moments collection...');
+        for (var moment in mockMoments) {
+          await _firestore.collection('moments').doc(moment.id).set(moment.toMap());
+        }
+      }
+
       debugPrint('Database seeding checked successfully.');
     } catch (e) {
       debugPrint('Error seeding database: $e');
@@ -154,13 +176,29 @@ class FirebaseService {
   /// Returns true if the given email belongs to an authorized club rep.
   bool isClubRep(String? email) {
     if (email == null) return false;
-    return _repEmailToClub.containsKey(email.toLowerCase());
+    if (_repEmailToClub.containsKey(email.toLowerCase())) return true;
+    final prefix = email.split('@').first.toLowerCase();
+    final rollRegex = RegExp(r'^\d{4}[a-zA-Z]{3}\d{4}$');
+    return !rollRegex.hasMatch(prefix);
   }
 
-  /// Returns the club name for a given rep email, or 'Unknown Club' if not found.
+  /// Returns the club name for a given rep email, or a dynamically parsed name if not in the pre-defined list.
   String getClubForEmail(String? email) {
-    if (email == null) return 'Unknown Club';
-    return _repEmailToClub[email.toLowerCase()] ?? 'Unknown Club';
+    if (email == null || email.isEmpty) return 'Robotics';
+    final lower = email.toLowerCase();
+    if (_repEmailToClub.containsKey(lower)) {
+      return _repEmailToClub[lower]!;
+    }
+    final prefix = lower.split('@').first;
+    final rollRegex = RegExp(r'^\d{4}[a-zA-Z]{3}\d{4}$');
+    if (rollRegex.hasMatch(prefix)) {
+      return 'Robotics';
+    }
+    if (prefix.contains('robotics')) return 'Robotics';
+    if (prefix.contains('web')) return 'Web Dev';
+    if (prefix.contains('music')) return 'Music';
+    if (prefix.contains('dance')) return 'Dance';
+    return prefix[0].toUpperCase() + prefix.substring(1);
   }
 
   // ─── ATTENDANCE SESSION MANAGEMENT ─────────────────────────────────
@@ -246,6 +284,62 @@ class FirebaseService {
         .map((doc) => (doc.data()?['status'] ?? 'ended') as String);
   }
 
+  /// Streams the session document.
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamSession(String sessionId) {
+    return _firestore.collection('attendance_sessions').doc(sessionId).snapshots();
+  }
+
+  /// Streams the list of scans (marked present students) for a session.
+  Stream<List<Map<String, dynamic>>> streamSessionScansList(String sessionId) {
+    return _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .collection('scans')
+        .orderBy('scannedAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['studentUid'] = doc.id;
+              return data;
+            }).toList());
+  }
+
+  /// Manually marks a student as present in the database session.
+  Future<void> addManualMark({
+    required String sessionId,
+    required String name,
+    required String rollNo,
+  }) async {
+    final scanRef = _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .collection('scans')
+        .doc(rollNo);
+    await scanRef.set({
+      'name': name,
+      'email': '$rollNo@iitrpr.ac.in',
+      'scannedAt': FieldValue.serverTimestamp(),
+    });
+    // Increment the scanCount
+    await _firestore.collection('attendance_sessions').doc(sessionId).update({
+      'scanCount': FieldValue.increment(1),
+    });
+  }
+
+  /// Removes a student scan from the session.
+  Future<void> removeScan(String sessionId, String studentUid) async {
+    await _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .collection('scans')
+        .doc(studentUid)
+        .delete();
+    // Decrement the scanCount
+    await _firestore.collection('attendance_sessions').doc(sessionId).update({
+      'scanCount': FieldValue.increment(-1),
+    });
+  }
+
   /// Fetches all scans for a session (for CSV export).
   Future<List<Map<String, dynamic>>> getSessionScans(String sessionId) async {
     final snapshot = await _firestore
@@ -300,25 +394,62 @@ class FirebaseService {
   Future<void> postEvent({
     required String title,
     required String date,
-    required String time,
+    required String startTime,
+    required String endTime,
     required String venue,
     required String description,
     required int day,
+    required String targetAudience,
     String type = 'E',
     String club = '',
   }) async {
+    final color = type == 'C' ? const Color(0xFF8B78FF) : const Color(0xFFB0C4DE);
     await _firestore.collection('events').add({
       'title': title,
       'date': date,
-      'time': time,
+      'time': '$startTime - $endTime',
+      'startTime': startTime,
+      'endTime': endTime,
       'venue': venue,
       'description': description,
       'type': type,
       'club': club,
       'day': day,
-      'groupNo': <int>[],
-      'dotColor': const Color(0xFFB0C4DE).toARGB32(),
+      'targetAudience': targetAudience,
+      'groupNo': targetAudience,
+      'dotColor': color.toARGB32(),
     });
+  }
+
+  /// Updates an existing event in the events collection.
+  Future<void> updateEvent({
+    required String eventId,
+    required String title,
+    required String date,
+    required String startTime,
+    required String endTime,
+    required String venue,
+    required String description,
+    required int day,
+    required String targetAudience,
+  }) async {
+    await _firestore.collection('events').doc(eventId).update({
+      'title': title,
+      'date': date,
+      'time': '$startTime - $endTime',
+      'startTime': startTime,
+      'endTime': endTime,
+      'venue': venue,
+      'description': description,
+      'day': day,
+      'targetAudience': targetAudience,
+      'groupNo': targetAudience,
+    });
+  }
+
+  /// Deletes an event from the events collection.
+  Future<void> deleteEvent(String eventId) async {
+    await _firestore.collection('events').doc(eventId).delete();
   }
 
   /// Streams events specifically for a given club (type 'C').
@@ -332,6 +463,111 @@ class FirebaseService {
         .map((snapshot) => snapshot.docs.map((doc) {
               return EventModel.fromMap(doc.data(), doc.id);
             }).toList());
+  }
+
+  /// Streams all club sessions (type 'C') for all clubs.
+  Stream<List<EventModel>> streamAllClubSessions() {
+    return _firestore
+        .collection('events')
+        .where('type', isEqualTo: 'C')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return EventModel.fromMap(doc.data(), doc.id);
+            }).toList());
+  }
+
+  /// Deletes old test events created in previous testing runs.
+  Future<void> deleteOldEvents() async {
+    try {
+      final snapshot = await _firestore.collection('events').get();
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final club = (data['club'] ?? '').toString().toLowerCase();
+        final title = (data['title'] ?? '').toString().toLowerCase();
+        if (club.contains('test') || 
+            club.contains('gupta') || 
+            club.contains('unknown') || 
+            title.contains('test') || 
+            club.isEmpty) {
+          await doc.reference.delete();
+        }
+      }
+    } catch (e) {
+      // Ignore errors silently in prod
+    }
+  }
+
+  /// Streams moments from backend.
+  Stream<List<MomentModel>> streamMoments() {
+    return _firestore.collection('moments').snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => MomentModel.fromMap(doc.data(), doc.id)).toList());
+  }
+
+  /// Combined stream of target events and user's marked attendance (to compute Present/Absent status)
+  Stream<List<AttendanceRecord>> streamCombinedStudentAttendance(String studentRollNo, int studentGroupNo) {
+    StreamController<List<AttendanceRecord>> controller = StreamController();
+    
+    StreamSubscription? sub1;
+    StreamSubscription? sub2;
+    
+    List<EventModel> latestEvents = [];
+    List<AttendanceRecord> latestRecords = [];
+    
+    void update() {
+      if (controller.isClosed) return;
+      List<AttendanceRecord> combined = [];
+      
+      for (var event in latestEvents) {
+        // Only show club sessions (type 'C') that match student's group
+        if (event.type == 'C') {
+          final target = event.targetAudience.toLowerCase();
+          final containsAll = target.contains('all') || target.contains('general') || target.isEmpty;
+          final containsGroup = target.contains(studentGroupNo.toString());
+          if (!containsAll && !containsGroup) {
+            continue;
+          }
+        }
+        
+        final matchingRecord = latestRecords.firstWhere(
+          (r) => r.eventId == event.id,
+          orElse: () => AttendanceRecord(
+            eventId: event.id,
+            eventType: event.type,
+            title: event.title,
+            date: event.date,
+            time: event.time,
+            venue: event.venue,
+            isPresent: false, // Default status if not marked
+            iconColor: event.dotColor,
+          ),
+        );
+        combined.add(matchingRecord);
+      }
+      
+      controller.add(combined);
+    }
+    
+    sub1 = _firestore.collection('events').snapshots().listen((snapshot) {
+      latestEvents = snapshot.docs.map((doc) => EventModel.fromMap(doc.data(), doc.id)).toList();
+      update();
+    }, onError: controller.addError);
+    
+    sub2 = _firestore
+        .collection('users')
+        .doc(studentRollNo)
+        .collection('attendance')
+        .snapshots()
+        .listen((snapshot) {
+      latestRecords = snapshot.docs.map((doc) => AttendanceRecord.fromFirestore(doc)).toList();
+      update();
+    }, onError: controller.addError);
+    
+    controller.onCancel = () {
+      sub1?.cancel();
+      sub2?.cancel();
+    };
+    
+    return controller.stream;
   }
 }
 

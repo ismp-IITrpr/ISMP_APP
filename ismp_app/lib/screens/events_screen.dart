@@ -270,8 +270,12 @@ class _EventsScreenState extends State<EventsScreen> {
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        _buildBadge(event.type,
-                                            const Color(0xFF3A3A4A)),
+                                        _buildBadge(
+                                          event.type == 'C'
+                                              ? 'Target: ${event.targetAudience}'
+                                              : 'General Event',
+                                          const Color(0xFF3A3A4A),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 8),

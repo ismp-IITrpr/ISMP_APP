@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/profile_data.dart';
-import '../screens/rep_access.dart';
 import 'login_screen.dart';
-import 'events_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final bool isRep;
@@ -25,7 +23,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = dummyUser;
-    final bool isRep = isCurrentUserRep(user.rollNo);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -51,31 +48,22 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Mentor Profile Section
-              if (!isRep && user.mentor != null) ...[
+              // ── Mentor Section (always shown for regular users) ──
+              if (user.mentor != null) ...[
                 _buildSectionHeader('YOUR MENTOR'),
                 const SizedBox(height: 16),
                 _buildMentorContainer(user.mentor!),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
               ],
 
-              // User Profile Section
+              // ── User Profile Section ──
               _buildSectionHeader('YOUR PROFILE'),
               const SizedBox(height: 16),
               _buildUserContainer(user),
 
-              // Rep-only quick access — only rendered when isCurrentUserRep
-              // is true for this user. No manual toggle anywhere.
-              if (isRep) ...[
-                const SizedBox(height: 32),
-                _buildSectionHeader('CLUB REP'),
-                const SizedBox(height: 16),
-                _buildRepAccessCard(context),
-              ],
-
               const SizedBox(height: 48),
 
-              // Logout Button
+              // ── Logout Button ──
               _buildLogoutButton(context),
               const SizedBox(height: 32),
             ],
@@ -85,58 +73,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Rep-only card — takes the rep straight to Events, where each club
-  // session now shows a "Start Attendance" action.
-  Widget _buildRepAccessCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primaryPurple.withOpacity(0.25)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const EventsScreen()),
-          );
-        },
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: primaryPurple.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: const Icon(Icons.event_available_outlined, color: primaryPurple, size: 22),
-            ),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Open Rep Events',
-                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Take attendance for your club sessions',
-                    style: TextStyle(color: textGray, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: textGray),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   // Header with text and a line in the same row
   Widget _buildSectionHeader(String title) {
@@ -200,19 +137,13 @@ class ProfileScreen extends StatelessWidget {
           _buildUserHeader(user),
           const SizedBox(height: 24),
 
-          if (isRep) ...[
-            _buildDetailRow(Icons.groups_outlined, 'Club Name', 'Coding Club'),
-            _buildListDivider(),
-            _buildDetailRow(Icons.email_outlined, 'Email', 'codingclub@iitrpr.ac.in'),
-          ] else ...[
-            _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
+          _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
             _buildListDivider(),
             _buildDetailRow(Icons.school_outlined, 'Degree', user.degree),
             _buildListDivider(),
             _buildDetailRow(Icons.account_tree_outlined, 'Branch', user.branch),
             _buildListDivider(),
             _buildDetailRow(Icons.groups_2_outlined, 'Group No.', "${user.groupNo}"),
-          ],
         ],
       ),
     );
@@ -254,32 +185,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // User Header (Avatar, Name, Sticker Pill - without "Student" text)
+  // User Header (Avatar + Name + Sticker pill)
   Widget _buildUserHeader(UserProfile user) {
-    if (isRep) {
-      const String clubName = "Coding Club"; // baad mein Firebase se aayega
-
-      return Center(
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 36,
-              backgroundColor: iconBgColor,
-              child: Text(
-                clubName[0].toUpperCase(),
-                style: const TextStyle(
-                  color: primaryPurple,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Student ke liye purana UI
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

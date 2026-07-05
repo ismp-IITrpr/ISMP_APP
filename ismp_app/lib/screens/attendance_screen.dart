@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/attendance.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
+import '../services/database_service.dart';
+import '../models/profile_data.dart';
 import 'student_scanner_screen.dart';
 import 'detailed_attendance_screen.dart';
 import 'live_attendance_screen.dart';
@@ -347,297 +349,306 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Widget _buildStudentView(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text(
-          'Attendance',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
-            onPressed: _openScanner,
-            tooltip: 'Scan QR Code',
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: StreamBuilder<List<AttendanceRecord>>(
-          stream: FirebaseService.instance.streamRecentAttendance(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
-            }
+    final String rollNo = FirebaseService.instance.currentStudentRollNo;
+    return FutureBuilder<UserProfile?>(
+      future: DatabaseService().getUserProfile(rollNo),
+      builder: (context, profileSnapshot) {
+        final profile = profileSnapshot.data;
+        final int groupNo = profile?.groupNo ?? 7;
 
-            final records = snapshot.data ?? [];
-            final totalCount = records.length;
-            final presentCount = records.where((r) => r.isPresent).length;
-            final absentCount = totalCount - presentCount;
-            final attendancePercentage = totalCount == 0 ? 0.0 : (presentCount / totalCount);
-            final attendancePercentageString = '${(attendancePercentage * 100).toInt()}%';
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            title: const Text(
+              'Attendance',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
+                onPressed: _openScanner,
+                tooltip: 'Scan QR Code',
+              ),
+            ],
+          ),
+          body: SafeArea(
+            child: StreamBuilder<List<AttendanceRecord>>(
+              stream: FirebaseService.instance.streamCombinedStudentAttendance(rollNo, groupNo),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Stats Card
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF2A2A3D),
-                          Color(0xFF14141A),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                final records = snapshot.data ?? [];
+                final totalCount = records.length;
+                final presentCount = records.where((r) => r.isPresent).length;
+                final absentCount = totalCount - presentCount;
+                final attendancePercentage = totalCount == 0 ? 0.0 : (presentCount / totalCount);
+                final attendancePercentageString = '${(attendancePercentage * 100).toInt()}%';
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Stats Card
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF2A2A3D),
+                              Color(0xFF14141A),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                          border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
                         ),
-                      ],
-                      border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF4A3AFF).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.bar_chart,
-                                    color: Color(0xFF8B78FF),
-                                    size: 24,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(
+                                        Icons.bar_chart,
+                                        color: Color(0xFF8B78FF),
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    const Text(
+                                      'Attendance Overview',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildStatItem('Total', totalCount.toString(), Colors.white),
+                                _buildStatItem('Present', presentCount.toString(), const Color(0xFF4CAF50)),
+                                _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: LinearProgressIndicator(
+                                value: attendancePercentage,
+                                backgroundColor: const Color(0xFF0F0F13),
+                                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
+                                minHeight: 10,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Overall attendance',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(width: 16),
-                                const Text(
-                                  'Attendance Overview',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    attendancePercentageString,
+                                    style: const TextStyle(
+                                      color: Color(0xFF8B78FF),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildStatItem('Total', totalCount.toString(), Colors.white),
-                            _buildStatItem('Present', presentCount.toString(), const Color(0xFF4CAF50)),
-                            _buildStatItem('Absent', absentCount.toString(), const Color(0xFFF44336)),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: LinearProgressIndicator(
-                            value: attendancePercentage,
-                            backgroundColor: const Color(0xFF0F0F13),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
-                            minHeight: 10,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Overall attendance',
-                              style: TextStyle(
-                                color: Colors.white70, 
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4A3AFF).withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                attendancePercentageString,
-                                style: const TextStyle(
-                                  color: Color(0xFF8B78FF),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
+                            const SizedBox(height: 16),
+                            Center(
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const DetailedAttendanceScreen(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.dashboard_customize_outlined, size: 18, color: Color(0xFF8B78FF)),
+                                label: const Text(
+                                  'View Club Trophy Boards',
+                                  style: TextStyle(
+                                    color: Color(0xFF8B78FF),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 16),
-                        Center(
-                          child: TextButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const DetailedAttendanceScreen(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.dashboard_customize_outlined, size: 18, color: Color(0xFF8B78FF)),
-                            label: const Text(
-                              'View Club Trophy Boards',
-                              style: TextStyle(
-                                color: Color(0xFF8B78FF),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Recent Sessions',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: records.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No attendance records found.',
-                            style: TextStyle(color: Colors.grey),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Recent Sessions',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                          itemCount: records.length,
-                          itemBuilder: (context, index) {
-                            final record = records[index];
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1C1C23),
-                                borderRadius: BorderRadius.circular(16),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: records.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'No attendance records found.',
+                                style: TextStyle(color: Colors.grey),
                               ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: record.iconColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      Icons.calendar_today,
-                                      color: record.iconColor,
-                                      size: 24,
-                                    ),
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                              itemCount: records.length,
+                              itemBuilder: (context, index) {
+                                final record = records[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1C1C23),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          record.title,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${record.date} • ${record.time}\n${record.venue}',
-                                          style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                  child: Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            record.isPresent ? 'Present' : 'Absent',
-                                            style: TextStyle(
-                                              color: record.isPresent
-                                                  ? const Color(0xFF4CAF50)
-                                                  : const Color(0xFFF44336),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: record.iconColor.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(
+                                          Icons.calendar_today,
+                                          color: record.iconColor,
+                                          size: 24,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              record.title,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Icon(
-                                            record.isPresent
-                                                ? Icons.check_circle_outline
-                                                : Icons.cancel_outlined,
-                                            color: record.isPresent
-                                                ? const Color(0xFF4CAF50)
-                                                : const Color(0xFFF44336),
-                                            size: 16,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${record.date} • ${record.time}\n${record.venue}',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                record.isPresent ? 'Present' : 'Absent',
+                                                style: TextStyle(
+                                                  color: record.isPresent
+                                                      ? const Color(0xFF4CAF50)
+                                                      : const Color(0xFFF44336),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Icon(
+                                                record.isPresent
+                                                    ? Icons.check_circle_outline
+                                                    : Icons.cancel_outlined,
+                                                color: record.isPresent
+                                                    ? const Color(0xFF4CAF50)
+                                                    : const Color(0xFFF44336),
+                                                size: 16,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -6,6 +6,7 @@ import '../services/firebase_service.dart';
 import '../models/team_member.dart';
 import '../models/mock_data/events_mock.dart';
 import '../models/profile_data.dart';
+import '../models/moment.dart';
 import 'core_team_screen.dart';
 import 'events_screen.dart';
 import 'profile_screen.dart';
@@ -30,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Variable list of slideshow photos — add or swap asset paths here
   static const List<String> _slideshowPhotos = [
     'assets/Theme images/college.png',
-    'assets/Theme images/login_bg.png',
     'assets/Theme images/G.png',
   ];
 
@@ -262,15 +262,42 @@ class _HomeScreenState extends State<HomeScreen> {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 140,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            _momentCard('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=500&q=80', 'Batch Meetup'),
-            _momentCard('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&q=80', 'Auditorium'),
-            _momentCard('https://images.unsplash.com/photo-1511629091441-ee46146481b6?w=500&q=80', 'Hostel Night'),
-            _momentCard('https://images.unsplash.com/photo-1523580494112-071d16940d14?w=500&q=80', 'Campus Tour'),
-          ],
+        child: StreamBuilder<List<MomentModel>>(
+          stream: FirebaseService.instance.streamMoments(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF4A3AFF),
+                    strokeWidth: 2,
+                  ),
+                ),
+              );
+            }
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text('Error', style: TextStyle(color: Colors.redAccent)),
+              );
+            }
+            final moments = snapshot.data ?? [];
+            if (moments.isEmpty) {
+              return const Center(
+                child: Text('No moments yet', style: TextStyle(color: Colors.grey)),
+              );
+            }
+            return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: moments.length,
+              itemBuilder: (context, index) {
+                final moment = moments[index];
+                return _momentCard(moment.imageUrl, moment.title);
+              },
+            );
+          },
         ),
       ),
     );

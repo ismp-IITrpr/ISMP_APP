@@ -16,18 +16,24 @@ class _RepDashboardState extends State<RepDashboard> {
   final _eventNameCtrl = TextEditingController();
   final _eventVenueCtrl = TextEditingController();
   final _eventDescCtrl = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  final _groupNoCtrl = TextEditingController();
+  DateTime _selectedDate = DateTime(2026, 8, 1);
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay(
+    hour: (TimeOfDay.now().hour + 1) % 24,
+    minute: TimeOfDay.now().minute,
+  );
   bool _isPostingEvent = false;
 
   String get _repEmail =>
-      FirebaseService.instance.currentUser?.email ?? 'testclub@iitrpr.ac.in';
+      FirebaseService.instance.currentUser?.email ?? 'robotics@iitrpr.ac.in';
 
   @override
   void dispose() {
     _eventNameCtrl.dispose();
     _eventVenueCtrl.dispose();
     _eventDescCtrl.dispose();
+    _groupNoCtrl.dispose();
     super.dispose();
   }
 
@@ -35,18 +41,26 @@ class _RepDashboardState extends State<RepDashboard> {
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      firstDate: DateTime(2026, 7, 1),
+      lastDate: DateTime(2027, 8, 31),
     );
     if (picked != null) setState(() => _selectedDate = picked);
   }
 
-  Future<void> _pickTime() async {
+  Future<void> _pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
-      initialTime: _selectedTime,
+      initialTime: _startTime,
     );
-    if (picked != null) setState(() => _selectedTime = picked);
+    if (picked != null) setState(() => _startTime = picked);
+  }
+
+  Future<void> _pickEndTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _endTime,
+    );
+    if (picked != null) setState(() => _endTime = picked);
   }
 
   Future<void> _postEvent() async {
@@ -55,13 +69,19 @@ class _RepDashboardState extends State<RepDashboard> {
     setState(() => _isPostingEvent = true);
     try {
       final club = FirebaseService.instance.getClubForEmail(_repEmail);
+      
+      // Target audience
+      final targetAudience = _groupNoCtrl.text.trim();
+
       await FirebaseService.instance.postEvent(
         title: _eventNameCtrl.text.trim(),
         date: DateFormat('yyyy-MM-dd').format(_selectedDate),
-        time: _selectedTime.format(context),
+        startTime: _startTime.format(context),
+        endTime: _endTime.format(context),
         venue: _eventVenueCtrl.text.trim(),
         description: _eventDescCtrl.text.trim(),
         day: _selectedDate.day,
+        targetAudience: targetAudience,
         type: 'C',
         club: club,
       );
@@ -70,6 +90,7 @@ class _RepDashboardState extends State<RepDashboard> {
         _eventNameCtrl.clear();
         _eventVenueCtrl.clear();
         _eventDescCtrl.clear();
+        _groupNoCtrl.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Event posted successfully!'),
@@ -185,33 +206,51 @@ class _RepDashboardState extends State<RepDashboard> {
             const SizedBox(height: 16),
 
             // Date & Time pickers
+            _buildPickerCard(
+              label: 'Date: ${DateFormat('dd MMM yyyy').format(_selectedDate)}',
+              icon: Icons.calendar_today,
+              onTap: _pickDate,
+            ),
+            const SizedBox(height: 16),
+
             Row(
               children: [
                 Expanded(
                   child: _buildPickerCard(
-                    label: DateFormat('dd MMM yyyy').format(_selectedDate),
-                    icon: Icons.calendar_today,
-                    onTap: _pickDate,
+                    label: 'Start: ${_startTime.format(context)}',
+                    icon: Icons.access_time,
+                    onTap: _pickStartTime,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildPickerCard(
-                    label: _selectedTime.format(context),
+                    label: 'End: ${_endTime.format(context)}',
                     icon: Icons.access_time,
-                    onTap: _pickTime,
+                    onTap: _pickEndTime,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
+            _buildTextField(
+              controller: _groupNoCtrl,
+              label: 'Target Audience (e.g., all members, 6 7)',
+              icon: Icons.group,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+            ),
+            const SizedBox(height: 16),
+
             // Description
             _buildTextField(
               controller: _eventDescCtrl,
-              label: 'Description (optional)',
+              label: 'Description',
               icon: Icons.description,
               maxLines: 3,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 28),
 

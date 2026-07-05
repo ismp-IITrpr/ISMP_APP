@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
-import 'rep_access.dart';
 import '../widgets/rep_main_layout.dart';
 import 'rep_dashboard.dart';
 
@@ -15,21 +14,23 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    FirebaseService.instance.deleteOldEvents();
+  }
+
   void _handleGoogleSignIn() async {
     setState(() {
       _isLoading = true;
     });
 
-    // TEMPORARY BYPASS: Navigate directly to main screen without Google OAuth
+    // TEMPORARY BYPASS: Navigate directly to the regular user main screen
     if (mounted) {
-      String mockRollNo = "24CS1001";
-      final isRep = isCurrentUserRep(mockRollNo);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => isRep
-              ? const RepMainLayout()
-              : const MainLayout(),
+          builder: (context) => const MainLayout(),
         ),
       );
       setState(() {
@@ -42,9 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
-          // Check if the signed-in user is a club rep and route accordingly
-          final isRep = FirebaseService.instance.isClubRep(user.email)
-              || isCurrentUserRep(user.uid);
+          // In production: check Firebase if user is a club rep
+          final isRep = FirebaseService.instance.isClubRep(user.email);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -220,9 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 14,
                   ),
                 ),
-                // ── DEV ONLY: Remove before production ──
-                const SizedBox(height: 12),
-                TextButton(
+                const SizedBox(height: 20),
+                OutlinedButton.icon(
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
@@ -231,13 +230,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
                   },
-                  child: const Text(
-                    '🛠 Dev: Login as Club Rep',
+                  icon: const Icon(
+                    Icons.shield_outlined,
+                    size: 18,
+                    color: Color(0xFF8B78FF),
+                  ),
+                  label: const Text(
+                    'Rep Access',
                     style: TextStyle(
                       color: Color(0xFF8B78FF),
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
                     ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF8B78FF), width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 28),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    minimumSize: const Size(double.infinity, 0),
                   ),
                 ),
               ],

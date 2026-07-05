@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:csv/csv.dart';
@@ -22,8 +23,40 @@ class LiveAttendanceScreen extends StatefulWidget {
 }
 
 class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
+  static const Color bg = Color(0xFF0F0F13);
+  static const Color appBarBg = Color(0xFF090A0F);
+  static const Color surface = Color(0xFF12131A);
+  static const Color card = Color(0xFF1C1C23);
+  static const Color primary = Color(0xFF4A3AFF);
+  static const Color primaryLight = Color(0xFF8B78FF);
+  static const Color success = Color(0xFF4CAF50);
+  static const Color error = Color(0xFFF44336);
+  static const Color textGray = Color(0xFF8B8B9B);
+
   bool _isExporting = false;
   bool _isEnding = false;
+  Timer? _uiTimer;
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _rollController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _uiTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _uiTimer?.cancel();
+    _nameController.dispose();
+    _rollController.dispose();
+    super.dispose();
+  }
 
   Future<void> _endSession() async {
     final confirm = await showDialog<bool>(
@@ -45,8 +78,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('End Session',
-                style: TextStyle(
-                    color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -87,12 +119,11 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
             Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
             SizedBox(width: 8),
             Text('Export & Erase',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
         content: const Text(
-          'This will:\n1. Generate a CSV file with all attendance data.\n2. Share it with you so you can save it.\n3. Permanently delete all session data from the database.\n\nThis action cannot be undone.',
+          'This will:\n1. Generate a CSV file with all attendance data.\n2. Share it so you can save it.\n3. Permanently delete all session data from the database.\n\nThis action cannot be undone.',
           style: TextStyle(color: Colors.grey, height: 1.5),
         ),
         actions: [
@@ -103,8 +134,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Export & Erase',
-                style: TextStyle(
-                    color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -114,11 +144,8 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
     setState(() => _isExporting = true);
     try {
-      // 1. Fetch all scans
-      final scans =
-          await FirebaseService.instance.getSessionScans(widget.sessionId);
+      final scans = await FirebaseService.instance.getSessionScans(widget.sessionId);
 
-      // 2. Build CSV
       final csvData = <List<String>>[
         ['S.No', 'Name', 'Email', 'Scanned At'],
         ...scans.asMap().entries.map((entry) {
@@ -138,20 +165,16 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
       final csvString = const ListToCsvConverter().convert(csvData);
 
-      // 3. Write to temp file
       final dir = await getTemporaryDirectory();
-      final sanitized =
-          widget.eventName.replaceAll(RegExp(r'[^\w\s]'), '').replaceAll(' ', '_');
+      final sanitized = widget.eventName.replaceAll(RegExp(r'[^\w\s]'), '').replaceAll(' ', '_');
       final file = File('${dir.path}/attendance_$sanitized.csv');
       await file.writeAsString(csvString);
 
-      // 4. Share file so the rep can save/send it
       await Share.shareXFiles(
         [XFile(file.path)],
         text: 'Attendance for ${widget.eventName}',
       );
 
-      // 5. Erase data from Firebase
       await FirebaseService.instance.eraseSessionData(widget.sessionId);
 
       if (mounted) {
@@ -161,7 +184,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
             backgroundColor: Color(0xFF4CAF50),
           ),
         );
-        Navigator.pop(context); // Go back to dashboard
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
@@ -174,211 +197,421 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     }
   }
 
+  void _addManualStudent() async {
+    final name = _nameController.text.trim();
+    final roll = _rollController.text.trim();
+    if (name.isEmpty || roll.isEmpty) return;
+
+    try {
+      await FirebaseService.instance.addManualMark(
+        sessionId: widget.sessionId,
+        name: name,
+        rollNo: roll,
+      );
+      _nameController.clear();
+      _rollController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add: $e')),
+      );
+    }
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hint) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white, fontSize: 13),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: textGray, fontSize: 13),
+        filled: true,
+        fillColor: surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
-      appBar: AppBar(
-        title: Text(
-          widget.eventName,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF1C1C23),
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      body: StreamBuilder<String>(
-        stream:
-            FirebaseService.instance.streamSessionStatus(widget.sessionId),
-        builder: (context, statusSnapshot) {
-          final status = statusSnapshot.data ?? 'active';
-          final isActive = status == 'active';
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseService.instance.streamSession(widget.sessionId),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data();
+        final status = data?['status'] ?? 'ended';
+        final isActive = status == 'active';
+        final Timestamp? createdAt = data?['createdAt'] as Timestamp?;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
+        Duration remaining = Duration.zero;
+        if (isActive && createdAt != null) {
+          final elapsed = DateTime.now().difference(createdAt.toDate());
+          remaining = const Duration(minutes: 5) - elapsed;
+          if (remaining.inSeconds <= 0) {
+            remaining = Duration.zero;
+            FirebaseService.instance.endSession(widget.sessionId);
+          }
+        }
+
+        return Scaffold(
+          backgroundColor: bg,
+          appBar: AppBar(
+            backgroundColor: appBarBg,
+            elevation: 0,
+            centerTitle: true,
+            title: const Text(
+              'Take Attendance',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               children: [
-                // Status badge
+                // Event Header Card
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? const Color(0xFF4CAF50).withOpacity(0.15)
-                        : Colors.redAccent.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isActive
-                          ? const Color(0xFF4CAF50)
-                          : Colors.redAccent,
-                    ),
+                    color: card,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        isActive ? Icons.circle : Icons.cancel,
-                        size: 10,
-                        color: isActive
-                            ? const Color(0xFF4CAF50)
-                            : Colors.redAccent,
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: primary.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: const Icon(Icons.groups_outlined, color: primaryLight, size: 22),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isActive ? 'LIVE — Accepting Scans' : 'SESSION ENDED',
-                        style: TextStyle(
-                          color: isActive
-                              ? const Color(0xFF4CAF50)
-                              : Colors.redAccent,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.eventName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Live scanning session',
+                              style: TextStyle(color: textGray, fontSize: 12),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
 
-                // QR Code
+                // QR Card
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF8B78FF).withOpacity(0.2),
-                        blurRadius: 30,
-                        spreadRadius: 5,
+                    color: surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: isActive ? primary.withOpacity(0.3) : Colors.white.withOpacity(0.05),
+                    ),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: primary.withOpacity(0.15),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isActive ? 'LIVE — Accepting Scans' : 'SESSION ENDED',
+                            style: TextStyle(
+                              color: isActive ? success : error,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          if (isActive && remaining > Duration.zero)
+                            Text(
+                              '${remaining.inMinutes.remainder(60).toString().padLeft(2, "0")}:${remaining.inSeconds.remainder(60).toString().padLeft(2, "0")}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // QR Box
+                      AnimatedOpacity(
+                        opacity: isActive ? 1.0 : 0.3,
+                        duration: const Duration(milliseconds: 300),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: QrImageView(
+                            data: widget.sessionId,
+                            version: QrVersions.auto,
+                            size: 200,
+                            backgroundColor: Colors.white,
+                            eyeStyle: const QrEyeStyle(
+                              eyeShape: QrEyeShape.square,
+                              color: Color(0xFF1C1C23),
+                            ),
+                            dataModuleStyle: const QrDataModuleStyle(
+                              dataModuleShape: QrDataModuleShape.square,
+                              color: Color(0xFF1C1C23),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        isActive
+                            ? 'Ask students to scan this to mark themselves present'
+                            : 'QR has stopped accepting new scans',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: textGray, fontSize: 12),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isActive ? _endSession : null,
+                              icon: Icon(
+                                Icons.stop_circle_outlined,
+                                size: 18,
+                                color: isActive ? error : Colors.grey,
+                              ),
+                              label: Text(
+                                isActive ? 'Stop QR now' : 'QR Stopped',
+                                style: TextStyle(
+                                  color: isActive ? error : Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: (isActive ? error : Colors.grey).withOpacity(0.4),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  child: QrImageView(
-                    data: widget.sessionId,
-                    version: QrVersions.auto,
-                    size: 220,
-                    backgroundColor: Colors.white,
-                    eyeStyle: const QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: Color(0xFF1C1C23),
-                    ),
-                    dataModuleStyle: const QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color: Color(0xFF1C1C23),
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  isActive
-                      ? 'Show this QR code to students'
-                      : 'This QR code is no longer valid',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
 
-                // Live counter
-                StreamBuilder<int>(
-                  stream: FirebaseService.instance
-                      .streamSessionScanCount(widget.sessionId),
-                  builder: (context, countSnapshot) {
-                    final count = countSnapshot.data ?? 0;
+                // Manual Add Card
+                _buildManualAddCard(),
+                const SizedBox(height: 20),
+
+                // Running List of Marked Present Students
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: FirebaseService.instance.streamSessionScansList(widget.sessionId),
+                  builder: (context, scansSnapshot) {
+                    final scannedStudents = scansSnapshot.data ?? [];
+
                     return Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1C1C23),
-                        borderRadius: BorderRadius.circular(16),
+                        color: card,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.05)),
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '$count',
-                            style: const TextStyle(
-                              color: Color(0xFF8B78FF),
-                              fontSize: 56,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Marked present',
+                                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: primary.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${scannedStudents.length}',
+                                  style: const TextStyle(color: primaryLight, fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            count == 1
-                                ? 'Student Scanned'
-                                : 'Students Scanned',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 15,
-                            ),
-                          ),
+                          const SizedBox(height: 12),
+                          if (scannedStudents.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Text(
+                                'No one marked yet — scans and manual adds will show up here.',
+                                style: TextStyle(color: textGray.withOpacity(0.8), fontSize: 12),
+                              ),
+                            )
+                          else
+                            ...scannedStudents.map((s) {
+                              final String name = s['name'] ?? '';
+                              final String rollNo = s['studentUid'] ?? '';
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: surface,
+                                      child: Text(
+                                        name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                        style: const TextStyle(color: primaryLight, fontSize: 13, fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(name, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                                          Text(rollNo, style: const TextStyle(color: textGray, fontSize: 11)),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close_rounded, size: 18, color: error),
+                                      splashRadius: 18,
+                                      onPressed: () async {
+                                        await FirebaseService.instance.removeScan(widget.sessionId, rollNo);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                         ],
                       ),
                     );
                   },
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
-                // Action buttons
-                if (isActive)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: _isEnding ? null : _endSession,
-                      icon: _isEnding
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2))
-                          : const Icon(Icons.stop_circle, color: Colors.white),
-                      label: Text(
-                        _isEnding ? 'Ending...' : 'End Session',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
+                // Submit Attendance / Export CSV button
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: _isExporting
+                        ? null
+                        : (isActive ? _endSession : _exportAndErase),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isActive ? primary : success,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: primary.withOpacity(0.5),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
+                    child: _isExporting
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                          )
+                        : Text(
+                            isActive ? 'End QR Session' : 'Export CSV & Clean Data',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          ),
                   ),
-
-                if (!isActive) ...[
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      onPressed: _isExporting ? null : _exportAndErase,
-                      icon: _isExporting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2))
-                          : const Icon(Icons.download, color: Colors.white),
-                      label: Text(
-                        _isExporting ? 'Exporting...' : 'Export CSV & Erase Data',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B78FF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ],
             ),
-          );
-        },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildManualAddCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Add manually',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "For students who couldn't scan the QR",
+            style: TextStyle(color: textGray, fontSize: 11),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: _buildTextField(_nameController, 'Name'),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: _buildTextField(_rollController, 'Roll No.'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _addManualStudent,
+              icon: const Icon(Icons.person_add_alt_1_rounded, size: 18, color: primaryLight),
+              label: const Text('Add student', style: TextStyle(color: primaryLight, fontWeight: FontWeight.w600)),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: primaryLight.withOpacity(0.35)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

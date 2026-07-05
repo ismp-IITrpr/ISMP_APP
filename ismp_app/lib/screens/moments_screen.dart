@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/firebase_service.dart';
+import '../models/moment.dart';
 
 class MomentsScreen extends StatelessWidget {
   const MomentsScreen({super.key});
@@ -24,8 +25,8 @@ class MomentsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('moments').snapshots(),
+      body: StreamBuilder<List<MomentModel>>(
+        stream: FirebaseService.instance.streamMoments(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
@@ -41,8 +42,8 @@ class MomentsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
           }
 
-          final docs = snapshot.data?.docs ?? [];
-          if (docs.isEmpty) {
+          final moments = snapshot.data ?? [];
+          if (moments.isEmpty) {
             return const Center(
               child: Text(
                 'No moments found yet.',
@@ -59,17 +60,15 @@ class MomentsScreen extends StatelessWidget {
               mainAxisSpacing: 16,
               childAspectRatio: 0.8,
             ),
-            itemCount: docs.length,
+            itemCount: moments.length,
             itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
-              final imageUrl = data['imageUrl'] ?? '';
-              final title = data['title'] ?? 'Untitled';
+              final moment = moments[index];
 
               return Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   image: DecorationImage(
-                    image: NetworkImage(imageUrl),
+                    image: NetworkImage(moment.imageUrl),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -85,7 +84,7 @@ class MomentsScreen extends StatelessWidget {
                   alignment: Alignment.bottomLeft,
                   padding: const EdgeInsets.all(12),
                   child: Text(
-                    title,
+                    moment.title,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

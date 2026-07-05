@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/profile_data.dart';
 import 'login_screen.dart';
+import 'rep_dashboard.dart';
 
 class RepProfileScreen extends StatelessWidget {
   const RepProfileScreen({super.key});
@@ -42,7 +43,14 @@ class RepProfileScreen extends StatelessWidget {
               _buildSectionHeader('CLUB REP'),
               const SizedBox(height: 16),
               _buildClubCard(user),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
+
+              // ── Quick Actions ──
+              _buildSectionHeader('QUICK ACTIONS'),
+              const SizedBox(height: 16),
+              _buildCreateEventCard(context),
+              const SizedBox(height: 32),
+
               _buildLogoutButton(context),
               const SizedBox(height: 32),
             ],
@@ -417,6 +425,83 @@ class RepProfileScreen extends StatelessWidget {
               ),
             )
           : null,
+    );
+  }
+
+  Widget _buildCreateEventCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const RepDashboard()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: primaryPurple.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: primaryPurple.withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    primaryPurple.withOpacity(0.3),
+                    primaryPurple.withOpacity(0.1),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: primaryPurple.withOpacity(0.4)),
+              ),
+              child: const Icon(
+                Icons.add_circle_outline_rounded,
+                color: primaryPurple,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Create Event',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'Post a new session for your club',
+                    style: TextStyle(
+                      color: textGray,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: textGray,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -34,8 +34,9 @@ class _MainLayoutState extends State<MainLayout> {
       const HomeScreen(),
       EventsScreen(isRep: widget.isRep, repClub: repClub),
       AttendanceScreen(isRep: widget.isRep, repClub: repClub),
-      const ProfileScreen(),
-      if (widget.isRep) const RepDashboard(),
+
+    ProfileScreen(isRep: widget.isRep),
+    if (widget.isRep) const RepDashboard(),
     ];
 
     _navItems = [

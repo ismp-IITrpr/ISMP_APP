@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           end: Alignment.bottomRight,
         ),
         color: const Color(0xFF00FFCC),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false))),
       ),
       _QuickLink(
         title: "Today's Events",

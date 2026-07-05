@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/profile_data.dart';
 import 'login_screen.dart';
 
@@ -66,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
               // ── Logout Button ──
               _buildLogoutButton(context),
               const SizedBox(height: 32),
-            ],
+            ].animate(interval: 100.ms).fadeIn(duration: 600.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad),
           ),
         ),
       ),

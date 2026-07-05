@@ -82,7 +82,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Gorish Lamba',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CSB1191.jpg',
+    image: 'img/2026/2025CSB1191.jpg',
     phone: '+91 7027155745',
     instagram: 'https://www.instagram.com/glk._.7/?hl=en',
     mail: '2025csb1191@iitrpr.ac.in',
@@ -90,7 +90,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Harsh Thapar',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CSB1199.jpg',
+    image: 'img/2026/2025CSB1199.jpg',
     phone: '+91 9988841406',
     instagram: 'https://www.instagram.com/harshthapar07?igsh=MXR2dWsxb2E0aHNpZg==',
     mail: '2025csb1199@iitrpr.ac.in',
@@ -98,7 +98,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Parag Gupta',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CHB1137.jpg',
+    image: 'img/2026/2025CHB1137.jpg',
     phone: '+91 9009826800',
     instagram: 'https://www.instagram.com/p4r4_g?igsh=OGQ3NWR4N2cyNGJ0',
     mail: '2025chb1137@iitrpr.ac.in',
@@ -106,7 +106,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Saksham',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CSB1251.jpg',
+    image: 'img/2026/2025CSB1251.jpg',
     phone: '+91 7011055687',
     instagram: 'https://www.instagram.com/makshas007?igsh=MW9lbnFycjBqdzk0MA==',
     mail: '2025CSB1251@iitrpr.ac.in',
@@ -114,7 +114,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Thoihenba B',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025ICB1449.jpeg',
+    image: 'img/2026/2025ICB1449.jpeg',
     phone: '+91 7348954235',
     instagram: 'https://www.instagram.com/th0i_boi/',
     mail: '2025icb1449@iitrpr.ac.in',
@@ -122,7 +122,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Deepti Ashwani',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025EEB1319.jpg',
+    image: 'img/2026/2025EEB1319.jpg',
     phone: '+91 9696551140',
     instagram: 'https://www.instagram.com/deeptiashwani7?igsh=MTJlcnd2eDlmNTl3eA==',
     mail: '2025eeb1319@iitrpr.ac.in',
@@ -130,7 +130,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Vishavpreet Singh',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025AIB1078.webp',
+    image: 'img/2026/2025AIB1078.webp',
     phone: '+91 7696146238',
     instagram: 'https://www.instagram.com/mrvishavop1?igsh=MTVwaDB1NGt2ZGYzMA==',
     mail: '2025AIB1078@iitrpr.ac.in',
@@ -138,7 +138,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Digvijaya Singh',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CSB1188.jpeg',
+    image: 'img/2026/2025CSB1188.jpeg',
     phone: '+91 9416316600',
     instagram: 'https://www.instagram.com/digvijaya2007?igsh=Y2FpYnRoankxZHo0',
     mail: '2025csb1188@iitrpr.ac.in',
@@ -146,7 +146,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Gurnoor Singh',
     role: 'DEVELOPER',
-    image: 'images/team/mentor/2026/2025CSB1196.jpg',
+    image: 'img/2026/2025CSB1196.jpg',
     phone: '+91 9501587214',
     instagram: 'https://www.instagram.com/singh_gnoor/',
     mail: '2025csb1196@iitrpr.ac.in',
@@ -154,7 +154,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Jasmine Kaur Dhaliwal',
     role: 'CONTRIBUTOR',
-    image: 'images/team/mentor/2026/2025DAB1277.jpg',
+    image: 'img/2026/2025DAB1277.jpg',
     phone: '+91 8360646191',
     instagram: 'instagram.com/dhaliwal.jas_mine/',
     mail: '2025dab1277@iitrpr.ac.in',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
+import 'rep_access.dart';
+import '../widgets/rep_main_layout.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,9 +21,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // TEMPORARY BYPASS: Navigate directly to main screen without Google OAuth
     if (mounted) {
+      String mockRollNo = "24CS1001";
+      final isRep = isCurrentUserRep(mockRollNo);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MainLayout()),
+        MaterialPageRoute(
+          builder: (context) => isRep
+              ? const RepMainLayout()
+              : const MainLayout(),
+        ),
       );
       setState(() {
         _isLoading = false;
@@ -33,9 +41,15 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
+          // Check if the signed-in user is a rep and route accordingly
+          final isRep = isCurrentUserRep(user.uid);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const MainLayout()),
+            MaterialPageRoute(
+              builder: (context) => isRep
+                  ? const RepMainLayout()
+                  : const MainLayout(),
+            ),
           );
         }
       }

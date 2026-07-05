@@ -35,6 +35,8 @@ class UserProfile {
   final String profileUrl;
   final String? mentorRollNo; // We just store the ID (Roll No) of their mentor here
   MentorProfile? mentor; // The app will hold the full mentor object here later
+  final String? clubName;
+  final String? clubId;
 
   UserProfile({
     required this.name,
@@ -46,6 +48,8 @@ class UserProfile {
     required this.profileUrl,
     this.mentorRollNo,
     this.mentor,
+    this.clubName,
+    this.clubId,
   });
 
   // THE TRANSLATOR: Converts raw Firebase data into a UserProfile object
@@ -60,6 +64,8 @@ class UserProfile {
       stickersCollected: data['stickersCollected'] ?? 0,
       profileUrl: data['profileUrl'] ?? '',
       mentorRollNo: data['mentorRollNo'], // Grabs the assigned mentor's ID
+      clubName: data['clubName'],
+      clubId: data['clubId'],
     );
   }
 }
@@ -81,4 +87,6 @@ final UserProfile dummyUser = UserProfile(
   stickersCollected: 12,
   profileUrl: '',
   mentor: dummyMentor,
+  clubName: 'Robotics',
+  clubId: 'C_ard_1',
 );

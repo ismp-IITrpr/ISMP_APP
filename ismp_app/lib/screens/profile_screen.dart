@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/profile_data.dart';
+import '../screens/rep_access.dart';
 import 'login_screen.dart';
+import 'events_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,6 +20,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = dummyUser;
+    final bool isRep = isCurrentUserRep(user.rollNo);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -55,7 +58,16 @@ class ProfileScreen extends StatelessWidget {
               _buildSectionHeader('YOUR PROFILE'),
               const SizedBox(height: 16),
               _buildUserContainer(user),
-              
+
+              // Rep-only quick access — only rendered when isCurrentUserRep
+              // is true for this user. No manual toggle anywhere.
+              if (isRep) ...[
+                const SizedBox(height: 32),
+                _buildSectionHeader('CLUB REP'),
+                const SizedBox(height: 16),
+                _buildRepAccessCard(context),
+              ],
+
               const SizedBox(height: 48),
 
               // Logout Button
@@ -63,6 +75,59 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 32),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Rep-only card — takes the rep straight to Events, where each club
+  // session now shows a "Start Attendance" action.
+  Widget _buildRepAccessCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: primaryPurple.withOpacity(0.25)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const EventsScreen()),
+          );
+        },
+        child: Row(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: primaryPurple.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: const Icon(Icons.event_available_outlined, color: primaryPurple, size: 22),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Open Rep Events',
+                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Take attendance for your club sessions',
+                    style: TextStyle(color: textGray, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: textGray),
+          ],
         ),
       ),
     );
@@ -308,13 +373,13 @@ class ProfileScreen extends StatelessWidget {
       backgroundImage: url.isNotEmpty ? (url.startsWith('http') ? NetworkImage(url) : AssetImage(url) as ImageProvider) : null,
       child: url.isEmpty
           ? Text(
-              initial,
-              style: TextStyle(
-                color: primaryPurple,
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
-              ),
-            )
+        initial,
+        style: TextStyle(
+          color: primaryPurple,
+          fontSize: fontSize,
+          fontWeight: FontWeight.w600,
+        ),
+      )
           : null,
     );
   }
@@ -328,7 +393,7 @@ class ProfileScreen extends StatelessWidget {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false,
+                (route) => false,
           );
         },
         style: TextButton.styleFrom(

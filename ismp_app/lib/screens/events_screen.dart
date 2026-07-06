@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/events.dart';
-import '../models/profile_data.dart'; // for dummyUser.rollNo — used for the rep check
+import '../services/firebase_service.dart';
+import '../services/database_service.dart';
 import '../screens/rep_access.dart';
 import 'rep_attendance_screen.dart';
-import '../services/firebase_service.dart';
 import 'live_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -22,8 +22,26 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  int _selectedDay = 1;
-  final DateTime _startDate = DateTime(2026, 8, 1);
+  late int _selectedDay;
+  late DateTime _startDate;
+  final DateTime _eventStartDate = DateTime(2026, 7, 7);
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Hide past dates by starting the scrollbar at today's date
+    if (today.isBefore(_eventStartDate)) {
+      _startDate = _eventStartDate;
+    } else {
+      _startDate = today;
+    }
+    
+    // Automatically set default selected day to the real date (or day 1 if event hasn't started)
+    _selectedDay = _startDate.difference(_eventStartDate).inDays + 1;
+  }
 
   String _getWeekdayString(int weekday) {
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -43,7 +61,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
     // Same login for everyone — no manual role picker. Whether the
     // "Start Attendance" button shows up is decided purely by this check.
-    final bool isRep = widget.isRep || isCurrentUserRep(dummyUser.rollNo);
+    final bool isRep = widget.isRep;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -97,8 +115,9 @@ class _EventsScreenState extends State<EventsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: 60, // Shows a scrollable buffer of 60 days
                 itemBuilder: (context, index) {
-                  int dayIndex = index + 1; // 1-based index for events query
                   DateTime date = _startDate.add(Duration(days: index));
+                  int dayIndex = date.difference(_eventStartDate).inDays + 1; // Backend maps this strictly to Day 1, Day 2, etc.
+                  
                   String weekday = _getWeekdayString(date.weekday);
                   String monthName = _getMonthString(date.month);
                   bool isSelected = _selectedDay == dayIndex;
@@ -177,8 +196,8 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: StreamBuilder<List<EventModel>>(
-                stream: FirebaseService.instance.streamEventsForDay(_selectedDay),
+              child: FutureBuilder<List<EventModel>>(
+                future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
@@ -199,8 +218,8 @@ class _EventsScreenState extends State<EventsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     itemCount: dailyEvents.length,
                     itemBuilder: (context, index) {
-                      final event = dailyEvents[index];
-                      final isLast = index == dailyEvents.length - 1;
+                        final event = dailyEvents[index];
+                        final isLast = index == dailyEvents.length - 1;
 
                       // Only club sessions ('C') that match this rep's club get
                       // a "Start Attendance" action (with Firebase session creation).
@@ -247,8 +266,19 @@ class _EventsScreenState extends State<EventsScreen> {
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1C1C23),
+                                  color: Colors.white.withOpacity(0.03),
                                   borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.08),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +386,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           ],
                         ),
                       ).animate().fadeIn(duration: 500.ms, delay: (index * 50).ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
-                    },
+                      },
                   );
                 }
               ),

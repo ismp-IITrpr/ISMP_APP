@@ -23,6 +23,24 @@ class MentorProfile {
       profileUrl: data['profileUrl'] ?? '',
     );
   }
+
+  factory MentorProfile.fromMap(Map<String, dynamic> data) {
+    return MentorProfile(
+      name: data['name'] ?? '',
+      rollNo: data['rollNo'] ?? '',
+      contactNo: data['contactNo'] ?? '',
+      profileUrl: data['profileUrl'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'rollNo': rollNo,
+      'contactNo': contactNo,
+      'profileUrl': profileUrl,
+    };
+  }
 }
 
 class UserProfile {
@@ -67,6 +85,38 @@ class UserProfile {
       clubName: data['clubName'],
       clubId: data['clubId'],
     );
+  }
+
+  factory UserProfile.fromMap(Map<String, dynamic> data) {
+    return UserProfile(
+      name: data['name'] ?? '',
+      rollNo: data['rollNo'] ?? '',
+      degree: data['degree'] ?? '',
+      branch: data['branch'] ?? '',
+      groupNo: data['groupNo'] ?? 0,
+      stickersCollected: data['stickersCollected'] ?? 0,
+      profileUrl: data['profileUrl'] ?? '',
+      mentorRollNo: data['mentorRollNo'],
+      mentor: data['mentor'] != null ? MentorProfile.fromMap(Map<String, dynamic>.from(data['mentor'])) : null,
+      clubName: data['clubName'],
+      clubId: data['clubId'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'rollNo': rollNo,
+      'degree': degree,
+      'branch': branch,
+      'groupNo': groupNo,
+      'stickersCollected': stickersCollected,
+      'profileUrl': profileUrl,
+      'mentorRollNo': mentorRollNo,
+      'mentor': mentor?.toMap(),
+      'clubName': clubName,
+      'clubId': clubId,
+    };
   }
 }
 

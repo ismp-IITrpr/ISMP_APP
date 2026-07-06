@@ -10,6 +10,7 @@ import '../models/moment.dart';
 import '../models/mock_data/blog_mock.dart';
 import '../models/mock_data/events_mock.dart';
 import '../models/mock_data/attendance_mock.dart';
+import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
 
 class FirebaseService {
@@ -124,6 +125,7 @@ class FirebaseService {
   // Sign out helper
   Future<void> signOut() async {
     _mockEmail = null;
+    DatabaseService.clearCache();
     await _auth.signOut();
     try {
       await GoogleSignIn(

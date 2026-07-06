@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
+import '../services/database_service.dart';
 import 'live_attendance_screen.dart';
 import 'rep_access.dart';
 
@@ -12,11 +14,35 @@ class RepEventsScreen extends StatefulWidget {
 }
 
 class _RepEventsScreenState extends State<RepEventsScreen> {
-  int _selectedDay = 1;
+  late int _selectedDay;
+  late DateTime _startDate;
+  final DateTime _eventStartDate = DateTime(2026, 7, 7);
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Hide past dates by starting the scrollbar at today's date
+    if (today.isBefore(_eventStartDate)) {
+      _startDate = _eventStartDate;
+    } else {
+      _startDate = today;
+    }
+    
+    // Automatically set default selected day to the real date (or day 1 if event hasn't started)
+    _selectedDay = _startDate.difference(_eventStartDate).inDays + 1;
+  }
 
   String _getWeekdayString(int weekday) {
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return weekdays[weekday - 1];
+  }
+  
+  String _getMonthString(int month) {
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    return months[month - 1];
   }
 
   @override
@@ -38,6 +64,14 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white70),
+            onPressed: () async {
+              await DatabaseService.clearPersistentEventsCache();
+              setState(() {});
+            },
+            tooltip: 'Refresh Schedule',
+          ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -70,15 +104,21 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 31,
+                itemCount: 60,
                 itemBuilder: (context, index) {
-                  int day = index + 1;
-                  DateTime date = DateTime(2026, 8, day);
+                  DateTime date = _startDate.add(Duration(days: index));
+                  int dayIndex = date.difference(_eventStartDate).inDays + 1;
+
                   String weekday = _getWeekdayString(date.weekday);
-                  bool isSelected = _selectedDay == day;
+                  String monthName = _getMonthString(date.month);
+                  bool isSelected = _selectedDay == dayIndex;
 
                   return GestureDetector(
-                    onTap: () => setState(() => _selectedDay = day),
+                    onTap: () {
+                      setState(() {
+                        _selectedDay = dayIndex;
+                      });
+                    },
                     child: Container(
                       width: 70,
                       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -119,16 +159,16 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            day.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            date.day.toString(),
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'AUG',
+                            monthName,
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white.withOpacity(0.9)
@@ -147,8 +187,8 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: StreamBuilder<List<EventModel>>(
-                stream: FirebaseService.instance.streamEventsForDay(_selectedDay),
+              child: FutureBuilder<List<EventModel>>(
+                future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
@@ -216,14 +256,18 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1C1C23),
+                                  color: Colors.white.withOpacity(0.03),
                                   borderRadius: BorderRadius.circular(16),
                                   border: isClubSession
-                                      ? Border.all(
-                                    color: const Color(0xFF4A3AFF)
-                                        .withOpacity(0.2),
-                                  )
-                                      : null,
+                                      ? Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3), width: 1.5)
+                                      : Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,8 +390,8 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                           ],
                         ),
                       );
-                    },
-                  );
+                      },
+                    );
                 }
               ),
             ),

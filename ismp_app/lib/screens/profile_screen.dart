@@ -4,6 +4,7 @@ import '../models/profile_data.dart';
 import 'login_screen.dart';
 import '../services/database_service.dart';
 import '../services/firebase_service.dart';
+import '../services/auth_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   final bool isRep;
@@ -412,6 +413,8 @@ class ProfileScreen extends StatelessWidget {
       height: 56,
       child: TextButton(
         onPressed: () async {
+          await AuthPreferences.clearAll();
+          DatabaseService.clearCache();
           await FirebaseService.instance.signOut();
           if (context.mounted) {
             Navigator.pushAndRemoveUntil(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
+import '../services/auth_preferences.dart';
 import '../widgets/rep_main_layout.dart';
 import 'rep_dashboard.dart';
 
@@ -30,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null) {
         if (mounted) {
           final isRep = FirebaseService.instance.isClubRep(user.email);
+          await AuthPreferences.saveLogin(user.email ?? '', isRep);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -309,6 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               if ((user != null || currentEmail == 'repaccess@gmail.com') && mounted) {
                                 Navigator.pop(context); // Close bottom sheet
                                 final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
+                                await AuthPreferences.saveLogin(FirebaseService.instance.currentUserEmail ?? '', isRep);
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(

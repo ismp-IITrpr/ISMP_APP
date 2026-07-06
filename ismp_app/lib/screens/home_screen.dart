@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Widget> _buildCarouselCards(BuildContext context) {
+    final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
     final mentor = dummyUser.mentor;
     final List<_QuickLink> links = [
       _QuickLink(
@@ -65,19 +66,20 @@ class _HomeScreenState extends State<HomeScreen> {
         color: const Color(0xFF4A3AFF),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DevTeamScreen())),
       ),
-      _QuickLink(
-        title: mentor?.name ?? 'Mentor Profile',
-        subtitle: 'We mentor. We guide.\nWe grow together.',
-        icon: Icons.person,
-        bgImage: 'assets/images/carousel/mentor_poster.png',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2B165C), Color(0xFF140733)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      if(!isRep)
+        _QuickLink(
+          title: mentor?.name ?? 'Mentor Profile',
+          subtitle: 'Get to know your mentor',
+          icon: Icons.person,
+          bgImage: 'assets/images/carousel/mentor_poster.png',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF2B165C), Color(0xFF140733)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          color: const Color(0xFF00FFCC),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false))),
         ),
-        color: const Color(0xFF00FFCC),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false))),
-      ),
       _QuickLink(
         title: "Today's Events",
         subtitle: _getEventsSubtitle(),

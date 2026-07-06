@@ -102,14 +102,6 @@ class CoreTeamScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _launchCall(String? phone) async {
-    if (phone == null || phone.isEmpty) return;
-    final Uri url = Uri.parse('tel:$phone');
-    if (!await launchUrl(url)) {
-      debugPrint('Could not launch $url');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -358,37 +350,19 @@ class CoreTeamScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 4,
-                  runSpacing: 4,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    if (member.linkedin != null && member.linkedin!.isNotEmpty)
-                      _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.linkedinIn, size: scaleMode > 0 ? 14 : 18, color: const Color(0xFFB4B0FF)),
-                        onTap: () => _launchUrl(member.linkedin),
-                        small: scaleMode > 0,
-                      ),
                     if (member.instagram != null && member.instagram!.isNotEmpty)
                       _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.instagram, size: scaleMode > 0 ? 14 : 18, color: const Color(0xFFB4B0FF)),
+                        icon: FaIcon(FontAwesomeIcons.instagram, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFB4B0FF)),
                         onTap: () => _launchUrl(member.instagram),
                         small: scaleMode > 0,
                       ),
-                    if (member.mail != null && member.mail!.isNotEmpty)
-                      _SocialButton(
-                        icon: Icon(Icons.mail_outline, size: scaleMode > 0 ? 14 : 18, color: const Color(0xFFB4B0FF)),
-                        onTap: () => _launchEmail(member.mail),
-                        small: scaleMode > 0,
-                      ),
                     if (member.phone != null && member.phone!.isNotEmpty)
                       _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.whatsapp, size: scaleMode > 0 ? 14 : 18, color: const Color(0xFFB4B0FF)),
+                        icon: FaIcon(FontAwesomeIcons.whatsapp, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFB4B0FF)),
                         onTap: () => _launchPhone(member.phone),
-                        small: scaleMode > 0,
-                      ),
-                    if (member.phone != null && member.phone!.isNotEmpty)
-                      _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.phone, size: scaleMode > 0 ? 14 : 18, color: const Color(0xFFB4B0FF)),
-                        onTap: () => _launchCall(member.phone),
                         small: scaleMode > 0,
                       ),
                   ],
@@ -513,7 +487,7 @@ class CoreTeamScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 if (member.mail != null && member.mail!.isNotEmpty)
                   _SocialButton(
-                    icon: const Icon(Icons.mail_outline, size: 16, color: Color(0xFFB4B0FF)),
+                    icon: const Icon(Icons.mail_outline, size: 28, color: Color(0xFFB4B0FF)),
                     onTap: () => _launchEmail(member.mail),
                     small: false,
                   ),
@@ -610,8 +584,8 @@ class _SocialButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        padding: EdgeInsets.all(small ? 8 : 10),
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        padding: EdgeInsets.all(small ? 14 : 18),
         decoration: BoxDecoration(
           color: const Color(0xFF4A3AFF).withOpacity(0.1),
           shape: BoxShape.circle,

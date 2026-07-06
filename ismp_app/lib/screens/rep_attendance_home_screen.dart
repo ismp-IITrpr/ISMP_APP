@@ -368,7 +368,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String email = FirebaseService.instance.currentUser?.email ?? 'robotics@iitrpr.ac.in';
+    final String email = FirebaseService.instance.currentUserEmail ?? 'robotics@iitrpr.ac.in';
     final String repClub = getRepClubName(email) ?? 'Robotics';
 
     return Scaffold(
@@ -547,7 +547,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                             final sessionId = await FirebaseService.instance.startAttendanceSession(
                               eventName: event.title,
                               venue: event.venue,
-                              repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                              repEmail: FirebaseService.instance.currentUserEmail ?? '',
                             );
                             if (context.mounted) {
                               Navigator.push(

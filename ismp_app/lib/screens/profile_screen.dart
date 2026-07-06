@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/profile_data.dart';
 import 'login_screen.dart';
+import '../services/database_service.dart';
+import '../services/firebase_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   final bool isRep;
@@ -23,54 +25,74 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = dummyUser;
+    final String rollNo = FirebaseService.instance.currentStudentRollNo;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+    return FutureBuilder<UserProfile?>(
+      future: DatabaseService().getUserProfile(rollNo),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: bgColor,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: primaryPurple,
+              ),
+            ),
+          );
+        }
+
+        final user = snapshot.data;
+        // Fallback to dummy user if profile doesn't exist in Firestore yet
+        final displayUser = user ?? dummyUser;
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            title: const Text(
+              'Profile',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
           ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Mentor Section (always shown for regular users) ──
-              if (user.mentor != null) ...[
-                _buildSectionHeader('YOUR MENTOR'),
-                const SizedBox(height: 16),
-                _buildMentorContainer(user.mentor!),
-                const SizedBox(height: 32),
-              ],
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Mentor Section (always shown for regular users) ──
+                  if (displayUser.mentor != null) ...[
+                    _buildSectionHeader('YOUR MENTOR'),
+                    const SizedBox(height: 16),
+                    _buildMentorContainer(displayUser.mentor!),
+                    const SizedBox(height: 32),
+                  ],
 
-              // ── User Profile Section ──
-              _buildSectionHeader('YOUR PROFILE'),
-              const SizedBox(height: 16),
-              _buildUserContainer(user),
+                  // ── User Profile Section ──
+                  _buildSectionHeader('YOUR PROFILE'),
+                  const SizedBox(height: 16),
+                  _buildUserContainer(displayUser),
 
-              const SizedBox(height: 48),
+                  const SizedBox(height: 48),
 
-              // ── Logout Button ──
-              _buildLogoutButton(context),
-              const SizedBox(height: 32),
-            ].animate(interval: 100.ms).fadeIn(duration: 600.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad),
+                  // ── Logout Button ──
+                  _buildLogoutButton(context),
+                  const SizedBox(height: 32),
+                ].animate(interval: 100.ms).fadeIn(duration: 600.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -186,14 +208,16 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // User Header (Avatar + Name + Sticker pill)
   Widget _buildUserHeader(UserProfile user) {
+    final googlePhotoUrl = FirebaseService.instance.currentUser?.photoURL ?? '';
+    final avatarUrl = googlePhotoUrl.isNotEmpty ? googlePhotoUrl : user.profileUrl;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildAvatar(
           name: user.name,
-          url: user.profileUrl,
+          url: avatarUrl,
           radius: 36,
           fontSize: 28,
         ),
@@ -305,7 +329,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // Helper for Avatars
   Widget _buildAvatar({
     required String name,
     required String url,
@@ -314,20 +337,72 @@ class ProfileScreen extends StatelessWidget {
   }) {
     final String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: iconBgColor,
-      backgroundImage: url.isNotEmpty ? (url.startsWith('http') ? NetworkImage(url) : AssetImage(url) as ImageProvider) : null,
-      child: url.isEmpty
-          ? Text(
-        initial,
-        style: TextStyle(
-          color: primaryPurple,
-          fontSize: fontSize,
-          fontWeight: FontWeight.w600,
+    if (url.isEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: iconBgColor,
+        child: Text(
+          initial,
+          style: TextStyle(
+            color: primaryPurple,
+            fontSize: fontSize,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      )
-          : null,
+      );
+    }
+
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: BoxDecoration(
+        color: iconBgColor,
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: url.startsWith('http')
+            ? Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: primaryPurple,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: primaryPurple,
+                      strokeWidth: 2,
+                    ),
+                  );
+                },
+              )
+            : Image.asset(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: primaryPurple,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 

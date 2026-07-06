@@ -307,7 +307,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                               final sessionId = await FirebaseService.instance.startAttendanceSession(
                                                 eventName: event.title,
                                                 venue: event.venue,
-                                                repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                                                repEmail: FirebaseService.instance.currentUserEmail ?? '',
                                               );
                                               if (context.mounted) {
                                                 Navigator.push(

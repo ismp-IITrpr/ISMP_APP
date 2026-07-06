@@ -25,32 +25,17 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    // TEMPORARY BYPASS: Navigate directly to the regular user main screen
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainLayout(),
-        ),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
     try {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
-          // In production: check Firebase if user is a club rep
           final isRep = FirebaseService.instance.isClubRep(user.email);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => isRep
                   ? const RepMainLayout()
-                  : const MainLayout(),
+                  : const MainLayout(isRep: false),
             ),
           );
         }
@@ -59,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         String errorMessage = 'An error occurred during sign-in. Please try again.';
         if (e.toString().contains('invalid-email-domain')) {
-          errorMessage = 'Access Denied: Only IIT Ropar email addresses (@iitrpr.ac.in) are allowed.';
+          errorMessage = 'Access Denied: You are not authorized to access this app.';
         }
         
         showDialog(
@@ -220,37 +205,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 20),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RepMainLayout(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.shield_outlined,
-                    size: 18,
-                    color: Color(0xFF8B78FF),
-                  ),
-                  label: const Text(
-                    'Rep Access',
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => _showTesterLoginSheet(context),
+                  child: const Text(
+                    'Tester Sign In',
                     style: TextStyle(
                       color: Color(0xFF8B78FF),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                      decoration: TextDecoration.underline,
                     ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF8B78FF), width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 28),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    minimumSize: const Size(double.infinity, 0),
                   ),
                 ),
               ],
@@ -258,6 +223,143 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showTesterLoginSheet(BuildContext context) {
+    final emailCtrl = TextEditingController(text: 'repaccess@gmail.com');
+    final passCtrl = TextEditingController(text: '12345678');
+    bool isTesterLoading = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1C1C23),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Tester / Representative Login',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: emailCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: const Color(0xFF0F0F13),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passCtrl,
+                    obscureText: true,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: const Color(0xFF0F0F13),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: isTesterLoading
+                        ? null
+                        : () async {
+                            setSheetState(() {
+                              isTesterLoading = true;
+                            });
+                            try {
+                              final user = await FirebaseService.instance.signInWithEmail(
+                                emailCtrl.text,
+                                passCtrl.text,
+                              );
+                              if (user != null && mounted) {
+                                Navigator.pop(context); // Close bottom sheet
+                                final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => isRep
+                                        ? const RepMainLayout()
+                                        : const MainLayout(isRep: false),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              setSheetState(() {
+                                isTesterLoading = false;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Login Failed: $e'),
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              );
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8B78FF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: isTesterLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

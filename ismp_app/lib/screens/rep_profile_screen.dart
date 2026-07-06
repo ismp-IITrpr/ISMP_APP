@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/profile_data.dart';
 import 'login_screen.dart';
 import 'rep_dashboard.dart';
+import '../services/firebase_service.dart';
 
 class RepProfileScreen extends StatelessWidget {
   const RepProfileScreen({super.key});
@@ -15,7 +16,8 @@ class RepProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = dummyUser;
+    final String email = FirebaseService.instance.currentUserEmail ?? 'robotics@iitrpr.ac.in';
+    final String clubName = FirebaseService.instance.getClubForEmail(email);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -42,7 +44,7 @@ class RepProfileScreen extends StatelessWidget {
             children: [
               _buildSectionHeader('CLUB REP'),
               const SizedBox(height: 16),
-              _buildClubCard(user),
+              _buildClubCard(clubName, email),
               const SizedBox(height: 32),
 
               // ── Quick Actions ──
@@ -60,9 +62,10 @@ class RepProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildClubCard(UserProfile user) {
-    final clubName = user.clubName ?? 'Unknown Club';
-    final clubEmail = '${clubName.toLowerCase()}@iitrpr.ac.in';
+  Widget _buildClubCard(String clubName, String email) {
+    final clubEmail = email;
+
+    final googlePhotoUrl = FirebaseService.instance.currentUser?.photoURL ?? '';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -82,7 +85,11 @@ class RepProfileScreen extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: primaryPurple.withOpacity(0.4), width: 2),
             ),
-            child: const Icon(Icons.groups_outlined, color: primaryPurple, size: 40),
+            child: ClipOval(
+              child: googlePhotoUrl.isNotEmpty
+                  ? Image.network(googlePhotoUrl, fit: BoxFit.cover)
+                  : const Icon(Icons.groups_outlined, color: primaryPurple, size: 40),
+            ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -407,24 +414,73 @@ class RepProfileScreen extends StatelessWidget {
     required double fontSize,
   }) {
     final String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: iconBgColor,
-      backgroundImage: url.isNotEmpty
-          ? (url.startsWith('http')
-              ? NetworkImage(url)
-              : AssetImage(url) as ImageProvider)
-          : null,
-      child: url.isEmpty
-          ? Text(
-              initial,
-              style: TextStyle(
-                color: primaryPurple,
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
+
+    if (url.isEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: iconBgColor,
+        child: Text(
+          initial,
+          style: TextStyle(
+            color: primaryPurple,
+            fontSize: fontSize,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: BoxDecoration(
+        color: iconBgColor,
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: url.startsWith('http')
+            ? Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: primaryPurple,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: primaryPurple,
+                      strokeWidth: 2,
+                    ),
+                  );
+                },
+              )
+            : Image.asset(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: primaryPurple,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
               ),
-            )
-          : null,
+      ),
     );
   }
 

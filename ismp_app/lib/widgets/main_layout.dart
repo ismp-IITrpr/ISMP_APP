@@ -27,7 +27,7 @@ class _MainLayoutState extends State<MainLayout> {
 
     final repClub = widget.isRep
         ? FirebaseService.instance.getClubForEmail(
-            FirebaseService.instance.currentUser?.email ?? 'robotics@iitrpr.ac.in')
+            FirebaseService.instance.currentUserEmail ?? 'robotics@iitrpr.ac.in')
         : '';
 
     _screens = [

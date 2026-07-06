@@ -19,7 +19,12 @@ class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Google Sign-In with @iitrpr.ac.in domain restriction
+  String? _mockEmail;
+
+  // Get current user email (checks mock email first for testing)
+  String? get currentUserEmail => _mockEmail ?? _auth.currentUser?.email;
+
+  // Google Sign-In with Batch 2026/Fresher and Rep restriction
   Future<User?> signInWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
@@ -40,14 +45,18 @@ class FirebaseService {
 
       if (user != null) {
         final email = user.email;
-        if (email != null && email.endsWith('@iitrpr.ac.in')) {
+        final isRep = isClubRep(email);
+        final isStudent = isAllowedStudent(email);
+
+        if (isRep || isStudent) {
+          _mockEmail = null; // Clear mock on successful Google Sign-in
           return user;
         } else {
-          // If domain doesn't match, sign out immediately and throw an error
+          // If domain doesn't match or unauthorized, sign out immediately and throw an error
           await signOut();
           throw FirebaseAuthException(
             code: 'invalid-email-domain',
-            message: 'Access Denied: Only IIT Ropar email addresses (@iitrpr.ac.in) are allowed.',
+            message: 'Access Denied: You are not authorized to access this app.',
           );
         }
       }
@@ -58,8 +67,44 @@ class FirebaseService {
     }
   }
 
+  // Email and password login helper with fallback for dummy tester account
+  Future<User?> signInWithEmail(String email, String password) async {
+    final lowerEmail = email.trim().toLowerCase();
+    final cleanPassword = password.trim();
+
+    try {
+      // First try standard Firebase Auth sign-in
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: lowerEmail,
+        password: cleanPassword,
+      );
+      _mockEmail = null;
+      return userCredential.user;
+    } catch (e) {
+      debugPrint('Firebase email login failed: $e');
+      
+      // Fallback bypass for the dummy testing account
+      if (lowerEmail == 'repaccess@gmail.com' && cleanPassword == '12345678') {
+        debugPrint('Using mock bypass for tester account repaccess@gmail.com');
+        _mockEmail = 'repaccess@gmail.com';
+        
+        // If not authenticated in firebase, sign in anonymously to obtain a valid Firebase session
+        if (_auth.currentUser == null) {
+          try {
+            await _auth.signInAnonymously();
+          } catch (anonError) {
+            debugPrint('Failed anonymous fallback sign-in: $anonError');
+          }
+        }
+        return _auth.currentUser;
+      }
+      rethrow;
+    }
+  }
+
   // Sign out helper
   Future<void> signOut() async {
+    _mockEmail = null;
     await _auth.signOut();
     try {
       await GoogleSignIn(
@@ -73,7 +118,7 @@ class FirebaseService {
 
   // Get current student's roll number
   String get currentStudentRollNo {
-    final email = currentUser?.email;
+    final email = currentUserEmail;
     if (email != null && email.contains('@')) {
       return email.split('@')[0].toUpperCase();
     }
@@ -162,43 +207,78 @@ class FirebaseService {
     }
   }
 
-  // ─── CLUB REP LOGIC ────────────────────────────────────────────────
+  // Allowed batch of 2025 emails for fresher access
+  static const Set<String> _allowed2025Emails = {
+    '2025csb1191@iitrpr.ac.in',
+    '2025csb1196@iitrpr.ac.in',
+    '2025csb1199@iitrpr.ac.in',
+    '2025icb1449@iitrpr.ac.in',
+    '2025chb1137@iitrpr.ac.in',
+    '2025eeb1319@iitrpr.ac.in',
+    '2025csb1251@iitrpr.ac.in',
+    '2025csb1215@iitrpr.ac.in',
+    '2025csb1188@iitrpr.ac.in',
+    '2025aib1078@iitrpr.ac.in',
+  };
+
+  /// Returns true if the email matches the fresher constraints
+  bool isAllowedStudent(String? email) {
+    if (email == null) return false;
+    final lower = email.trim().toLowerCase();
+    if (lower.startsWith('2026') && lower.endsWith('@iitrpr.ac.in')) {
+      return true;
+    }
+    return _allowed2025Emails.contains(lower);
+  }
 
   /// Maps authorized club rep emails to their club name.
-  /// Replace these with the real club emails when provided.
   static const Map<String, String> _repEmailToClub = {
-    'testclub@iitrpr.ac.in': 'Test Club',
+    'act-sports-athletics1@iitrpr.ac.in': 'Athletics Club',
+    'undekha@iitrpr.ac.in': 'UNDEKHA',
+    'act-sports-chess1@iitrpr.ac.in': 'Chess Club',
+    'enarrators@iitrpr.ac.in': 'The Enarrators',
+    'fincom@iitrpr.ac.in': 'FINCOM',
+    'act-sports-cricket1@iitrpr.ac.in': 'Cricket Club',
+    'cimclub@iitrpr.ac.in': 'Cim',
+    'act-sports -basketball1@iitrpr.ac.in': 'Basketball Club',
+    'act-sports-basketball1@iitrpr.ac.in': 'Basketball Club',
+    'automotiveclub@iitrpr.ac.in': 'Automotive Club',
     'codingclub@iitrpr.ac.in': 'Coding Club',
+    'act-sports-badminton1@iitrpr.ac.in': 'Badminton Club',
+    'club.iotacluster@iitrpr.ac.in': 'iota Cluster',
+    'danceclub@iitrpr.ac.in': "The D'Cypher",
+    'act-sports-volley1@iitrpr.ac.in': 'Volley Club',
+    'alpha@iitrpr.ac.in': 'Alpha Production',
+    'monochromeclub@iitrpr.ac.in': 'Monochrome',
+    'aeromodelling@iitrpr.ac.in': 'Aeromodelling Club',
+    'movie.club@iitrpr.ac.in': 'Filmski',
+    'sa.esportz@iitrpr.ac.in': 'ESportZ Club',
+    'alfaaz@iitrpr.ac.in': 'Alfaaz',
+    'act-sports-hockey1@iitrpr.ac.in': 'Hockey Club',
+    'robotics@iitrpr.ac.in': 'Robotics Club',
     'roboticsclub@iitrpr.ac.in': 'Robotics Club',
-    // Add more club rep emails here
+    'act-sports-tabletennis1@iitrpr.ac.in': 'Tabletennis Club',
+    'act-sports-lawntennis1@iitrpr.ac.in': 'Lawntennis Club',
+    'act-cultural-epicure@iitrpr.ac.in': 'Culinary Club',
+    'zenithclub@iitrpr.ac.in': 'Zenith',
+    'softcom@iitrpr.ac.in': 'SoftCom',
+    'act-sports-weightlifting1@iitrpr.ac.in': 'Weightlifting Club',
+    'act-sports-football1@iitrpr.ac.in': 'Football Club',
+    'panache@iitrpr.ac.in': 'Panache',
+    'enigma@iitrpr.ac.in': 'Enigma',
+    'repaccess@gmail.com': 'Robotics Club',
   };
 
   /// Returns true if the given email belongs to an authorized club rep.
   bool isClubRep(String? email) {
     if (email == null) return false;
-    if (_repEmailToClub.containsKey(email.toLowerCase())) return true;
-    final prefix = email.split('@').first.toLowerCase();
-    final rollRegex = RegExp(r'^\d{4}[a-zA-Z]{3}\d{4}$');
-    return !rollRegex.hasMatch(prefix);
+    return _repEmailToClub.containsKey(email.trim().toLowerCase());
   }
 
-  /// Returns the club name for a given rep email, or a dynamically parsed name if not in the pre-defined list.
+  /// Returns the club name for a given rep email.
   String getClubForEmail(String? email) {
     if (email == null || email.isEmpty) return 'Robotics';
-    final lower = email.toLowerCase();
-    if (_repEmailToClub.containsKey(lower)) {
-      return _repEmailToClub[lower]!;
-    }
-    final prefix = lower.split('@').first;
-    final rollRegex = RegExp(r'^\d{4}[a-zA-Z]{3}\d{4}$');
-    if (rollRegex.hasMatch(prefix)) {
-      return 'Robotics';
-    }
-    if (prefix.contains('robotics')) return 'Robotics';
-    if (prefix.contains('web')) return 'Web Dev';
-    if (prefix.contains('music')) return 'Music';
-    if (prefix.contains('dance')) return 'Dance';
-    return prefix[0].toUpperCase() + prefix.substring(1);
+    return _repEmailToClub[email.trim().toLowerCase()] ?? 'Robotics';
   }
 
   // ─── ATTENDANCE SESSION MANAGEMENT ─────────────────────────────────

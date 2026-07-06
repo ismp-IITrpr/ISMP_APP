@@ -172,7 +172,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                       final event = dailyEvents[index];
                       final isLast = index == dailyEvents.length - 1;
                       final isClubSession = event.type == 'C';
-                      final repClub = getRepClubName(FirebaseService.instance.currentUser?.email ?? 'robotics@iitrpr.ac.in') ?? '';
+                      final repClub = getRepClubName(FirebaseService.instance.currentUserEmail ?? 'robotics@iitrpr.ac.in') ?? '';
                       final isRepClub = isClubSession &&
                           event.club.toLowerCase() == repClub.toLowerCase();
 
@@ -270,7 +270,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                 final sessionId = await FirebaseService.instance.startAttendanceSession(
                                                   eventName: event.title,
                                                   venue: event.venue,
-                                                  repEmail: FirebaseService.instance.currentUser?.email ?? '',
+                                                  repEmail: FirebaseService.instance.currentUserEmail ?? '',
                                                 );
                                                 if (context.mounted) {
                                                   Navigator.push(

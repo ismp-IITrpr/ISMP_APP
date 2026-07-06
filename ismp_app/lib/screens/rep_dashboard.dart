@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/firebase_service.dart';
 import 'live_attendance_screen.dart';
+import 'login_screen.dart';
 
 class RepDashboard extends StatefulWidget {
   const RepDashboard({super.key});
@@ -26,7 +27,7 @@ class _RepDashboardState extends State<RepDashboard> {
   bool _isPostingEvent = false;
 
   String get _repEmail =>
-      FirebaseService.instance.currentUser?.email ?? 'robotics@iitrpr.ac.in';
+      FirebaseService.instance.currentUserEmail ?? 'robotics@iitrpr.ac.in';
 
   @override
   void dispose() {
@@ -150,7 +151,11 @@ class _RepDashboardState extends State<RepDashboard> {
             onPressed: () async {
               await FirebaseService.instance.signOut();
               if (mounted) {
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
               }
             },
           ),

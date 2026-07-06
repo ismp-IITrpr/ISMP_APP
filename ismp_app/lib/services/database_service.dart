@@ -25,10 +25,9 @@ class DatabaseService {
       if (doc.exists) {
         UserProfile user = UserProfile.fromFirestore(doc);
 
-        // If this user has a mentor assigned, go fetch that mentor's data too!
-        if (user.mentorRollNo != null) {
-          user.mentor = await getMentor(user.mentorRollNo!);
-        }
+        // If this user has a mentor assigned, go fetch that mentor's data too! (otherwise default to Kanika)
+        final String mRollNo = user.mentorRollNo ?? '2024MEB1358';
+        user.mentor = await getMentor(mRollNo);
 
         return user;
       }

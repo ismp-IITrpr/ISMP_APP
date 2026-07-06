@@ -12,7 +12,20 @@
           "package_name": "ismp.iitropar.ismp_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "231730406983-84vqj56u9a836p47so9540rnvn2vj10u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ismp.iitropar.ismp_app",
+            "certificate_hash": "2d6cb9dacd945b39382076a4426e90751d77f1ce"
+          }
+        },
+        {
+          "client_id": "231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDcoMqURpYa8DQaAfbGFhXv7140ItEcGFE"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "231730406983-6pa8g33hl525i2etbjv5mvphsth378i2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ismp.iitropar.ismpApp"
+              }
+            }
+          ]
         }
       }
     }

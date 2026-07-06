@@ -50,6 +50,25 @@ class FirebaseService {
 
         if (isRep || isStudent) {
           _mockEmail = null; // Clear mock on successful Google Sign-in
+          
+          if (isStudent && email != null) {
+            // Extract roll number (e.g. 2026CSB1123)
+            final rollNo = email.split('@')[0].toUpperCase();
+            final userDoc = await _firestore.collection('users').doc(rollNo).get();
+            if (!userDoc.exists) {
+              debugPrint('Auto-creating student profile document for $rollNo in Firestore...');
+              await _firestore.collection('users').doc(rollNo).set({
+                'name': user.displayName ?? 'Rohan Sharma',
+                'degree': 'B.Tech',
+                'branch': 'Computer Science & Engineering',
+                'groupNo': 7,
+                'stickersCollected': 12,
+                'profileUrl': user.photoURL ?? '',
+                'mentorRollNo': '2024MEB1358', // Default mentor Kanika
+              });
+            }
+          }
+          
           return user;
         } else {
           // If domain doesn't match or unauthorized, sign out immediately and throw an error
@@ -199,6 +218,17 @@ class FirebaseService {
         for (var moment in mockMoments) {
           await _firestore.collection('moments').doc(moment.id).set(moment.toMap());
         }
+      }
+
+      // 5. Seed default mentor if not exists
+      final mentorDoc = await _firestore.collection('mentors').doc('2024MEB1358').get();
+      if (!mentorDoc.exists) {
+        debugPrint('Seeding default mentor Kanika into Firestore...');
+        await _firestore.collection('mentors').doc('2024MEB1358').set({
+          'name': 'Kanika',
+          'contactNo': '+91 8817929545',
+          'profileUrl': 'img/2026/Kanika.jpg',
+        });
       }
 
       debugPrint('Database seeding checked successfully.');

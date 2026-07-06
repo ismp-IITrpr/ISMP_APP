@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _buildCarouselCards(BuildContext context) {
     final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
-    final mentor = dummyUser.mentor;
+    final mentor = FirebaseService.instance.mentor;
     final List<_QuickLink> links = [
       _QuickLink(
         title: 'App Developers',
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       if(!isRep)
         _QuickLink(
-          title: mentor?.name ?? 'Mentor Profile',
+          title: 'Mentor : ${mentor?.name ?? 'Profile'}',
           subtitle: 'Get to know your mentor',
           icon: Icons.person,
           bgImage: 'assets/images/carousel/mentor_poster.png',

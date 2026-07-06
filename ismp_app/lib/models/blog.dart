@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-enum BlogTag { cluv, academic, sports, tech, campus }
+enum BlogTag { club, academic, sports, tech, campus }
 
 extension BlogTagExtension on BlogTag {
   String get label {
     switch (this) {
-      case BlogTag.cluv:
-        return 'CLUV';
+      case BlogTag.club:
+        return 'Clubs';
       case BlogTag.academic:
         return 'Academic';
       case BlogTag.sports:
@@ -20,7 +20,7 @@ extension BlogTagExtension on BlogTag {
 
   Color get color {
     switch (this) {
-      case BlogTag.cluv:
+      case BlogTag.club:
         return const Color(0xFF8B78FF);
       case BlogTag.academic:
         return const Color(0xFF2196F3);
@@ -35,7 +35,7 @@ extension BlogTagExtension on BlogTag {
 
   Color get bgColor {
     switch (this) {
-      case BlogTag.cluv:
+      case BlogTag.club:
         return const Color(0xFF2E2A4A);
       case BlogTag.academic:
         return const Color(0xFF1A2E42);
@@ -94,7 +94,7 @@ class BlogPost {
       readMinutes: map['readMinutes'] ?? 0,
       tag: BlogTag.values.firstWhere(
         (t) => t.name == map['tag'],
-        orElse: () => BlogTag.cluv,
+        orElse: () => BlogTag.club,
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/blog.dart';
 import '../services/firebase_service.dart';
+import 'blog_detail_screen.dart';
 
 class BlogsScreen extends StatefulWidget {
   const BlogsScreen({super.key});
@@ -134,10 +135,19 @@ class _BlogsScreenState extends State<BlogsScreen> {
   }
 
   Widget _buildBlogCard(BlogPost blog, int index) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlogDetailScreen(blog: blog),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
         color: const Color(0xFF15151A),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
@@ -212,6 +222,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
             ],
           ),
         ],
+      ),
       ),
     ).animate().fadeIn(duration: 400.ms, delay: (index * 100).ms).slideY(begin: 0.1);
   }

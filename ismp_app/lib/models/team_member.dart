@@ -112,14 +112,6 @@ final List<TeamMember> devTeamMembers = [
     mail: '2025CSB1251@iitrpr.ac.in',
   ),
   TeamMember(
-    name: 'Mahit Chopra',
-    role: 'DEVELOPER',
-    image: 'img/2026/2025CSB1215.jpeg',
-    phone: '+91 9606997752',
-    instagram: 'https://www.instagram.com/notmahit',
-    mail: '2025CSB1215@iitrpr.ac.in',
-  ),
-  TeamMember(
     name: 'Thoihenba B',
     role: 'DEVELOPER',
     image: 'img/2026/2025ICB1449.jpeg',
@@ -135,15 +127,7 @@ final List<TeamMember> devTeamMembers = [
     instagram: 'https://www.instagram.com/deeptiashwani7?igsh=MTJlcnd2eDlmNTl3eA==',
     mail: '2025eeb1319@iitrpr.ac.in',
   ),
-  TeamMember(
-    name: 'Vishavpreet Singh',
-    role: 'DEVELOPER',
-    image: 'img/2026/2025AIB1078.webp',
-    phone: '+91 7696146238',
-    instagram: 'https://www.instagram.com/mrvishavop1?igsh=MTVwaDB1NGt2ZGYzMA==',
-    mail: '2025AIB1078@iitrpr.ac.in',
-  ),
-  TeamMember(
+    TeamMember(
     name: 'Digvijaya Singh',
     role: 'DEVELOPER',
     image: 'img/2026/2025CSB1188.jpeg',
@@ -152,20 +136,21 @@ final List<TeamMember> devTeamMembers = [
     mail: '2025csb1188@iitrpr.ac.in',
   ),
   TeamMember(
-    name: 'Gurnoor Singh',
+    name: 'Mahit Chopra',
     role: 'DEVELOPER',
-    image: 'img/2026/2025CSB1196.jpg',
-    phone: '+91 9501587214',
-    instagram: 'https://www.instagram.com/singh_gnoor/',
-    mail: '2025csb1196@iitrpr.ac.in',
+    image: 'img/2026/2025CSB1215.jpeg',
+    phone: '+91 9606997752',
+    instagram: 'https://www.instagram.com/notmahit',
+    mail: '2025CSB1215@iitrpr.ac.in',
   ),
   TeamMember(
-    name: 'Jasmine Kaur Dhaliwal',
-    role: 'CONTRIBUTOR',
-    image: 'img/2026/2025DAB1277.jpg',
-    phone: '+91 8360646191',
-    instagram: 'instagram.com/dhaliwal.jas_mine/',
-    mail: '2025dab1277@iitrpr.ac.in',
+    name: 'Vishavpreet Singh',
+    role: 'DEVELOPER',
+    image: 'img/2026/2025AIB1078.webp',
+    phone: '+91 7696146238',
+    instagram: 'https://www.instagram.com/mrvishavop1?igsh=MTVwaDB1NGt2ZGYzMA==',
+    mail: '2025AIB1078@iitrpr.ac.in',
   ),
+
   
 ];

@@ -305,7 +305,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 emailCtrl.text,
                                 passCtrl.text,
                               );
-                              if (user != null && mounted) {
+                              final currentEmail = FirebaseService.instance.currentUserEmail;
+                              if ((user != null || currentEmail == 'repaccess@gmail.com') && mounted) {
                                 Navigator.pop(context); // Close bottom sheet
                                 final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
                                 Navigator.pushReplacement(
@@ -314,6 +315,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                     builder: (context) => isRep
                                         ? const RepMainLayout()
                                         : const MainLayout(isRep: false),
+                                  ),
+                                );
+                              } else {
+                                setSheetState(() {
+                                  isTesterLoading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Login Failed: Unable to verify account.'),
+                                    backgroundColor: Colors.redAccent,
                                   ),
                                 );
                               }

@@ -144,6 +144,18 @@ class AttendanceService {
       );
 
       batch.set(docRef, record.toMap());
+
+      // Generate a notification document for the student
+      final notifRef = _db.collection('notifications').doc();
+      final notificationData = {
+        'userRollNo': rollNo,
+        'title': 'Attendance Marked',
+        'description': 'Your attendance for the session "${event?.title ?? 'Mentoring'}" has been marked present.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'iconType': 'attendance',
+      };
+      batch.set(notifRef, notificationData);
     }
 
     // Set the status of the session to 'submitted'

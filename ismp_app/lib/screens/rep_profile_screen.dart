@@ -87,7 +87,23 @@ class RepProfileScreen extends StatelessWidget {
             ),
             child: ClipOval(
               child: googlePhotoUrl.isNotEmpty
-                  ? Image.network(googlePhotoUrl, fit: BoxFit.cover)
+                  ? Image.network(
+                      googlePhotoUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback to groups icon if loading fails (CORS, network error, etc.)
+                        return const Icon(Icons.groups_outlined, color: primaryPurple, size: 40);
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryPurple,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      },
+                    )
                   : const Icon(Icons.groups_outlined, color: primaryPurple, size: 40),
             ),
           ),
@@ -566,12 +582,15 @@ class RepProfileScreen extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: TextButton(
-        onPressed: () {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false,
-          );
+        onPressed: () async {
+          await FirebaseService.instance.signOut();
+          if (context.mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+            );
+          }
         },
         style: TextButton.styleFrom(
           backgroundColor: const Color(0xFFF44336).withOpacity(0.1),

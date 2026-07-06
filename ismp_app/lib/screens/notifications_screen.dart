@@ -1,10 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/firebase_service.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _markAllAsRead();
+  }
+
+  void _markAllAsRead() {
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .where('userRollNo', isEqualTo: rollNo)
+        .where('isRead', isEqualTo: false)
+        .get()
+        .then((snapshot) {
+          final batch = FirebaseFirestore.instance.batch();
+          for (var doc in snapshot.docs) {
+            batch.update(doc.reference, {'isRead': true});
+          }
+          batch.commit().catchError((e) {
+            debugPrint('Error marking notifications as read: $e');
+          });
+        });
+  }
+
+  String _formatTimestamp(DateTime dateTime) {
+    final difference = DateTime.now().difference(dateTime);
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} mins ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else {
+      return '${difference.inDays} days ago';
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F13),
       appBar: AppBar(
@@ -23,31 +69,77 @@ class NotificationsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildNotificationCard(
-            icon: Icons.event,
-            iconColor: const Color(0xFFFFB020),
-            title: 'Upcoming Event: Freshers Meet',
-            description: 'Don\'t forget! The ISMP Freshers Meet is happening tonight at 6 PM in the main auditorium.',
-            time: '2 hours ago',
-          ),
-          _buildNotificationCard(
-            icon: Icons.check_circle_outline,
-            iconColor: const Color(0xFF00FFCC),
-            title: 'Attendance Updated',
-            description: 'Your attendance for the mentoring session on Friday has been marked present.',
-            time: '1 day ago',
-          ),
-          _buildNotificationCard(
-            icon: Icons.info_outline,
-            iconColor: const Color(0xFF4A3AFF),
-            title: 'Welcome to ISMP!',
-            description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
-            time: '2 days ago',
-          ),
-        ],
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('notifications')
+            .where('userRollNo', isEqualTo: rollNo)
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          // Trigger mark as read whenever new notifications arrive
+          _markAllAsRead();
+
+          final docs = snapshot.data?.docs ?? [];
+
+          return ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              // Dynamic Firestore Notifications
+              ...docs.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                final title = data['title'] ?? 'Notification';
+                final description = data['description'] ?? '';
+                final timestamp = data['timestamp'] as Timestamp?;
+                final timeStr = timestamp != null
+                    ? _formatTimestamp(timestamp.toDate())
+                    : 'Just now';
+                final iconType = data['iconType'] ?? 'info';
+
+                IconData icon = Icons.info_outline;
+                Color iconColor = const Color(0xFF4A3AFF);
+
+                if (iconType == 'attendance') {
+                  icon = Icons.check_circle_outline;
+                  iconColor = const Color(0xFF00FFCC);
+                } else if (iconType == 'event') {
+                  icon = Icons.event;
+                  iconColor = const Color(0xFFFFB020);
+                }
+
+                return _buildNotificationCard(
+                  icon: icon,
+                  iconColor: iconColor,
+                  title: title,
+                  description: description,
+                  time: timeStr,
+                );
+              }),
+
+              // Pre-existing Mock Notifications
+              _buildNotificationCard(
+                icon: Icons.event,
+                iconColor: const Color(0xFFFFB020),
+                title: 'Upcoming Event: Freshers Meet',
+                description: 'Don\'t forget! The ISMP Freshers Meet is happening tonight at 6 PM in the main auditorium.',
+                time: '2 hours ago',
+              ),
+              _buildNotificationCard(
+                icon: Icons.check_circle_outline,
+                iconColor: const Color(0xFF00FFCC),
+                title: 'Attendance Updated',
+                description: 'Your attendance for the mentoring session on Friday has been marked present.',
+                time: '1 day ago',
+              ),
+              _buildNotificationCard(
+                icon: Icons.info_outline,
+                iconColor: const Color(0xFF4A3AFF),
+                title: 'Welcome to ISMP!',
+                description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
+                time: '2 days ago',
+              ),
+            ],
+          );
+        },
       ),
     );
   }

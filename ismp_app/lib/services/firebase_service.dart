@@ -240,7 +240,6 @@ class FirebaseService {
     'fincom@iitrpr.ac.in': 'FINCOM',
     'act-sports-cricket1@iitrpr.ac.in': 'Cricket Club',
     'cimclub@iitrpr.ac.in': 'Cim',
-    'act-sports -basketball1@iitrpr.ac.in': 'Basketball Club',
     'act-sports-basketball1@iitrpr.ac.in': 'Basketball Club',
     'automotiveclub@iitrpr.ac.in': 'Automotive Club',
     'codingclub@iitrpr.ac.in': 'Coding Club',
@@ -256,7 +255,6 @@ class FirebaseService {
     'alfaaz@iitrpr.ac.in': 'Alfaaz',
     'act-sports-hockey1@iitrpr.ac.in': 'Hockey Club',
     'robotics@iitrpr.ac.in': 'Robotics Club',
-    'roboticsclub@iitrpr.ac.in': 'Robotics Club',
     'act-sports-tabletennis1@iitrpr.ac.in': 'Tabletennis Club',
     'act-sports-lawntennis1@iitrpr.ac.in': 'Lawntennis Club',
     'act-cultural-epicure@iitrpr.ac.in': 'Culinary Club',
@@ -266,7 +264,12 @@ class FirebaseService {
     'act-sports-football1@iitrpr.ac.in': 'Football Club',
     'panache@iitrpr.ac.in': 'Panache',
     'enigma@iitrpr.ac.in': 'Enigma',
-    'repaccess@gmail.com': 'Robotics Club',
+    'repaccess@gmail.com': 'Test Club',
+    'alankar@iitrpr.ac.in': 'Alankar',
+    'arturo@iitrpr.ac.in': 'Arturo',
+    'debsoc@iitrpr.ac.in': 'Debsoc',
+    'mun@iitrpr.ac.in': 'MuN',
+    'fineartsclub@iitrpr.ac.in': 'Vibgyor',
   };
 
   /// Returns true if the given email belongs to an authorized club rep.

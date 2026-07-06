@@ -411,12 +411,15 @@ class ProfileScreen extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: TextButton(
-        onPressed: () {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false,
-          );
+        onPressed: () async {
+          await FirebaseService.instance.signOut();
+          if (context.mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+            );
+          }
         },
         style: TextButton.styleFrom(
           backgroundColor: const Color(0xFFF44336).withOpacity(0.1),

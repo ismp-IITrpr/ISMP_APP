@@ -7,6 +7,7 @@ import '../models/blog.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
 import '../models/moment.dart';
+import '../models/profile_data.dart';
 import '../models/mock_data/blog_mock.dart';
 import '../models/mock_data/events_mock.dart';
 import '../models/mock_data/attendance_mock.dart';
@@ -20,6 +21,28 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String? _mockEmail;
+  MentorProfile? _cachedMentor;
+
+  /// The current user's mentor, loaded after sign-in.
+  MentorProfile? get mentor => _cachedMentor;
+
+  /// Fetches and caches the mentor for the current student.
+  Future<void> loadMentor() async {
+    try {
+      final rollNo = currentStudentRollNo;
+      final userDoc = await _firestore.collection('users').doc(rollNo).get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        final mentorRollNo = data['mentorRollNo'] ?? '2024MEB1358';
+        final mentorDoc = await _firestore.collection('mentors').doc(mentorRollNo).get();
+        if (mentorDoc.exists) {
+          _cachedMentor = MentorProfile.fromFirestore(mentorDoc);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading mentor: $e');
+    }
+  }
 
   // Get current user email (checks mock email first for testing)
   String? get currentUserEmail => _mockEmail ?? _auth.currentUser?.email;
@@ -67,6 +90,8 @@ class FirebaseService {
                 'mentorRollNo': '2024MEB1358', // Default mentor Kanika
               });
             }
+            // Cache the mentor for quick access across screens
+            await loadMentor();
           }
           
           return user;
@@ -124,6 +149,7 @@ class FirebaseService {
   // Sign out helper
   Future<void> signOut() async {
     _mockEmail = null;
+    _cachedMentor = null;
     await _auth.signOut();
     try {
       await GoogleSignIn(

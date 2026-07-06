@@ -112,6 +112,14 @@ final List<TeamMember> devTeamMembers = [
     mail: '2025CSB1251@iitrpr.ac.in',
   ),
   TeamMember(
+    name: 'Mahit Chopra',
+    role: 'DEVELOPER',
+    image: 'img/2026/2025CSB1215.jpg',
+    phone: '+91 9606997752',
+    instagram: 'https://www.instagram.com/notmahit',
+    mail: '2025CSB1215@iitrpr.ac.in',
+  ),
+  TeamMember(
     name: 'Thoihenba B',
     role: 'DEVELOPER',
     image: 'img/2026/2025ICB1449.jpeg',

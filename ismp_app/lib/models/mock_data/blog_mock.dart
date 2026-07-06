@@ -3,15 +3,15 @@ import '../blog.dart';
 final List<BlogPost> blogPosts = [
   BlogPost(
     id: '1',
-    title: 'CLUV Kickoff: What to Expect This Semester',
+    title: 'club Kickoff: What to Expect This Semester',
     summary:
         'The Club & Community engagement program is back with a packed schedule of inter-club activities, competitions, and social nights.',
     content:
-        'The CLUV program officially kicks off this week with orientation sessions across all registered clubs. Freshers are encouraged to explore at least three clubs before the end of the first month. This semester we have over 20 clubs participating, ranging from robotics and coding to music and debate.\n\nHighlights include the Inter-Club Quiz Night on Aug 10, the Freshers Talent Show on Aug 18, and the CLUV Sports Day on Aug 25. Club heads will be hosting open house sessions throughout the first two weeks — check the Events tab for timings.',
+        'The club program officially kicks off this week with orientation sessions across all registered clubs. Freshers are encouraged to explore at least three clubs before the end of the first month. This semester we have over 20 clubs participating, ranging from robotics and coding to music and debate.\n\nHighlights include the Inter-Club Quiz Night on Aug 10, the Freshers Talent Show on Aug 18, and the club Sports Day on Aug 25. Club heads will be hosting open house sessions throughout the first two weeks — check the Events tab for timings.',
     author: 'ISMP Team',
     date: 'Jun 25, 2026',
     readMinutes: 3,
-    tag: BlogTag.cluv,
+    tag: BlogTag.club,
   ),
   BlogPost(
     id: '2',
@@ -63,14 +63,14 @@ final List<BlogPost> blogPosts = [
   ),
   BlogPost(
     id: '6',
-    title: 'CLUV Mentorship Program: Meet Your Senior Mentor',
+    title: 'club Mentorship Program: Meet Your Senior Mentor',
     summary:
-        'This year CLUV pairs every fresher with a senior mentor for the first semester. Here\'s how the matching process works and what to expect.',
+        'This year club pairs every fresher with a senior mentor for the first semester. Here\'s how the matching process works and what to expect.',
     content:
-        'CLUV is introducing a structured mentorship program for the incoming batch. Every fresher will be matched with a 2nd or 3rd year senior based on interests, home state, and academic branch.\n\nHow the matching works:\nYou\'ll fill a short interest form (link in the ISMP portal) by Jul 31. The CLUV team manually reviews matches and announces pairings on Aug 3.\n\nWhat mentors do:\n- Weekly 30-minute check-ins for the first month\n- Help with academic adjustment and course selection\n- Campus tour and introductions to club networks\n- Point of contact for any campus emergency\n\nMentors are volunteers and have been briefed and trained by the ISMP team. If you feel your mentor pairing isn\'t a good fit, you can request a reassignment through the portal.',
-    author: 'CLUV Coordinators',
+        'club is introducing a structured mentorship program for the incoming batch. Every fresher will be matched with a 2nd or 3rd year senior based on interests, home state, and academic branch.\n\nHow the matching works:\nYou\'ll fill a short interest form (link in the ISMP portal) by Jul 31. The club team manually reviews matches and announces pairings on Aug 3.\n\nWhat mentors do:\n- Weekly 30-minute check-ins for the first month\n- Help with academic adjustment and course selection\n- Campus tour and introductions to club networks\n- Point of contact for any campus emergency\n\nMentors are volunteers and have been briefed and trained by the ISMP team. If you feel your mentor pairing isn\'t a good fit, you can request a reassignment through the portal.',
+    author: 'club Coordinators',
     date: 'Jun 15, 2026',
     readMinutes: 4,
-    tag: BlogTag.cluv,
+    tag: BlogTag.club,
   ),
 ];

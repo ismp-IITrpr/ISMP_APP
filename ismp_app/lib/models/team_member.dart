@@ -114,7 +114,7 @@ final List<TeamMember> devTeamMembers = [
   TeamMember(
     name: 'Mahit Chopra',
     role: 'DEVELOPER',
-    image: 'img/2026/2025CSB1215.jpg',
+    image: 'img/2026/2025CSB1215.jpeg',
     phone: '+91 9606997752',
     instagram: 'https://www.instagram.com/notmahit',
     mail: '2025CSB1215@iitrpr.ac.in',

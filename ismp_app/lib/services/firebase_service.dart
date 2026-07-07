@@ -553,11 +553,39 @@ class FirebaseService {
     // Use student's real name from the DB if available
     final dbName = userDoc.data()?['name'] ?? name;
 
+    // 1. Check if student already has a scan record in the session
     final scanRef = _firestore
         .collection('attendance_sessions')
         .doc(sessionId)
         .collection('scans')
         .doc(formattedRollNo);
+        
+    final scanDoc = await scanRef.get();
+    if (scanDoc.exists) {
+      throw Exception('Student $formattedRollNo is already added to this session.');
+    }
+
+    // 2. Fetch session details to check persistent status
+    final sessionDoc = await _firestore.collection('attendance_sessions').doc(sessionId).get();
+    if (!sessionDoc.exists) {
+      throw Exception('Attendance session no longer exists.');
+    }
+    final eventId = sessionDoc.data()?['eventId'] ?? sessionId;
+
+    // 3. Verify if they already have a persistent attendance marked present for this event
+    final persistentDoc = await _firestore
+        .collection('users')
+        .doc(formattedRollNo)
+        .collection('attendance')
+        .doc(eventId)
+        .get();
+    if (persistentDoc.exists) {
+      final pData = persistentDoc.data();
+      if (pData != null && pData['isPresent'] == true) {
+        throw Exception('Student $formattedRollNo has already marked attendance for this event.');
+      }
+    }
+
     await scanRef.set({
       'name': dbName,
       'email': '$formattedRollNo@iitrpr.ac.in',

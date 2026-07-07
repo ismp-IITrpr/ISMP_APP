@@ -42,6 +42,32 @@ class AttendanceService {
       throw Exception("Attendance session is no longer active.");
     }
 
+    // 1. Verify if they already scanned in this active session
+    final scanDoc = await _db
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .collection('scans')
+        .doc(studentRollNo)
+        .get();
+    if (scanDoc.exists) {
+      throw Exception("You have already scanned for this session.");
+    }
+
+    // 2. Verify if they already have a persistent attendance marked present for this event
+    final eventId = session.eventId.isNotEmpty ? session.eventId : sessionId;
+    final persistentDoc = await _db
+        .collection('users')
+        .doc(studentRollNo)
+        .collection('attendance')
+        .doc(eventId)
+        .get();
+    if (persistentDoc.exists) {
+      final data = persistentDoc.data();
+      if (data != null && data['isPresent'] == true) {
+        throw Exception("You have already marked attendance for this event.");
+      }
+    }
+
     // Write scan document under this active session's subcollection
     final scan = AttendanceScan(
       rollNo: studentRollNo,

@@ -259,6 +259,83 @@ class FirebaseService {
         });
       }
 
+      // 6. Seed Clubs if empty
+      final clubsSnapshot = await _firestore.collection('clubs').limit(1).get();
+      if (clubsSnapshot.docs.isEmpty) {
+        debugPrint('Seeding clubs collection...');
+        final Map<String, List<Map<String, dynamic>>> boardClubs = {
+          'BOLA': [
+            {'name': 'Alfaaz', 'image': 'alfaaz.png'},
+            {'name': 'Alpha', 'image': 'alpha.png'},
+            {'name': 'DebSoc', 'image': 'debsoc.png'},
+            {'name': 'Ennarators', 'image': 'enn.png'},
+            {'name': 'Enigma', 'image': 'enigma.png'},
+            {'name': 'Filmski', 'image': 'filmski.png'},
+            {'name': 'MUN', 'image': 'mun.png'},
+          ],
+          'BOCA': [
+            {'name': 'Alankar', 'image': 'alankar.png'},
+            {'name': 'Arturo', 'image': 'arturo.png'},
+            {'name': "D'Cypher", 'image': 'dcypher.png'},
+            {'name': 'Epicure', 'image': 'epicure.png'},
+            {'name': 'Panache', 'image': 'panache.png'},
+            {'name': 'Undekha', 'image': 'undekha.png'},
+            {'name': 'Vibgyor', 'image': 'vibgyor.png'},
+          ],
+          'BOST': [
+            {'name': 'Zenith', 'image': 'zenith.png'},
+            {'name': 'E-Sportz', 'image': 'esportz.png'},
+            {'name': 'Monochrome', 'image': 'monochrome.png'},
+            {'name': 'Robotics', 'image': 'robotics.png'},
+            {'name': 'Softcom', 'image': 'softcom.png'},
+            {'name': 'Coding Club', 'image': 'coding.png'},
+            {'name': 'FinCom', 'image': 'fincom.png'},
+            {'name': 'CIM', 'image': 'cim.png'},
+            {'name': 'Iota Cluster', 'image': 'BOST.png'},
+            {'name': 'Automotive', 'image': 'auto.png'},
+            {'name': 'Aeromodelling', 'image': 'aero.png'},
+          ],
+          'BOSA': [
+            {'name': 'Athletic', 'image': 'BOSA.png'},
+            {'name': 'Badminton', 'image': 'BOSA.png'},
+            {'name': 'Basketball', 'image': 'BOSA.png'},
+            {'name': 'Chess', 'image': 'BOSA.png'},
+            {'name': 'Cricket', 'image': 'BOSA.png'},
+            {'name': 'Football', 'image': 'BOSA.png'},
+            {'name': 'Hockey', 'image': 'BOSA.png'},
+            {'name': 'Tennis', 'image': 'BOSA.png'},
+            {'name': 'Table Tennis', 'image': 'BOSA.png'},
+            {'name': 'Volleyball', 'image': 'BOSA.png'},
+            {'name': 'Weightlifting', 'image': 'BOSA.png'},
+          ],
+        };
+
+        final Map<String, String> boardFullNames = {
+          'BOSA': 'Board of Sports Activities',
+          'BOLA': 'Board of Literary Activities',
+          'BOCA': 'Board of Cultural Activities',
+          'BOST': 'Board of Science & Technology',
+        };
+
+        final batch = _firestore.batch();
+        boardClubs.forEach((board, clubsList) {
+          final boardName = boardFullNames[board] ?? '';
+          for (var club in clubsList) {
+            final name = club['name'] as String;
+            final image = club['image'] as String;
+            final docRef = _firestore.collection('clubs').doc(name);
+            batch.set(docRef, {
+              'name': name,
+              'image': image,
+              'board': board,
+              'boardName': boardName,
+            });
+          }
+        });
+        await batch.commit();
+        debugPrint('Seeding clubs collection complete.');
+      }
+
       debugPrint('Database seeding checked successfully.');
     } catch (e) {
       debugPrint('Error seeding database: $e');

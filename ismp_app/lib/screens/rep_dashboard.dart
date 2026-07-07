@@ -81,7 +81,7 @@ class _RepDashboardState extends State<RepDashboard> {
         endTime: _endTime.format(context),
         venue: _eventVenueCtrl.text.trim(),
         description: _eventDescCtrl.text.trim(),
-        day: _selectedDate.day,
+        day: _selectedDate.difference(DateTime(2026, 7, 7)).inDays + 1,
         targetAudience: targetAudience,
         type: 'C',
         club: club,

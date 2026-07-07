@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/attendance.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
@@ -383,8 +384,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ],
           ),
           body: SafeArea(
-            child: StreamBuilder<List<AttendanceRecord>>(
-              stream: FirebaseService.instance.streamCombinedStudentAttendance(rollNo, groupNo),
+            child: FutureBuilder<List<AttendanceRecord>>(
+              future: DatabaseService().getPersistentCombinedStudentAttendance(rollNo, groupNo),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
@@ -547,6 +548,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          IconButton(
+                            icon: const Icon(Icons.refresh, color: Colors.white70, size: 20),
+                            onPressed: () async {
+                              await DatabaseService.clearPersistentAttendanceCache(rollNo);
+                              setState(() {}); // Re-builds FutureBuilder
+                            },
+                            tooltip: 'Refresh Attendance',
+                          ),
                         ],
                       ),
                     ),
@@ -567,8 +576,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF1C1C23),
+                                    color: Colors.white.withOpacity(0.03),
                                     borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.08),
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
                                   child: Row(
                                     children: [
@@ -640,7 +660,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                       ),
                                     ],
                                   ),
-                                );
+                                ).animate().fadeIn(duration: 500.ms, delay: (index * 50).ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
                               },
                             ),
                     ),

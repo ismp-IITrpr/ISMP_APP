@@ -11,6 +11,7 @@ import '../models/profile_data.dart';
 import '../models/mock_data/blog_mock.dart';
 import '../models/mock_data/events_mock.dart';
 import '../models/mock_data/attendance_mock.dart';
+import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
 
 class FirebaseService {
@@ -150,6 +151,7 @@ class FirebaseService {
   Future<void> signOut() async {
     _mockEmail = null;
     _cachedMentor = null;
+    DatabaseService.clearCache();
     await _auth.signOut();
     try {
       await GoogleSignIn(

@@ -20,7 +20,7 @@ class RepProfileScreen extends StatelessWidget {
     final String clubName = FirebaseService.instance.getClubForEmail(email);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
           'Profile',
@@ -31,7 +31,7 @@ class RepProfileScreen extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        backgroundColor: bgColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),

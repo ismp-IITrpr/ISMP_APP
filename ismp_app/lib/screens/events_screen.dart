@@ -80,6 +80,14 @@ class _EventsScreenState extends State<EventsScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white70),
+            onPressed: () async {
+              await DatabaseService.clearPersistentEventsCache();
+              setState(() {});
+            },
+            tooltip: 'Refresh Schedule',
+          ),
           if (widget.isRep)
             Container(
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),

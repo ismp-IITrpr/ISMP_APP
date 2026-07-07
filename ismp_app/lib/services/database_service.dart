@@ -212,28 +212,20 @@ class DatabaseService {
     }
   }
 
-  /// Combines persistent events and persistent student records.
+  /// Combines persistent events and persistent student records (showing full schedule to everyone).
   Future<List<AttendanceRecord>> getPersistentCombinedStudentAttendance(String studentRollNo, int studentGroupNo) async {
     final allEvents = await getPersistentAllEvents();
     final studentRecords = await getPersistentStudentAttendanceRecords(studentRollNo);
 
     List<AttendanceRecord> combined = [];
     for (var event in allEvents) {
-      if (event.type == 'C') {
-        final target = event.targetAudience.toLowerCase();
-        final containsAll = target.contains('all') || target.contains('general') || target.isEmpty;
-        final containsGroup = target.contains(studentGroupNo.toString());
-        if (!containsAll && !containsGroup) {
-          continue;
-        }
-      }
-      
       final matchingRecord = studentRecords.firstWhere(
         (r) => r.eventId == event.id,
         orElse: () => AttendanceRecord(
           eventId: event.id,
           eventType: event.type,
           title: event.title,
+          club: event.club,
           date: event.date,
           time: event.time,
           venue: event.venue,

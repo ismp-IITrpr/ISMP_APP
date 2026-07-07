@@ -856,22 +856,13 @@ class FirebaseService {
       List<AttendanceRecord> combined = [];
       
       for (var event in latestEvents) {
-        // Only show club sessions (type 'C') that match student's group
-        if (event.type == 'C') {
-          final target = event.targetAudience.toLowerCase();
-          final containsAll = target.contains('all') || target.contains('general') || target.isEmpty;
-          final containsGroup = target.contains(studentGroupNo.toString());
-          if (!containsAll && !containsGroup) {
-            continue;
-          }
-        }
-        
         final matchingRecord = latestRecords.firstWhere(
           (r) => r.eventId == event.id,
           orElse: () => AttendanceRecord(
             eventId: event.id,
             eventType: event.type,
             title: event.title,
+            club: event.club,
             date: event.date,
             time: event.time,
             venue: event.venue,

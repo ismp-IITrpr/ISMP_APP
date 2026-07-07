@@ -18,7 +18,7 @@ class _RepDashboardState extends State<RepDashboard> {
   final _eventVenueCtrl = TextEditingController();
   final _eventDescCtrl = TextEditingController();
   final _groupNoCtrl = TextEditingController();
-  DateTime _selectedDate = DateTime(2026, 8, 1);
+  DateTime _selectedDate = DateTime.now();
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay _endTime = TimeOfDay(
     hour: (TimeOfDay.now().hour + 1) % 24,

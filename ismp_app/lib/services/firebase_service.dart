@@ -827,6 +827,20 @@ class FirebaseService {
         snapshot.docs.map((doc) => MomentModel.fromMap(doc.data(), doc.id)).toList());
   }
 
+  /// Streams a student's personal attendance records.
+  Stream<List<AttendanceRecord>> streamStudentAttendance(String studentRollNo) {
+    return _firestore
+        .collection('users')
+        .doc(studentRollNo)
+        .collection('attendance')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => AttendanceRecord.fromFirestore(doc))
+          .toList();
+    });
+  }
+
   /// Combined stream of target events and user's marked attendance (to compute Present/Absent status)
   Stream<List<AttendanceRecord>> streamCombinedStudentAttendance(String studentRollNo, int studentGroupNo) {
     StreamController<List<AttendanceRecord>> controller = StreamController();

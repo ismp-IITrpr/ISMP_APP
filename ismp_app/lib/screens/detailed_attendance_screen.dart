@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/mock_data/attendance_mock.dart';
+import '../models/attendance.dart';
+import '../services/firebase_service.dart';
 
 /// Total stickers that can be collected across all clubs.
 const int TOTAL_STICKERS = 36;
@@ -76,9 +77,9 @@ class DetailedAttendanceScreen extends StatelessWidget {
 
   /// Returns 'present', 'absent', or 'locked' for a club.
   /// Matches attendance record title exactly with the club name.
-  String _getClubStatus(String clubName) {
-    for (var record in recentSessions) {
-      if (record.title == clubName) {
+  String _getClubStatus(String clubName, List<AttendanceRecord> records) {
+    for (var record in records) {
+      if (record.club.trim().toLowerCase() == clubName.trim().toLowerCase()) {
         return record.isPresent ? 'present' : 'absent';
       }
     }
@@ -86,11 +87,11 @@ class DetailedAttendanceScreen extends StatelessWidget {
   }
 
   /// Counts how many stickers are collected (status == 'present') across all boards.
-  int _countCollectedStickers() {
+  int _countCollectedStickers(List<AttendanceRecord> records) {
     int count = 0;
     for (var clubs in boardClubs.values) {
       for (var club in clubs) {
-        if (_getClubStatus(club['name'] as String) == 'present') {
+        if (_getClubStatus(club['name'] as String, records) == 'present') {
           count++;
         }
       }
@@ -100,80 +101,89 @@ class DetailedAttendanceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int collected = _countCollectedStickers();
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2B124C),
-            Color(0xFF0F0F13),
-            Color(0xFF1E103C),
-            Color(0xFF0F0F13),
-          ],
-          stops: [0.0, 0.4, 0.7, 1.0],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          centerTitle: true,
-          title: const Text(
-            'Sticker Collection',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Stickers Collected Header ──
-                _buildStickersHeader(collected)
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .slideY(begin: -0.05),
-                const SizedBox(height: 20),
+    return StreamBuilder<List<AttendanceRecord>>(
+      stream: FirebaseService.instance.streamStudentAttendance(rollNo),
+      builder: (context, snapshot) {
+        final records = snapshot.data ?? [];
+        final int collected = _countCollectedStickers(records);
 
-                // ── Legend ──
-                _buildLegend()
-                    .animate()
-                    .fadeIn(duration: 600.ms, delay: 100.ms),
-                const SizedBox(height: 24),
-
-                // ── Board Sections ──
-                ...boardClubs.keys.toList().asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final board = entry.value;
-                  return _buildBoardSection(
-                    board,
-                    boardColors[board]!,
-                    boardClubs[board]!,
-                  ).animate().fadeIn(
-                    duration: 700.ms,
-                    delay: (200 + index * 120).ms,
-                  ).slideY(begin: 0.08);
-                }),
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF2B124C),
+                Color(0xFF0F0F13),
+                Color(0xFF1E103C),
+                Color(0xFF0F0F13),
               ],
+              stops: [0.0, 0.4, 0.7, 1.0],
             ),
           ),
-        ),
-      ),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              centerTitle: true,
+              title: const Text(
+                'Sticker Collection',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Stickers Collected Header ──
+                    _buildStickersHeader(collected)
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(begin: -0.05),
+                    const SizedBox(height: 20),
+
+                    // ── Legend ──
+                    _buildLegend()
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 100.ms),
+                    const SizedBox(height: 24),
+
+                    // ── Board Sections ──
+                    ...boardClubs.keys.toList().asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final board = entry.value;
+                      return _buildBoardSection(
+                        board,
+                        boardColors[board]!,
+                        boardClubs[board]!,
+                        records,
+                      ).animate().fadeIn(
+                        duration: 700.ms,
+                        delay: (200 + index * 120).ms,
+                      ).slideY(begin: 0.08);
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
     );
   }
 
@@ -315,10 +325,11 @@ class DetailedAttendanceScreen extends StatelessWidget {
     String boardName,
     Color color,
     List<Map<String, dynamic>> clubs,
+    List<AttendanceRecord> records,
   ) {
     int collected = 0;
     for (var club in clubs) {
-      if (_getClubStatus(club['name'] as String) == 'present') {
+      if (_getClubStatus(club['name'] as String, records) == 'present') {
         collected++;
       }
     }
@@ -405,7 +416,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
               spacing: 12,
               runSpacing: 14,
               children: clubs.map((club) {
-                final status = _getClubStatus(club['name'] as String);
+                final status = _getClubStatus(club['name'] as String, records);
                 return _buildStickerTile(
                   club['name'] as String,
                   club['image'] as String,

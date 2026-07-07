@@ -144,6 +144,9 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
     setState(() => _isExporting = true);
     try {
+      // Mark attendance persistently for all scanned students
+      await FirebaseService.instance.submitSessionAttendance(widget.sessionId);
+
       final scans = await FirebaseService.instance.getSessionScans(widget.sessionId);
 
       final csvData = <List<String>>[

@@ -86,7 +86,7 @@ class FirebaseService {
                 'degree': 'B.Tech',
                 'branch': 'Computer Science & Engineering',
                 'groupNo': 7,
-                'stickersCollected': 12,
+                'stickersCollected': 0,
                 'profileUrl': user.photoURL ?? '',
                 'mentorRollNo': '2024MEB1358', // Default mentor Kanika
               });
@@ -426,6 +426,7 @@ class FirebaseService {
     required String eventName,
     required String venue,
     required String repEmail,
+    String eventId = '',
   }) async {
     final docRef = await _firestore.collection('attendance_sessions').add({
       'eventName': eventName,
@@ -434,6 +435,7 @@ class FirebaseService {
       'status': 'active',
       'createdAt': FieldValue.serverTimestamp(),
       'scanCount': 0,
+      'eventId': eventId,
     });
     return docRef.id;
   }
@@ -523,25 +525,129 @@ class FirebaseService {
   }
 
   /// Manually marks a student as present in the database session.
+  /// First checks if the student exists in the database.
   Future<void> addManualMark({
     required String sessionId,
     required String name,
     required String rollNo,
   }) async {
+    final formattedRollNo = rollNo.trim().toUpperCase();
+    final userDoc = await _firestore.collection('users').doc(formattedRollNo).get();
+    if (!userDoc.exists) {
+      throw Exception('Student with Roll No. $formattedRollNo not found in database.');
+    }
+    
+    // Use student's real name from the DB if available
+    final dbName = userDoc.data()?['name'] ?? name;
+
     final scanRef = _firestore
         .collection('attendance_sessions')
         .doc(sessionId)
         .collection('scans')
-        .doc(rollNo);
+        .doc(formattedRollNo);
     await scanRef.set({
-      'name': name,
-      'email': '$rollNo@iitrpr.ac.in',
+      'name': dbName,
+      'email': '$formattedRollNo@iitrpr.ac.in',
       'scannedAt': FieldValue.serverTimestamp(),
     });
     // Increment the scanCount
     await _firestore.collection('attendance_sessions').doc(sessionId).update({
       'scanCount': FieldValue.increment(1),
     });
+  }
+
+  /// Submits the final attendance for all scanned students in a session to their persistent records.
+  Future<void> submitSessionAttendance(String sessionId) async {
+    final sessionDoc = await _firestore.collection('attendance_sessions').doc(sessionId).get();
+    if (!sessionDoc.exists) return;
+
+    final sessionData = sessionDoc.data()!;
+    final eventId = sessionData['eventId'] ?? '';
+    final eventName = sessionData['eventName'] ?? '';
+    final venue = sessionData['venue'] ?? '';
+
+    EventModel? event;
+    if (eventId.isNotEmpty) {
+      final eventDoc = await _firestore.collection('events').doc(eventId).get();
+      if (eventDoc.exists) {
+        event = EventModel.fromMap(eventDoc.data()!, eventDoc.id);
+      }
+    }
+
+    final eventType = event?.type ?? 'E';
+    final clubName = event?.club ?? '';
+    final date = event?.date ?? '';
+    final time = event?.time ?? '';
+    final dotColor = event?.dotColor ?? const Color(0xFF4A3AFF);
+
+    final scansSnapshot = await _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .collection('scans')
+        .get();
+
+    final batch = _firestore.batch();
+
+    for (var doc in scansSnapshot.docs) {
+      final rollNo = doc.id.toUpperCase().trim();
+      final data = doc.data();
+      final studentName = data['name'] ?? '';
+
+      final attendanceRef = _firestore
+          .collection('users')
+          .doc(rollNo)
+          .collection('attendance')
+          .doc(eventId.isNotEmpty ? eventId : sessionId);
+
+      final record = AttendanceRecord(
+        eventId: eventId.isNotEmpty ? eventId : sessionId,
+        eventType: eventType,
+        title: eventName,
+        club: clubName,
+        date: date,
+        time: time,
+        venue: venue,
+        isPresent: true,
+        iconColor: dotColor,
+        markedAt: DateTime.now(),
+      );
+
+      batch.set(attendanceRef, record.toMap());
+
+      // Update stickersCollected if first time attending this club
+      if (eventType == 'C' && clubName.isNotEmpty) {
+        try {
+          final existing = await _firestore
+              .collection('users')
+              .doc(rollNo)
+              .collection('attendance')
+              .where('club', isEqualTo: clubName)
+              .where('isPresent', isEqualTo: true)
+              .limit(1)
+              .get();
+          if (existing.docs.isEmpty) {
+            batch.update(_firestore.collection('users').doc(rollNo), {
+              'stickersCollected': FieldValue.increment(1)
+            });
+          }
+        } catch (e) {
+          debugPrint('Error updating stickersCollected for $rollNo: $e');
+        }
+      }
+
+      // Generate notification
+      final notifRef = _firestore.collection('notifications').doc();
+      batch.set(notifRef, {
+        'userRollNo': rollNo,
+        'title': 'Attendance Marked',
+        'description': 'Your attendance for the session "$eventName" has been marked present.',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'iconType': 'attendance',
+      });
+    }
+
+    await batch.commit();
   }
 
   /// Removes a student scan from the session.

@@ -6,6 +6,7 @@ class AttendanceRecord {
   final String eventId;
   final String eventType;
   final String title;
+  final String club;
   final String date;
   final String time;
   final String venue;
@@ -17,6 +18,7 @@ class AttendanceRecord {
     this.eventId = '',
     this.eventType = '',
     this.title = '',
+    this.club = '',
     this.date = '',
     this.time = '',
     this.venue = '',
@@ -30,6 +32,7 @@ class AttendanceRecord {
       'eventId': eventId,
       'eventType': eventType,
       'title': title,
+      'club': club,
       'date': date,
       'time': time,
       'venue': venue,
@@ -44,6 +47,7 @@ class AttendanceRecord {
       eventId: map['eventId'] ?? '',
       eventType: map['eventType'] ?? '',
       title: map['title'] ?? '',
+      club: map['club'] ?? '',
       date: map['date'] ?? '',
       time: map['time'] ?? '',
       venue: map['venue'] ?? '',

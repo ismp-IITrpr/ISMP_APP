@@ -315,6 +315,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                   eventName: event.title,
                                                   venue: event.venue,
                                                   repEmail: FirebaseService.instance.currentUserEmail ?? '',
+                                                  eventId: event.id,
                                                 );
                                                 if (context.mounted) {
                                                   Navigator.push(

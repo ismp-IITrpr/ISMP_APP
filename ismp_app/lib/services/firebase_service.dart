@@ -689,6 +689,17 @@ class FirebaseService {
     }
 
     await batch.commit();
+
+    // Mark the event as completed in Firestore
+    if (eventId.isNotEmpty) {
+      try {
+        await _firestore.collection('events').doc(eventId).update({
+          'isCompleted': true,
+        });
+      } catch (e) {
+        debugPrint('Error marking event $eventId as completed: $e');
+      }
+    }
   }
 
   /// Removes a student scan from the session.

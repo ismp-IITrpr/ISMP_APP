@@ -15,6 +15,7 @@ class EventModel {
   final String startTime;
   final String endTime;
   final int day;
+  final bool isCompleted;
 
   EventModel({
     required this.id,
@@ -30,6 +31,7 @@ class EventModel {
     this.startTime = '',
     this.endTime = '',
     this.day = 0,
+    this.isCompleted = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -48,6 +50,7 @@ class EventModel {
       'startTime': startTime,
       'endTime': endTime,
       'day': day,
+      'isCompleted': isCompleted,
     };
   }
 
@@ -87,6 +90,7 @@ class EventModel {
       startTime: start,
       endTime: end,
       day: map['day'] ?? 0,
+      isCompleted: map['isCompleted'] ?? false,
     );
   }
 

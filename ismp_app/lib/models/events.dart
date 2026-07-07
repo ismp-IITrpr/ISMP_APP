@@ -14,6 +14,7 @@ class EventModel {
   final Color dotColor;
   final String startTime;
   final String endTime;
+  final int day;
 
   EventModel({
     required this.id,
@@ -28,6 +29,7 @@ class EventModel {
     required this.dotColor,
     this.startTime = '',
     this.endTime = '',
+    this.day = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -45,6 +47,7 @@ class EventModel {
       'dotColor': dotColor.toARGB32(),
       'startTime': startTime,
       'endTime': endTime,
+      'day': day,
     };
   }
 
@@ -83,6 +86,7 @@ class EventModel {
       dotColor: Color(map['dotColor'] ?? 0xFF4A3AFF),
       startTime: start,
       endTime: end,
+      day: map['day'] ?? 0,
     );
   }
 

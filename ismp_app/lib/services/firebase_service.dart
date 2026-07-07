@@ -515,13 +515,26 @@ class FirebaseService {
         .collection('attendance_sessions')
         .doc(sessionId)
         .collection('scans')
-        .orderBy('scannedAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['studentUid'] = doc.id;
-              return data;
-            }).toList());
+        .map((snapshot) {
+          final list = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['studentUid'] = doc.id;
+            return data;
+          }).toList();
+
+          // Sort locally by scannedAt descending, handling null values safely
+          list.sort((a, b) {
+            final aTime = a['scannedAt'] as Timestamp?;
+            final bTime = b['scannedAt'] as Timestamp?;
+            if (aTime == null && bTime == null) return 0;
+            if (aTime == null) return -1; // Local/pending writes first
+            if (bTime == null) return 1;
+            return bTime.compareTo(aTime);
+          });
+
+          return list;
+        });
   }
 
   /// Manually marks a student as present in the database session.
@@ -839,6 +852,25 @@ class FirebaseService {
           .map((doc) => AttendanceRecord.fromFirestore(doc))
           .toList();
     });
+  }
+
+  /// Fetches student profile suggestions from the users collection matching a roll number prefix.
+  Future<List<UserProfile>> getStudentSuggestions(String query) async {
+    if (query.trim().isEmpty) return [];
+    final upperQuery = query.trim().toUpperCase();
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .where(FieldPath.documentId, isGreaterThanOrEqualTo: upperQuery)
+          .where(FieldPath.documentId, isLessThanOrEqualTo: upperQuery + '\uf8ff')
+          .limit(5)
+          .get();
+          
+      return snapshot.docs.map((doc) => UserProfile.fromFirestore(doc)).toList();
+    } catch (e) {
+      debugPrint('Error fetching student suggestions: $e');
+      return [];
+    }
   }
 
   /// Combined stream of target events and user's marked attendance (to compute Present/Absent status)

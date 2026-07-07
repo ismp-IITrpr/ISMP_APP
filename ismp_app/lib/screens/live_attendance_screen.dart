@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firebase_service.dart';
+import '../models/profile_data.dart';
 
 class LiveAttendanceScreen extends StatefulWidget {
   final String sessionId;
@@ -200,9 +201,11 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     }
   }
 
+  TextEditingController? _autocompleteRollController;
+
   void _addManualStudent() async {
     final name = _nameController.text.trim();
-    final roll = _rollController.text.trim();
+    final roll = (_autocompleteRollController?.text ?? _rollController.text).trim();
     if (name.isEmpty || roll.isEmpty) return;
 
     try {
@@ -212,6 +215,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
         rollNo: roll,
       );
       _nameController.clear();
+      _autocompleteRollController?.clear();
       _rollController.clear();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -588,6 +592,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           ),
           const SizedBox(height: 14),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 flex: 3,
@@ -596,7 +601,75 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
               const SizedBox(width: 10),
               Expanded(
                 flex: 2,
-                child: _buildTextField(_rollController, 'Roll No.'),
+                child: Autocomplete<UserProfile>(
+                  optionsBuilder: (TextEditingValue textEditingValue) async {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<UserProfile>.empty();
+                    }
+                    return await FirebaseService.instance.getStudentSuggestions(textEditingValue.text);
+                  },
+                  displayStringForOption: (UserProfile option) => option.rollNo,
+                  onSelected: (UserProfile selection) {
+                    _rollController.text = selection.rollNo;
+                    _nameController.text = selection.name;
+                  },
+                  fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                    _autocompleteRollController = textEditingController;
+                    return TextField(
+                      controller: textEditingController,
+                      focusNode: focusNode,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: InputDecoration(
+                        hintText: 'Roll No.',
+                        hintStyle: const TextStyle(color: textGray, fontSize: 13),
+                        filled: true,
+                        fillColor: surface,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    );
+                  },
+                  optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<UserProfile> onSelected, Iterable<UserProfile> options) {
+                    return Align(
+                      alignment: Alignment.topLeft,
+                      child: Material(
+                        elevation: 4.0,
+                        color: const Color(0xFF1C1C23),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 160,
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemCount: options.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final UserProfile option = options.elementAt(index);
+                              return ListTile(
+                                title: Text(
+                                  option.rollNo,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                ),
+                                subtitle: Text(
+                                  option.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFF8B8B9B), fontSize: 11),
+                                ),
+                                onTap: () {
+                                  onSelected(option);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),

@@ -377,15 +377,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white70),
-                onPressed: () async {
-                  await DatabaseService.clearPersistentAttendanceCache(rollNo);
-                  await DatabaseService.clearPersistentEventsCache();
-                  setState(() {});
-                },
-                tooltip: 'Refresh Attendance',
-              ),
-              IconButton(
                 icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
                 onPressed: _openScanner,
                 tooltip: 'Scan QR Code',

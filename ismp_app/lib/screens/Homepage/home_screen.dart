@@ -5,9 +5,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
 import '../../models/team_member.dart';
-import '../../models/mock_data/events_mock.dart';
 import '../../models/profile_data.dart';
 import '../../models/moment.dart';
+import '../../services/database_service.dart';
 import 'core_team_screen.dart';
 import '../events_screen.dart';
 import '../profile_screen.dart';
@@ -30,28 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentCarouselIndex = 0;
   BlogTag? _activeTag;
 
-
-
   String _getEventsSubtitle() {
-    final now = DateTime.now();
-    final oneHourFromNow = now.add(const Duration(hours: 1));
-    bool upcoming = false;
-    
-    for (var eventList in eventsData.values) {
-      for (var event in eventList) {
-        final eventTime = event.getParsedDateTime();
-        if (eventTime.isAfter(now) && eventTime.isBefore(oneHourFromNow)) {
-          return '${event.title} starts soon!';
-        } else if (eventTime.year == now.year && eventTime.month == now.month && eventTime.day == now.day && eventTime.isAfter(now)) {
-          upcoming = true;
-        }
-      }
-    }
-    return upcoming ? 'You have events scheduled later today.' : 'See what is happening today.';
+    // Default subtitle - will be updated dynamically from Firebase
+    return 'See what is happening today.';
   }
 
   List<Widget> _buildCarouselCards(BuildContext context) {
-    final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
+    final isRep = FirebaseService.instance.isClubRep(
+      FirebaseService.instance.currentUserEmail,
+    );
     final mentor = FirebaseService.instance.mentor;
     final List<_QuickLink> links = [
       _QuickLink(
@@ -65,9 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
           end: Alignment.bottomRight,
         ),
         color: const Color(0xFF4A3AFF),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DevTeamScreen())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DevTeamScreen()),
+        ),
       ),
-      if(!isRep)
+      if (!isRep)
         _QuickLink(
           title: 'Mentor : ${mentor?.name ?? 'Profile'}',
           subtitle: 'Get to know your mentor',
@@ -83,7 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
             if (widget.onNavigateToTab != null) {
               widget.onNavigateToTab!(3);
             } else {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProfileScreen(isRep: false),
+                ),
+              );
             }
           },
         ),
@@ -102,7 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
           if (widget.onNavigateToTab != null) {
             widget.onNavigateToTab!(1);
           } else {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EventsScreen()),
+            );
           }
         },
       ),
@@ -130,10 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fit: StackFit.expand,
               children: [
                 // Full-bleed background image
-                Image.asset(
-                  link.bgImage,
-                  fit: BoxFit.cover,
-                ),
+                Image.asset(link.bgImage, fit: BoxFit.cover),
                 // Gradient overlay for text readability
                 Container(
                   decoration: BoxDecoration(
@@ -214,21 +209,30 @@ class _HomeScreenState extends State<HomeScreen> {
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('notifications')
-                .where('userRollNo', isEqualTo: FirebaseService.instance.currentStudentRollNo)
+                .where(
+                  'userRollNo',
+                  isEqualTo: FirebaseService.instance.currentStudentRollNo,
+                )
                 .where('isRead', isEqualTo: false)
                 .snapshots(),
             builder: (context, snapshot) {
-              final hasUnread = snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+              final hasUnread =
+                  snapshot.hasData && snapshot.data!.docs.isNotEmpty;
 
               return Stack(
                 alignment: Alignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.notifications_none, color: Colors.white),
+                    icon: const Icon(
+                      Icons.notifications_none,
+                      color: Colors.white,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen(),
+                        ),
                       );
                     },
                   ),
@@ -267,7 +271,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildMomentsHeader(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
@@ -285,7 +288,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const MomentsScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MomentsScreen()),
+                );
               },
               child: const Text(
                 'View all',
@@ -329,7 +335,10 @@ class _HomeScreenState extends State<HomeScreen> {
             final moments = snapshot.data ?? [];
             if (moments.isEmpty) {
               return const Center(
-                child: Text('No moments yet', style: TextStyle(color: Colors.grey)),
+                child: Text(
+                  'No moments yet',
+                  style: TextStyle(color: Colors.grey),
+                ),
               );
             }
             return ListView.builder(
@@ -398,7 +407,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const BlogsScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BlogsScreen()),
+                );
               },
               child: const Text(
                 'View all',
@@ -435,9 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final posts = snapshot.data!;
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          sliver: SliverToBoxAdapter(
-            child: _BlogCard(post: posts.first),
-          ),
+          sliver: SliverToBoxAdapter(child: _BlogCard(post: posts.first)),
         );
       },
     );
@@ -479,37 +489,42 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-            child: Row(
-              children: [
-                const Text(
-                  'ISMP Core Team',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const CoreTeamScreen()),
-                    );
-                  },
-                  child: const Text(
-                    'View All →',
-                    style: TextStyle(
-                      color: Color(0xFF4A3AFF),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                child: Row(
+                  children: [
+                    const Text(
+                      'ISMP Core Team',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CoreTeamScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'View All →',
+                        style: TextStyle(
+                          color: Color(0xFF4A3AFF),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 800.ms).slideX(begin: -0.05, curve: Curves.easeOutQuad),
+              )
+              .animate()
+              .fadeIn(duration: 800.ms)
+              .slideX(begin: -0.05, curve: Curves.easeOutQuad),
           SizedBox(
             height: 190,
             child: ListView.builder(
@@ -521,26 +536,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     .animate()
                     .fadeIn(duration: 800.ms, delay: (index * 100).ms)
                     .slideY(begin: 0.15, curve: Curves.easeOutQuad)
-                    .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutQuad);
+                    .scale(
+                      begin: const Offset(0.9, 0.9),
+                      curve: Curves.easeOutQuad,
+                    );
               },
             ),
           ),
           const SizedBox(height: 24),
           CarouselSlider(
-            options: CarouselOptions(
-              height: 180.0,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 4),
-              enlargeCenterPage: true,
-              viewportFraction: 0.9,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentCarouselIndex = index;
-                });
-              },
-            ),
-            items: _buildCarouselCards(context),
-          ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.1),
+                options: CarouselOptions(
+                  height: 180.0,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 4),
+                  enlargeCenterPage: true,
+                  viewportFraction: 0.9,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentCarouselIndex = index;
+                    });
+                  },
+                ),
+                items: _buildCarouselCards(context),
+              )
+              .animate()
+              .fadeIn(duration: 800.ms, delay: 200.ms)
+              .slideY(begin: 0.1),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -566,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showBioDialog(BuildContext context, TeamMember member) {
     if (member.bio == null || member.bio!.isEmpty) return;
-    
+
     showDialog(
       context: context,
       builder: (context) {
@@ -669,7 +690,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     member.role.toUpperCase(),
                     style: TextStyle(
-                      color: isFaculty ? const Color(0xFF00FFCC) : const Color(0xFFB4B0FF),
+                      color: isFaculty
+                          ? const Color(0xFF00FFCC)
+                          : const Color(0xFFB4B0FF),
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.0,
@@ -688,14 +711,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: isFaculty
-                      ? [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withOpacity(0.1)]
-                      : [const Color(0xFF4A3AFF), const Color(0xFF00FFCC).withOpacity(0.5)],
+                      ? [
+                          const Color(0xFF00FFCC),
+                          const Color(0xFF00FFCC).withOpacity(0.1),
+                        ]
+                      : [
+                          const Color(0xFF4A3AFF),
+                          const Color(0xFF00FFCC).withOpacity(0.5),
+                        ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (isFaculty ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.3),
+                    color:
+                        (isFaculty
+                                ? const Color(0xFF00FFCC)
+                                : const Color(0xFF4A3AFF))
+                            .withOpacity(0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -776,7 +809,11 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: const Center(
-                      child: Icon(Icons.image_outlined, color: Colors.white24, size: 40),
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: Colors.white24,
+                        size: 40,
+                      ),
                     ),
                   ),
                 ),
@@ -821,10 +858,7 @@ class _BlogCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1C1C23),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: post.tag.color.withOpacity(0.15),
-            width: 1,
-          ),
+          border: Border.all(color: post.tag.color.withOpacity(0.15), width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18),
@@ -837,10 +871,7 @@ class _BlogCard extends StatelessWidget {
                   const Spacer(),
                   Text(
                     '${post.readMinutes} min read',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 11,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
                   ),
                 ],
               ),
@@ -894,10 +925,7 @@ class _BlogCard extends StatelessWidget {
                   ),
                   Text(
                     post.date,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 11,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
                   ),
                 ],
               ),
@@ -909,9 +937,9 @@ class _BlogCard extends StatelessWidget {
   }
 
   void _openDetail(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => _BlogDetailScreen(post: post)),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => _BlogDetailScreen(post: post)));
   }
 }
 

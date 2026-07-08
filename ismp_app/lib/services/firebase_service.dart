@@ -9,7 +9,6 @@ import '../models/attendance.dart';
 import '../models/moment.dart';
 import '../models/profile_data.dart';
 import '../models/mock_data/blog_mock.dart';
-import '../models/mock_data/events_mock.dart';
 import '../models/mock_data/attendance_mock.dart';
 import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
@@ -35,7 +34,10 @@ class FirebaseService {
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>;
         final mentorRollNo = data['mentorRollNo'] ?? '2024MEB1358';
-        final mentorDoc = await _firestore.collection('mentors').doc(mentorRollNo).get();
+        final mentorDoc = await _firestore
+            .collection('mentors')
+            .doc(mentorRollNo)
+            .get();
         if (mentorDoc.exists) {
           _cachedMentor = MentorProfile.fromFirestore(mentorDoc);
         }
@@ -52,19 +54,23 @@ class FirebaseService {
   Future<User?> signInWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+        clientId:
+            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
       );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return null; // User cancelled
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
       final user = userCredential.user;
 
       if (user != null) {
@@ -74,13 +80,18 @@ class FirebaseService {
 
         if (isRep || isStudent) {
           _mockEmail = null; // Clear mock on successful Google Sign-in
-          
+
           if (isStudent && email != null) {
             // Extract roll number (e.g. 2026CSB1123)
             final rollNo = email.split('@')[0].toUpperCase();
-            final userDoc = await _firestore.collection('users').doc(rollNo).get();
+            final userDoc = await _firestore
+                .collection('users')
+                .doc(rollNo)
+                .get();
             if (!userDoc.exists) {
-              debugPrint('Auto-creating student profile document for $rollNo in Firestore...');
+              debugPrint(
+                'Auto-creating student profile document for $rollNo in Firestore...',
+              );
               await _firestore.collection('users').doc(rollNo).set({
                 'name': user.displayName ?? 'Rohan Sharma',
                 'degree': 'B.Tech',
@@ -94,14 +105,15 @@ class FirebaseService {
             // Cache the mentor for quick access across screens
             await loadMentor();
           }
-          
+
           return user;
         } else {
           // If domain doesn't match or unauthorized, sign out immediately and throw an error
           await signOut();
           throw FirebaseAuthException(
             code: 'invalid-email-domain',
-            message: 'Access Denied: You are not authorized to access this app.',
+            message:
+                'Access Denied: You are not authorized to access this app.',
           );
         }
       }
@@ -119,20 +131,21 @@ class FirebaseService {
 
     try {
       // First try standard Firebase Auth sign-in
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: lowerEmail,
-        password: cleanPassword,
-      );
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(
+            email: lowerEmail,
+            password: cleanPassword,
+          );
       _mockEmail = null;
       return userCredential.user;
     } catch (e) {
       debugPrint('Firebase email login failed: $e');
-      
+
       // Fallback bypass for the dummy testing account
       if (lowerEmail == 'repaccess@gmail.com' && cleanPassword == '12345678') {
         debugPrint('Using mock bypass for tester account repaccess@gmail.com');
         _mockEmail = 'repaccess@gmail.com';
-        
+
         // If not authenticated in firebase, sign in anonymously to obtain a valid Firebase session
         if (_auth.currentUser == null) {
           try {
@@ -155,7 +168,8 @@ class FirebaseService {
     await _auth.signOut();
     try {
       await GoogleSignIn(
-        clientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+        clientId:
+            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
       ).signOut();
     } catch (_) {}
   }
@@ -172,11 +186,12 @@ class FirebaseService {
     return '24CS1001';
   }
 
-
   // Stream blog posts from Firestore in real-time
   Stream<List<BlogPost>> streamBlogPosts() {
     return _firestore.collection('blogs').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => BlogPost.fromMap(doc.data(), doc.id)).toList();
+      return snapshot.docs
+          .map((doc) => BlogPost.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 
@@ -187,14 +202,18 @@ class FirebaseService {
         .where('day', isEqualTo: day)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => EventModel.fromMap(doc.data())).toList();
-    });
+          return snapshot.docs
+              .map((doc) => EventModel.fromMap(doc.data()))
+              .toList();
+        });
   }
 
   // Stream recent attendance records
   Stream<List<AttendanceRecord>> streamRecentAttendance() {
     return _firestore.collection('attendance').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => AttendanceRecord.fromMap(doc.data())).toList();
+      return snapshot.docs
+          .map((doc) => AttendanceRecord.fromMap(doc.data()))
+          .toList();
     });
   }
 
@@ -215,23 +234,14 @@ class FirebaseService {
         }
       }
 
-      // 2. Seed Events if empty
-      final eventsSnapshot = await _firestore.collection('events').limit(1).get();
-      if (eventsSnapshot.docs.isEmpty) {
-        debugPrint('Seeding events collection...');
-        for (var entry in eventsData.entries) {
-          final day = entry.key;
-          final list = entry.value;
-          for (var event in list) {
-            final map = event.toMap();
-            map['day'] = day; // Add the day field to group events
-            await _firestore.collection('events').add(map);
-          }
-        }
-      }
+      // 2. Events are now managed through Firebase console only
+      // No seeding from mock data
 
       // 3. Seed Attendance if empty
-      final attendanceSnapshot = await _firestore.collection('attendance').limit(1).get();
+      final attendanceSnapshot = await _firestore
+          .collection('attendance')
+          .limit(1)
+          .get();
       if (attendanceSnapshot.docs.isEmpty) {
         debugPrint('Seeding attendance collection...');
         for (var record in recentSessions) {
@@ -240,16 +250,25 @@ class FirebaseService {
       }
 
       // 4. Seed Moments if empty
-      final momentsSnapshot = await _firestore.collection('moments').limit(1).get();
+      final momentsSnapshot = await _firestore
+          .collection('moments')
+          .limit(1)
+          .get();
       if (momentsSnapshot.docs.isEmpty) {
         debugPrint('Seeding moments collection...');
         for (var moment in mockMoments) {
-          await _firestore.collection('moments').doc(moment.id).set(moment.toMap());
+          await _firestore
+              .collection('moments')
+              .doc(moment.id)
+              .set(moment.toMap());
         }
       }
 
       // 5. Seed default mentor if not exists
-      final mentorDoc = await _firestore.collection('mentors').doc('2024MEB1358').get();
+      final mentorDoc = await _firestore
+          .collection('mentors')
+          .doc('2024MEB1358')
+          .get();
       if (!mentorDoc.exists) {
         debugPrint('Seeding default mentor Kanika into Firestore...');
         await _firestore.collection('mentors').doc('2024MEB1358').set({
@@ -455,7 +474,10 @@ class FirebaseService {
     required String studentEmail,
   }) async {
     // First check if the session is still active
-    final sessionDoc = await _firestore.collection('attendance_sessions').doc(sessionId).get();
+    final sessionDoc = await _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .get();
     if (!sessionDoc.exists || sessionDoc.data()?['status'] != 'active') {
       return false; // Session expired or doesn't exist
     }
@@ -505,8 +527,13 @@ class FirebaseService {
   }
 
   /// Streams the session document.
-  Stream<DocumentSnapshot<Map<String, dynamic>>> streamSession(String sessionId) {
-    return _firestore.collection('attendance_sessions').doc(sessionId).snapshots();
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamSession(
+    String sessionId,
+  ) {
+    return _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .snapshots();
   }
 
   /// Streams the list of scans (marked present students) for a session.
@@ -545,11 +572,16 @@ class FirebaseService {
     required String rollNo,
   }) async {
     final formattedRollNo = rollNo.trim().toUpperCase();
-    final userDoc = await _firestore.collection('users').doc(formattedRollNo).get();
+    final userDoc = await _firestore
+        .collection('users')
+        .doc(formattedRollNo)
+        .get();
     if (!userDoc.exists) {
-      throw Exception('Student with Roll No. $formattedRollNo not found in database.');
+      throw Exception(
+        'Student with Roll No. $formattedRollNo not found in database.',
+      );
     }
-    
+
     // Use student's real name from the DB if available
     final dbName = userDoc.data()?['name'] ?? name;
 
@@ -559,14 +591,19 @@ class FirebaseService {
         .doc(sessionId)
         .collection('scans')
         .doc(formattedRollNo);
-        
+
     final scanDoc = await scanRef.get();
     if (scanDoc.exists) {
-      throw Exception('Student $formattedRollNo is already added to this session.');
+      throw Exception(
+        'Student $formattedRollNo is already added to this session.',
+      );
     }
 
     // 2. Fetch session details to check persistent status
-    final sessionDoc = await _firestore.collection('attendance_sessions').doc(sessionId).get();
+    final sessionDoc = await _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .get();
     if (!sessionDoc.exists) {
       throw Exception('Attendance session no longer exists.');
     }
@@ -582,7 +619,9 @@ class FirebaseService {
     if (persistentDoc.exists) {
       final pData = persistentDoc.data();
       if (pData != null && pData['isPresent'] == true) {
-        throw Exception('Student $formattedRollNo has already marked attendance for this event.');
+        throw Exception(
+          'Student $formattedRollNo has already marked attendance for this event.',
+        );
       }
     }
 
@@ -599,7 +638,10 @@ class FirebaseService {
 
   /// Submits the final attendance for all scanned students in a session to their persistent records.
   Future<void> submitSessionAttendance(String sessionId) async {
-    final sessionDoc = await _firestore.collection('attendance_sessions').doc(sessionId).get();
+    final sessionDoc = await _firestore
+        .collection('attendance_sessions')
+        .doc(sessionId)
+        .get();
     if (!sessionDoc.exists) return;
 
     final sessionData = sessionDoc.data()!;
@@ -627,7 +669,9 @@ class FirebaseService {
         .collection('scans')
         .get();
 
-    final presentRollNos = scansSnapshot.docs.map((doc) => doc.id.toUpperCase().trim()).toSet();
+    final presentRollNos = scansSnapshot.docs
+        .map((doc) => doc.id.toUpperCase().trim())
+        .toSet();
     final studentsSnapshot = await _firestore.collection('users').get();
 
     final batch = _firestore.batch();
@@ -670,7 +714,7 @@ class FirebaseService {
               .get();
           if (existing.docs.isEmpty) {
             batch.update(_firestore.collection('users').doc(rollNo), {
-              'stickersCollected': FieldValue.increment(1)
+              'stickersCollected': FieldValue.increment(1),
             });
           }
         } catch (e) {
@@ -683,7 +727,8 @@ class FirebaseService {
       batch.set(notifRef, {
         'userRollNo': rollNo,
         'title': 'Attendance Marked',
-        'description': 'Your attendance for the session "$eventName" has been marked present.',
+        'description':
+            'Your attendance for the session "$eventName" has been marked present.',
         'timestamp': FieldValue.serverTimestamp(),
         'isRead': false,
         'iconType': 'attendance',
@@ -697,10 +742,14 @@ class FirebaseService {
 
       final data = doc.data();
       final studentDegree = data['degree'] ?? 'B.Tech';
-      final studentGroupNo = data['groupNo'] is int ? data['groupNo'] as int : (int.tryParse(data['groupNo']?.toString() ?? '') ?? 7);
+      final studentGroupNo = data['groupNo'] is int
+          ? data['groupNo'] as int
+          : (int.tryParse(data['groupNo']?.toString() ?? '') ?? 7);
 
       // Check if student is in the target audience
-      final bool isTarget = event == null ? true : event.isStudentTargeted(studentDegree, studentGroupNo);
+      final bool isTarget = event == null
+          ? true
+          : event.isStudentTargeted(studentDegree, studentGroupNo);
 
       if (isTarget) {
         final attendanceRef = _firestore
@@ -806,11 +855,13 @@ class FirebaseService {
         .where('repEmail', isEqualTo: repEmail)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['sessionId'] = doc.id;
-              return data;
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['sessionId'] = doc.id;
+            return data;
+          }).toList(),
+        );
   }
 
   // ─── EVENT POSTING ─────────────────────────────────────────────────
@@ -828,7 +879,9 @@ class FirebaseService {
     String type = 'E',
     String club = '',
   }) async {
-    final color = type == 'C' ? const Color(0xFF8B78FF) : const Color(0xFFB0C4DE);
+    final color = type == 'C'
+        ? const Color(0xFF8B78FF)
+        : const Color(0xFFB0C4DE);
     await _firestore.collection('events').add({
       'title': title,
       'date': date,
@@ -885,9 +938,11 @@ class FirebaseService {
         .where('type', isEqualTo: 'C')
         .where('club', isEqualTo: clubName)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              return EventModel.fromMap(doc.data(), doc.id);
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            return EventModel.fromMap(doc.data(), doc.id);
+          }).toList(),
+        );
   }
 
   /// Streams all club sessions (type 'C') for all clubs.
@@ -896,9 +951,11 @@ class FirebaseService {
         .collection('events')
         .where('type', isEqualTo: 'C')
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              return EventModel.fromMap(doc.data(), doc.id);
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            return EventModel.fromMap(doc.data(), doc.id);
+          }).toList(),
+        );
   }
 
   /// Deletes old test events created in previous testing runs.
@@ -909,10 +966,10 @@ class FirebaseService {
         final data = doc.data();
         final club = (data['club'] ?? '').toString().toLowerCase();
         final title = (data['title'] ?? '').toString().toLowerCase();
-        if (club.contains('test') || 
-            club.contains('gupta') || 
-            club.contains('unknown') || 
-            title.contains('test') || 
+        if (club.contains('test') ||
+            club.contains('gupta') ||
+            club.contains('unknown') ||
+            title.contains('test') ||
             club.isEmpty) {
           await doc.reference.delete();
         }
@@ -924,8 +981,14 @@ class FirebaseService {
 
   /// Streams moments from backend.
   Stream<List<MomentModel>> streamMoments() {
-    return _firestore.collection('moments').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => MomentModel.fromMap(doc.data(), doc.id)).toList());
+    return _firestore
+        .collection('moments')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => MomentModel.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   /// Streams a student's personal attendance records.
@@ -936,10 +999,10 @@ class FirebaseService {
         .collection('attendance')
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => AttendanceRecord.fromFirestore(doc))
-          .toList();
-    });
+          return snapshot.docs
+              .map((doc) => AttendanceRecord.fromFirestore(doc))
+              .toList();
+        });
   }
 
   /// Fetches student profile suggestions from the users collection matching a roll number prefix.
@@ -950,11 +1013,16 @@ class FirebaseService {
       final snapshot = await _firestore
           .collection('users')
           .where(FieldPath.documentId, isGreaterThanOrEqualTo: upperQuery)
-          .where(FieldPath.documentId, isLessThanOrEqualTo: upperQuery + '\uf8ff')
+          .where(
+            FieldPath.documentId,
+            isLessThanOrEqualTo: upperQuery + '\uf8ff',
+          )
           .limit(5)
           .get();
-          
-      return snapshot.docs.map((doc) => UserProfile.fromFirestore(doc)).toList();
+
+      return snapshot.docs
+          .map((doc) => UserProfile.fromFirestore(doc))
+          .toList();
     } catch (e) {
       debugPrint('Error fetching student suggestions: $e');
       return [];
@@ -962,19 +1030,22 @@ class FirebaseService {
   }
 
   /// Combined stream of target events and user's marked attendance (to compute Present/Absent status)
-  Stream<List<AttendanceRecord>> streamCombinedStudentAttendance(String studentRollNo, int studentGroupNo) {
+  Stream<List<AttendanceRecord>> streamCombinedStudentAttendance(
+    String studentRollNo,
+    int studentGroupNo,
+  ) {
     StreamController<List<AttendanceRecord>> controller = StreamController();
-    
+
     StreamSubscription? sub1;
     StreamSubscription? sub2;
-    
+
     List<EventModel> latestEvents = [];
     List<AttendanceRecord> latestRecords = [];
-    
+
     void update() {
       if (controller.isClosed) return;
       List<AttendanceRecord> combined = [];
-      
+
       for (var event in latestEvents) {
         final matchingRecord = latestRecords.firstWhere(
           (r) => r.eventId == event.id,
@@ -992,31 +1063,117 @@ class FirebaseService {
         );
         combined.add(matchingRecord);
       }
-      
+
       controller.add(combined);
     }
-    
+
     sub1 = _firestore.collection('events').snapshots().listen((snapshot) {
-      latestEvents = snapshot.docs.map((doc) => EventModel.fromMap(doc.data(), doc.id)).toList();
+      latestEvents = snapshot.docs
+          .map((doc) => EventModel.fromMap(doc.data(), doc.id))
+          .toList();
       update();
     }, onError: controller.addError);
-    
+
     sub2 = _firestore
         .collection('users')
         .doc(studentRollNo)
         .collection('attendance')
         .snapshots()
         .listen((snapshot) {
-      latestRecords = snapshot.docs.map((doc) => AttendanceRecord.fromFirestore(doc)).toList();
-      update();
-    }, onError: controller.addError);
-    
+          latestRecords = snapshot.docs
+              .map((doc) => AttendanceRecord.fromFirestore(doc))
+              .toList();
+          update();
+        }, onError: controller.addError);
+
     controller.onCancel = () {
       sub1?.cancel();
       sub2?.cancel();
     };
-    
+
     return controller.stream;
   }
-}
 
+  /// Resets all testing and attendance data across Firestore and clears local caches
+  Future<void> resetTestingData() async {
+    debugPrint('Resetting testing data...');
+
+    // 1. Delete all users and their attendance subcollections
+    final usersSnapshot = await _firestore.collection('users').get();
+    for (var userDoc in usersSnapshot.docs) {
+      final rollNo = userDoc.id;
+      final attendanceSnapshot = await _firestore
+          .collection('users')
+          .doc(rollNo)
+          .collection('attendance')
+          .get();
+      for (var doc in attendanceSnapshot.docs) {
+        await doc.reference.delete();
+      }
+      await userDoc.reference.delete();
+    }
+
+    // 2. Clear general attendance collection
+    final attendanceSnapshot = await _firestore.collection('attendance').get();
+    for (var doc in attendanceSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    // 3. Clear attendance sessions and their scans subcollections
+    final sessionsSnapshot = await _firestore
+        .collection('attendance_sessions')
+        .get();
+    for (var sessionDoc in sessionsSnapshot.docs) {
+      final scansSnapshot = await sessionDoc.reference
+          .collection('scans')
+          .get();
+      for (var doc in scansSnapshot.docs) {
+        await doc.reference.delete();
+      }
+      await sessionDoc.reference.delete();
+    }
+
+    // 4. Clear all notifications
+    final notificationsSnapshot = await _firestore
+        .collection('notifications')
+        .get();
+    for (var doc in notificationsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    // 5. Clear events, blogs, moments, clubs, mentors collections completely so they can be re-seeded
+    final eventsSnapshot = await _firestore.collection('events').get();
+    for (var doc in eventsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    final blogsSnapshot = await _firestore.collection('blogs').get();
+    for (var doc in blogsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    final momentsSnapshot = await _firestore.collection('moments').get();
+    for (var doc in momentsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    final clubsSnapshot = await _firestore.collection('clubs').get();
+    for (var doc in clubsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    final mentorsSnapshot = await _firestore.collection('mentors').get();
+    for (var doc in mentorsSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
+    // 6. Re-seed default collections
+    await seedDatabaseIfNeeded();
+
+    // 7. Clear all local caches
+    await DatabaseService.clearPersistentEventsCache();
+    await DatabaseService.clearCache();
+    await DatabaseService.clearPersistentAttendanceCache(currentStudentRollNo);
+    debugPrint('Testing data reset complete.');
+  }
+}

@@ -134,7 +134,7 @@ final UserProfile dummyUser = UserProfile(
   degree: 'B.Tech',
   branch: 'Computer Science & Engineering',
   groupNo: 7,
-  stickersCollected: 12,
+  stickersCollected: 0,
   profileUrl: '',
   mentor: dummyMentor,
   clubName: 'Robotics',

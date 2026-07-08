@@ -115,28 +115,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 );
               }),
 
-              // Pre-existing Mock Notifications
-              _buildNotificationCard(
-                icon: Icons.event,
-                iconColor: const Color(0xFFFFB020),
-                title: 'Upcoming Event: Freshers Meet',
-                description: 'Don\'t forget! The ISMP Freshers Meet is happening tonight at 6 PM in the main auditorium.',
-                time: '2 hours ago',
-              ),
-              _buildNotificationCard(
-                icon: Icons.check_circle_outline,
-                iconColor: const Color(0xFF00FFCC),
-                title: 'Attendance Updated',
-                description: 'Your attendance for the mentoring session on Friday has been marked present.',
-                time: '1 day ago',
-              ),
-              _buildNotificationCard(
-                icon: Icons.info_outline,
-                iconColor: const Color(0xFF4A3AFF),
-                title: 'Welcome to ISMP!',
-                description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
-                time: '2 days ago',
-              ),
+              // // Pre-existing Mock Notifications
+              // _buildNotificationCard(
+              //   icon: Icons.event,
+              //   iconColor: const Color(0xFFFFB020),
+              //   title: 'Upcoming Event: Freshers Meet',
+              //   description: 'Don\'t forget! The ISMP Freshers Meet is happening tonight at 6 PM in the main auditorium.',
+              //   time: '2 hours ago',
+              // ),
+              // _buildNotificationCard(
+              //   icon: Icons.check_circle_outline,
+              //   iconColor: const Color(0xFF00FFCC),
+              //   title: 'Attendance Updated',
+              //   description: 'Your attendance for the mentoring session on Friday has been marked present.',
+              //   time: '1 day ago',
+              // ),
+              // _buildNotificationCard(
+              //   icon: Icons.info_outline,
+              //   iconColor: const Color(0xFF4A3AFF),
+              //   title: 'Welcome to ISMP!',
+              //   description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
+              //   time: '2 days ago',
+              // ),
             ],
           );
         },

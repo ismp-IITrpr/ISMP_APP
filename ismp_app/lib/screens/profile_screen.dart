@@ -407,6 +407,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+
   Widget _buildLogoutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,

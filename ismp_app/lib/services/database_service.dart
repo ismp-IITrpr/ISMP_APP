@@ -77,6 +77,45 @@ class DatabaseService {
         final String mRollNo = user.mentorRollNo ?? '2024MEB1358';
         user.mentor = await getMentor(mRollNo);
 
+        // Dynamically compute actual stickers collected from their attendance subcollection
+        int actualStickers = 0;
+        try {
+          final attendanceSnapshot = await _db
+              .collection('users')
+              .doc(userRollNo)
+              .collection('attendance')
+              .where('isPresent', isEqualTo: true)
+              .get();
+          
+          final uniqueClubs = attendanceSnapshot.docs
+              .where((doc) {
+                final data = doc.data();
+                final String? type = data['eventType']?.toString();
+                final String? club = data['club']?.toString();
+                return type == 'C' && club != null && club.trim().isNotEmpty;
+              })
+              .map((doc) => doc.data()['club'].toString().trim().toLowerCase())
+              .toSet();
+          actualStickers = uniqueClubs.length;
+        } catch (e) {
+          print("Error computing actual stickers: $e");
+          actualStickers = user.stickersCollected;
+        }
+
+        user = UserProfile(
+          name: user.name,
+          rollNo: user.rollNo,
+          degree: user.degree,
+          branch: user.branch,
+          groupNo: user.groupNo,
+          stickersCollected: actualStickers,
+          profileUrl: user.profileUrl,
+          mentorRollNo: user.mentorRollNo,
+          mentor: user.mentor,
+          clubName: user.clubName,
+          clubId: user.clubId,
+        );
+
         // Store in both memory and persistent cache
         _cachedProfile = user;
         await prefs.setString('cached_profile_rollno', userRollNo);

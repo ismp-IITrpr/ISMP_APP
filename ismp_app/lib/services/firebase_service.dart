@@ -627,12 +627,14 @@ class FirebaseService {
         .collection('scans')
         .get();
 
+    final presentRollNos = scansSnapshot.docs.map((doc) => doc.id.toUpperCase().trim()).toSet();
+    final studentsSnapshot = await _firestore.collection('users').get();
+
     final batch = _firestore.batch();
 
+    // 1. Mark present for all scanned students
     for (var doc in scansSnapshot.docs) {
       final rollNo = doc.id.toUpperCase().trim();
-      final data = doc.data();
-      final studentName = data['name'] ?? '';
 
       final attendanceRef = _firestore
           .collection('users')
@@ -676,7 +678,7 @@ class FirebaseService {
         }
       }
 
-      // Generate notification
+      // Generate notification for present student
       final notifRef = _firestore.collection('notifications').doc();
       batch.set(notifRef, {
         'userRollNo': rollNo,
@@ -686,6 +688,60 @@ class FirebaseService {
         'isRead': false,
         'iconType': 'attendance',
       });
+    }
+
+    // 2. Mark absent for target audience students who did not scan
+    final targetAudienceLower = (event?.targetAudience ?? '').trim().toLowerCase();
+    for (var doc in studentsSnapshot.docs) {
+      final rollNo = doc.id.toUpperCase().trim();
+      if (presentRollNos.contains(rollNo)) continue;
+
+      final data = doc.data();
+      final studentGroup = data['groupNo']?.toString() ?? '';
+
+      // Check if student is in the target audience
+      bool isTarget = false;
+      if (targetAudienceLower.isEmpty || 
+          targetAudienceLower == 'all' || 
+          targetAudienceLower == 'all members') {
+        isTarget = true;
+      } else {
+        isTarget = targetAudienceLower.contains(studentGroup.toLowerCase());
+      }
+
+      if (isTarget) {
+        final attendanceRef = _firestore
+            .collection('users')
+            .doc(rollNo)
+            .collection('attendance')
+            .doc(eventId.isNotEmpty ? eventId : sessionId);
+
+        final record = AttendanceRecord(
+          eventId: eventId.isNotEmpty ? eventId : sessionId,
+          eventType: eventType,
+          title: eventName,
+          club: clubName,
+          date: date,
+          time: time,
+          venue: venue,
+          isPresent: false, // Absent
+          iconColor: dotColor,
+          markedAt: DateTime.now(),
+        );
+
+        batch.set(attendanceRef, record.toMap());
+
+        // Generate notification for absent student
+        final notifRef = _firestore.collection('notifications').doc();
+        batch.set(notifRef, {
+          'userRollNo': rollNo,
+          'title': 'Attendance Marked Absent',
+          'description': 'You were marked absent for the session "$eventName".',
+          'timestamp': FieldValue.serverTimestamp(),
+          'isRead': false,
+          'iconType': 'attendance',
+        });
+      }
     }
 
     await batch.commit();

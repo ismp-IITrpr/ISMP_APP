@@ -117,14 +117,14 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+            Icon(Icons.help_outline_rounded, color: Color(0xFF8B78FF)),
             SizedBox(width: 8),
-            Text('Export & Erase',
+            Text('Submit Attendance',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
         content: const Text(
-          'This will:\n1. Generate a CSV file with all attendance data.\n2. Share it so you can save it.\n3. Permanently delete all session data from the database.\n\nThis action cannot be undone.',
+          'Are you sure you want to mark attendance for this session?',
           style: TextStyle(color: Colors.grey, height: 1.5),
         ),
         actions: [
@@ -134,8 +134,8 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Export & Erase',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            child: const Text('Submit',
+                style: TextStyle(color: Color(0xFF8B78FF), fontWeight: FontWeight.bold)),
           ),
         ],
       ),

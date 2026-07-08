@@ -557,7 +557,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
                           )
                         : Text(
-                            isActive ? 'End QR Session' : 'Export CSV & Clean Data',
+                            isActive ? 'End QR Session' : 'Mark Attendance',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                           ),
                   ),

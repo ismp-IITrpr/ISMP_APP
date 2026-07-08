@@ -409,24 +409,38 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                     final studentRecords = attendanceSnapshot.data ?? [];
 
-                    // Combine persistent events list with live marked student records
+                    // Combine persistent events list with live marked student records (filtered by student's target group)
                     List<AttendanceRecord> records = [];
                     for (var event in allEvents) {
-                      final matchingRecord = studentRecords.firstWhere(
-                        (r) => r.eventId == event.id,
-                        orElse: () => AttendanceRecord(
-                          eventId: event.id,
-                          eventType: event.type,
-                          title: event.title,
-                          club: event.club,
-                          date: event.date,
-                          time: event.time,
-                          venue: event.venue,
-                          isPresent: false,
-                          iconColor: event.dotColor,
-                        ),
-                      );
-                      records.add(matchingRecord);
+                      final targetAudienceLower = event.targetAudience.trim().toLowerCase();
+                      final studentGroup = groupNo.toString();
+
+                      bool isTarget = false;
+                      if (targetAudienceLower.isEmpty || 
+                          targetAudienceLower == 'all' || 
+                          targetAudienceLower == 'all members') {
+                        isTarget = true;
+                      } else {
+                        isTarget = targetAudienceLower.contains(studentGroup.toLowerCase());
+                      }
+
+                      if (isTarget) {
+                        final matchingRecord = studentRecords.firstWhere(
+                          (r) => r.eventId == event.id,
+                          orElse: () => AttendanceRecord(
+                            eventId: event.id,
+                            eventType: event.type,
+                            title: event.title,
+                            club: event.club,
+                            date: event.date,
+                            time: event.time,
+                            venue: event.venue,
+                            isPresent: false,
+                            iconColor: event.dotColor,
+                          ),
+                        );
+                        records.add(matchingRecord);
+                      }
                     }
 
                     final totalCount = records.length;

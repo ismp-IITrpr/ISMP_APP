@@ -153,4 +153,42 @@ class EventModel {
 
     return true;
   }
+
+  // Returns a user-friendly formatted string representing the targeted audience of this event.
+  String getFormattedAudience() {
+    final raw = targetAudience.trim();
+    if (raw.isEmpty) return 'All Members';
+
+    if (raw.contains(':')) {
+      final parts = raw.split(':');
+      final degreeLimit = parts[0].trim();
+      final groupsPart = parts[1].trim();
+
+      final isAllGroups = groupsPart.toLowerCase() == 'all' || 
+                           groupsPart.toLowerCase() == 'all members' || 
+                           groupsPart.isEmpty;
+
+      if (degreeLimit == 'All') {
+        if (isAllGroups) {
+          return 'All Members';
+        } else {
+          return 'Grp $groupsPart';
+        }
+      } else {
+        if (isAllGroups) {
+          return '$degreeLimit All';
+        } else {
+          return '$degreeLimit Grp $groupsPart';
+        }
+      }
+    } else {
+      // Backward compatibility (old representation e.g. "6 7" or "all members")
+      if (raw.toLowerCase() == 'all' || raw.toLowerCase() == 'all members') {
+        return 'All Members';
+      } else {
+        final formatted = raw.replaceAll(RegExp(r'\s+'), ', ');
+        return 'Grp $formatted';
+      }
+    }
+  }
 }

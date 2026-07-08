@@ -328,7 +328,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                       children: [
                                         _buildBadge(
                                           event.type == 'C'
-                                              ? 'Target: ${event.targetAudience}'
+                                              ? event.getFormattedAudience()
                                               : 'General Event',
                                           const Color(0xFF3A3A4A),
                                         ),

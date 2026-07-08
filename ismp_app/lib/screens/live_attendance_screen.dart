@@ -1,10 +1,6 @@
-import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:csv/csv.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firebase_service.dart';
 import '../models/profile_data.dart';
@@ -148,43 +144,13 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
       // Mark attendance persistently for all scanned students
       await FirebaseService.instance.submitSessionAttendance(widget.sessionId);
 
-      final scans = await FirebaseService.instance.getSessionScans(widget.sessionId);
-
-      final csvData = <List<String>>[
-        ['S.No', 'Name', 'Email', 'Scanned At'],
-        ...scans.asMap().entries.map((entry) {
-          final i = entry.key;
-          final scan = entry.value;
-          final scannedAt = scan['scannedAt'] is Timestamp
-              ? (scan['scannedAt'] as Timestamp).toDate().toString()
-              : scan['scannedAt']?.toString() ?? 'N/A';
-          return [
-            '${i + 1}',
-            scan['name'] ?? '',
-            scan['email'] ?? '',
-            scannedAt,
-          ];
-        }),
-      ];
-
-      final csvString = const ListToCsvConverter().convert(csvData);
-
-      final dir = await getTemporaryDirectory();
-      final sanitized = widget.eventName.replaceAll(RegExp(r'[^\w\s]'), '').replaceAll(' ', '_');
-      final file = File('${dir.path}/attendance_$sanitized.csv');
-      await file.writeAsString(csvString);
-
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Attendance for ${widget.eventName}',
-      );
-
+      // Clean up/erase session data
       await FirebaseService.instance.eraseSessionData(widget.sessionId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Data exported and erased from database.'),
+            content: Text('Attendance submitted and session closed.'),
             backgroundColor: Color(0xFF4CAF50),
           ),
         );
@@ -193,7 +159,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Submission failed: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {

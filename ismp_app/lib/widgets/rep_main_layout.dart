@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
-import '../screens/rep_events_screen.dart';
-import '../screens/rep_attendance_home_screen.dart';
+import '../screens/Homepage/home_screen.dart';
+import '../screens/reps/rep_events_screen.dart';
+import '../screens/reps/rep_attendance_home_screen.dart';
 import '../screens/profile_screen.dart';
-import '../screens/rep_profile_screen.dart';
+import '../screens/reps/rep_profile_screen.dart';
 import '../widgets/rep_main_layout.dart';
 
 class RepMainLayout extends StatefulWidget {
@@ -16,8 +16,8 @@ class RepMainLayout extends StatefulWidget {
 class _RepMainLayoutState extends State<RepMainLayout> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
+  late final List<Widget> _screens = [
+    HomeScreen(onNavigateToTab: _onItemTapped),
     const RepEventsScreen(),
     const RepAttendanceHomeScreen(), // ← Yeh change kiya
     const RepProfileScreen(),

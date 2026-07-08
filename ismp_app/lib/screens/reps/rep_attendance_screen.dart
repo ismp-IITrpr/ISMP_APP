@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../models/events.dart';
+import '../../models/events.dart';
 
 /// Rep-facing Attendance screen — brand-new file (per Gorish's note, this
 /// stays separate from the student attendance file since the club-id

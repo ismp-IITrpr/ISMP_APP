@@ -3,7 +3,7 @@ import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
 import '../widgets/rep_main_layout.dart';
-import 'rep_dashboard.dart';
+import 'reps/rep_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

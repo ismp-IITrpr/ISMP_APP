@@ -2,24 +2,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../models/blog.dart';
-import '../services/firebase_service.dart';
-import '../models/team_member.dart';
-import '../models/mock_data/events_mock.dart';
-import '../models/profile_data.dart';
-import '../models/moment.dart';
+import '../../models/blog.dart';
+import '../../services/firebase_service.dart';
+import '../../models/team_member.dart';
+import '../../models/mock_data/events_mock.dart';
+import '../../models/profile_data.dart';
+import '../../models/moment.dart';
 import 'core_team_screen.dart';
-import 'events_screen.dart';
-import 'profile_screen.dart';
+import '../events_screen.dart';
+import '../profile_screen.dart';
 import 'dev_team_screen.dart';
-import 'notifications_screen.dart';
+import '../notifications_screen.dart';
 import 'moments_screen.dart';
 import 'blogs_screen.dart';
-import 'attendance_screen.dart';
+import '../attendance_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int)? onNavigateToTab;
+  const HomeScreen({super.key, this.onNavigateToTab});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -78,7 +79,13 @@ class _HomeScreenState extends State<HomeScreen> {
             end: Alignment.bottomRight,
           ),
           color: const Color(0xFF00FFCC),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false))),
+          onTap: () {
+            if (widget.onNavigateToTab != null) {
+              widget.onNavigateToTab!(3);
+            } else {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isRep: false)));
+            }
+          },
         ),
       _QuickLink(
         title: "Today's Events",
@@ -91,7 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
           end: Alignment.bottomRight,
         ),
         color: const Color(0xFFFFB020),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsScreen())),
+        onTap: () {
+          if (widget.onNavigateToTab != null) {
+            widget.onNavigateToTab!(1);
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsScreen()));
+          }
+        },
       ),
     ];
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/events.dart';
-import '../services/firebase_service.dart';
-import '../services/database_service.dart';
-import 'live_attendance_screen.dart';
+import '../../models/events.dart';
+import '../../services/firebase_service.dart';
+import '../../services/database_service.dart';
+import '../live_attendance_screen.dart';
 import 'rep_access.dart';
 
 class RepEventsScreen extends StatefulWidget {

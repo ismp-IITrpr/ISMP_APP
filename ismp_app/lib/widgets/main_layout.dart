@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import '../screens/Homepage/home_screen.dart';
 import '../screens/events_screen.dart';
 import '../screens/attendance_screen.dart';
 import '../screens/profile_screen.dart';
-import '../screens/rep_dashboard.dart';
+import '../screens/reps/rep_dashboard.dart';
 import '../services/firebase_service.dart';
 
 class MainLayout extends StatefulWidget {
@@ -31,7 +31,7 @@ class _MainLayoutState extends State<MainLayout> {
         : '';
 
     _screens = [
-      const HomeScreen(),
+      HomeScreen(onNavigateToTab: _onItemTapped),
       EventsScreen(isRep: widget.isRep, repClub: repClub),
       AttendanceScreen(isRep: widget.isRep, repClub: repClub),
 

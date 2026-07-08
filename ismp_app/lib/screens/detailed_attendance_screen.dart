@@ -45,17 +45,17 @@ class DetailedAttendanceScreen extends StatelessWidget {
       {'name': 'Aeromodelling', 'image': 'aero.png'},
     ],
     'BOSA': [
-      {'name': 'Athletic', 'image': 'BOSA.png'},
-      {'name': 'Badminton', 'image': 'BOSA.png'},
-      {'name': 'Basketball', 'image': 'BOSA.png'},
-      {'name': 'Chess', 'image': 'BOSA.png'},
-      {'name': 'Cricket', 'image': 'BOSA.png'},
-      {'name': 'Football', 'image': 'BOSA.png'},
-      {'name': 'Hockey', 'image': 'BOSA.png'},
-      {'name': 'Tennis', 'image': 'BOSA.png'},
-      {'name': 'Table Tennis', 'image': 'BOSA.png'},
-      {'name': 'Volleyball', 'image': 'BOSA.png'},
-      {'name': 'Weightlifting', 'image': 'BOSA.png'},
+      {'name': 'Athletic', 'image': 'athletics.png'},
+      {'name': 'Badminton', 'image': 'badminton.png'},
+      {'name': 'Basketball', 'image': 'basketball.png'},
+      {'name': 'Chess', 'image': 'chess.png'},
+      {'name': 'Cricket', 'image': 'cricket.png'},
+      {'name': 'Football', 'image': 'football.png'},
+      {'name': 'Hockey', 'image': 'hockey.png'},
+      {'name': 'Tennis', 'image': 'tennis.png'},
+      {'name': 'Table Tennis', 'image': 'tt.png'},
+      {'name': 'Volleyball', 'image': 'volleyball.png'},
+      {'name': 'Weightlifting', 'image': 'wieght.png'},
     ],
   };
 
@@ -109,76 +109,61 @@ class DetailedAttendanceScreen extends StatelessWidget {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);
 
-        return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF2B124C),
-                Color(0xFF0F0F13),
-                Color(0xFF1E103C),
-                Color(0xFF0F0F13),
-              ],
-              stops: [0.0, 0.4, 0.7, 1.0],
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            centerTitle: true,
+            title: const Text(
+              'Sticker Collection',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
-              ),
-              centerTitle: true,
-              title: const Text(
-                'Sticker Collection',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Stickers Collected Header ──
-                    _buildStickersHeader(collected)
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .slideY(begin: -0.05),
-                    const SizedBox(height: 20),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Stickers Collected Header ──
+                  _buildStickersHeader(collected)
+                      .animate()
+                      .fadeIn(duration: 600.ms)
+                      .slideY(begin: -0.05),
+                  const SizedBox(height: 20),
 
-                    // ── Legend ──
-                    _buildLegend()
-                        .animate()
-                        .fadeIn(duration: 600.ms, delay: 100.ms),
-                    const SizedBox(height: 24),
+                  // ── Legend ──
+                  _buildLegend()
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 100.ms),
+                  const SizedBox(height: 24),
 
-                    // ── Board Sections ──
-                    ...boardClubs.keys.toList().asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final board = entry.value;
-                      return _buildBoardSection(
-                        board,
-                        boardColors[board]!,
-                        boardClubs[board]!,
-                        records,
-                      ).animate().fadeIn(
-                        duration: 700.ms,
-                        delay: (200 + index * 120).ms,
-                      ).slideY(begin: 0.08);
-                    }),
-                  ],
-                ),
+                  // ── Board Sections ──
+                  ...boardClubs.keys.toList().asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final board = entry.value;
+                    return _buildBoardSection(
+                      board,
+                      boardColors[board]!,
+                      boardClubs[board]!,
+                      records,
+                    ).animate().fadeIn(
+                      duration: 700.ms,
+                      delay: (200 + index * 120).ms,
+                    ).slideY(begin: 0.08);
+                  }),
+                ],
               ),
             ),
           ),

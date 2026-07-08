@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/firebase_service.dart';
-import '../models/moment.dart';
+import '../../services/firebase_service.dart';
+import '../../models/moment.dart';
 
 class MomentsScreen extends StatelessWidget {
   const MomentsScreen({super.key});

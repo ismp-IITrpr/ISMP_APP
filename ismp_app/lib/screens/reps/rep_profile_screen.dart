@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/profile_data.dart';
-import 'login_screen.dart';
+import '../../models/profile_data.dart';
+import '../login_screen.dart';
 import 'rep_dashboard.dart';
-import '../services/firebase_service.dart';
+import '../../services/firebase_service.dart';
 
 class RepProfileScreen extends StatelessWidget {
   const RepProfileScreen({super.key});

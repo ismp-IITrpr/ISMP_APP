@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/events.dart';
-import '../services/firebase_service.dart';
-import 'live_attendance_screen.dart';
+import '../../models/events.dart';
+import '../../services/firebase_service.dart';
+import '../live_attendance_screen.dart';
 import 'rep_access.dart';
 
 class RepAttendanceHomeScreen extends StatefulWidget {

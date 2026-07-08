@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../models/blog.dart';
-import '../services/firebase_service.dart';
+import '../../models/blog.dart';
+import '../../services/firebase_service.dart';
 import 'blog_detail_screen.dart';
 
 class BlogsScreen extends StatefulWidget {

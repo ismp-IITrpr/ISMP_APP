@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
 import '../services/database_service.dart';
-import '../screens/rep_access.dart';
-import 'rep_attendance_screen.dart';
+import 'reps/rep_access.dart';
+import 'reps/rep_attendance_screen.dart';
 import 'live_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -80,14 +80,6 @@ class _EventsScreenState extends State<EventsScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white70),
-            onPressed: () async {
-              await DatabaseService.clearPersistentEventsCache();
-              setState(() {});
-            },
-            tooltip: 'Refresh Schedule',
-          ),
           if (widget.isRep)
             Container(
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),

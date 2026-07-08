@@ -335,6 +335,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                           onPressed: () async {
                                             try {
                                               final sessionId = await FirebaseService.instance.startAttendanceSession(
+                                                eventId: event.id,
                                                 eventName: event.title,
                                                 venue: event.venue,
                                                 repEmail: FirebaseService.instance.currentUserEmail ?? '',

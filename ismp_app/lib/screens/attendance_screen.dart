@@ -298,6 +298,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           // 1. Show loading or just start session
                           try {
                             final sessionId = await FirebaseService.instance.startAttendanceSession(
+                              eventId: event.id,
                               eventName: event.title,
                               venue: event.venue,
                               repEmail: FirebaseService.instance.currentUserEmail ?? '',
@@ -384,26 +385,59 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ],
           ),
           body: SafeArea(
-            child: FutureBuilder<List<AttendanceRecord>>(
-              future: DatabaseService().getPersistentCombinedStudentAttendance(rollNo, groupNo),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: FutureBuilder<List<EventModel>>(
+              future: DatabaseService().getPersistentAllEvents(),
+              builder: (context, eventsSnapshot) {
+                if (eventsSnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
                 }
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                if (eventsSnapshot.hasError) {
+                  return Center(child: Text('Error: ${eventsSnapshot.error}', style: const TextStyle(color: Colors.red)));
                 }
 
-                final records = snapshot.data ?? [];
-                final totalCount = records.length;
-                final presentCount = records.where((r) => r.isPresent).length;
-                final absentCount = totalCount - presentCount;
-                final attendancePercentage = totalCount == 0 ? 0.0 : (presentCount / totalCount);
-                final attendancePercentageString = '${(attendancePercentage * 100).toInt()}%';
+                final allEvents = eventsSnapshot.data ?? [];
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                return StreamBuilder<List<AttendanceRecord>>(
+                  stream: FirebaseService.instance.streamStudentAttendance(rollNo),
+                  builder: (context, attendanceSnapshot) {
+                    if (attendanceSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                    }
+                    if (attendanceSnapshot.hasError) {
+                      return Center(child: Text('Error: ${attendanceSnapshot.error}', style: const TextStyle(color: Colors.red)));
+                    }
+
+                    final studentRecords = attendanceSnapshot.data ?? [];
+
+                    // Combine persistent events list with live marked student records
+                    List<AttendanceRecord> records = [];
+                    for (var event in allEvents) {
+                      final matchingRecord = studentRecords.firstWhere(
+                        (r) => r.eventId == event.id,
+                        orElse: () => AttendanceRecord(
+                          eventId: event.id,
+                          eventType: event.type,
+                          title: event.title,
+                          club: event.club,
+                          date: event.date,
+                          time: event.time,
+                          venue: event.venue,
+                          isPresent: false,
+                          iconColor: event.dotColor,
+                        ),
+                      );
+                      records.add(matchingRecord);
+                    }
+
+                    final totalCount = records.length;
+                    final presentCount = records.where((r) => r.isPresent).length;
+                    final absentCount = totalCount - presentCount;
+                    final attendancePercentage = totalCount == 0 ? 0.0 : (presentCount / totalCount);
+                    final attendancePercentageString = '${(attendancePercentage * 100).toInt()}%';
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     // Top Stats Card
                     Padding(
                       padding: const EdgeInsets.all(24.0),
@@ -667,7 +701,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ],
                 );
               },
-            ),
+            );
+          },
+        ),
           ),
         );
       },

@@ -545,6 +545,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                         onTap: () async {
                           try {
                             final sessionId = await FirebaseService.instance.startAttendanceSession(
+                              eventId: event.id,
                               eventName: event.title,
                               venue: event.venue,
                               repEmail: FirebaseService.instance.currentUserEmail ?? '',

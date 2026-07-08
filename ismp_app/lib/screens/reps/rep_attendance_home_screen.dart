@@ -540,68 +540,101 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                           ],
                         ),
                       ),
-                      // Take Attendance button
-                      GestureDetector(
-                        onTap: () async {
-                          try {
-                            final sessionId = await FirebaseService.instance.startAttendanceSession(
-                              eventId: event.id,
-                              eventName: event.title,
-                              venue: event.venue,
-                              repEmail: FirebaseService.instance.currentUserEmail ?? '',
-                            );
-                            if (context.mounted) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => LiveAttendanceScreen(
-                                    sessionId: sessionId,
+                      // Take Attendance button / Completed status
+                      event.isCompleted
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF4CAF50).withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color(0xFF4CAF50).withOpacity(0.4),
+                                ),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    size: 14,
+                                    color: Color(0xFF4CAF50),
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Completed',
+                                    style: TextStyle(
+                                      color: Color(0xFF4CAF50),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap: () async {
+                                try {
+                                  final sessionId = await FirebaseService.instance.startAttendanceSession(
+                                    eventId: event.id,
                                     eventName: event.title,
+                                    venue: event.venue,
+                                    repEmail: FirebaseService.instance.currentUserEmail ?? '',
+                                  );
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => LiveAttendanceScreen(
+                                          sessionId: sessionId,
+                                          eventName: event.title,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to start session: $e')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: const Color(0xFF4A3AFF).withOpacity(0.5),
                                   ),
                                 ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Failed to start session: $e')),
-                              );
-                            }
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4A3AFF).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color(0xFF4A3AFF).withOpacity(0.5),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.qr_code_scanner,
-                                size: 14,
-                                color: Color(0xFF8B78FF),
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Start',
-                                style: TextStyle(
-                                  color: Color(0xFF8B78FF),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.qr_code_scanner,
+                                      size: 14,
+                                      color: Color(0xFF8B78FF),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Start',
+                                      style: TextStyle(
+                                        color: Color(0xFF8B78FF),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            ),
                     ],
                   ),
                 );

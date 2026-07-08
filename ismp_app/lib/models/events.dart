@@ -105,4 +105,52 @@ class EventModel {
       return DateTime.now();
     }
   }
+
+  // Returns true if a student with the given degree and group number is targeted by this event.
+  bool isStudentTargeted(String studentDegree, int studentGroupNo) {
+    final raw = targetAudience.trim();
+    if (raw.isEmpty) return true;
+
+    String degreeLimit = 'All';
+    List<int> targetGroups = [];
+
+    // Parse encoded representation e.g. "B.Tech: 1, 2, 7"
+    if (raw.contains(':')) {
+      final parts = raw.split(':');
+      degreeLimit = parts[0].trim();
+      final groupsPart = parts[1].trim().toLowerCase();
+      if (groupsPart != 'all' && groupsPart != 'all members' && groupsPart.isNotEmpty) {
+        targetGroups = groupsPart
+            .split(RegExp(r'[\s,]+'))
+            .map((s) => int.tryParse(s))
+            .whereType<int>()
+            .toList();
+      }
+    } else {
+      // Backward compatibility for old records (e.g. "6 7" or "all members")
+      if (raw.toLowerCase() != 'all' && raw.toLowerCase() != 'all members') {
+        targetGroups = raw
+            .split(RegExp(r'[\s,]+'))
+            .map((s) => int.tryParse(s))
+            .whereType<int>()
+            .toList();
+      }
+    }
+
+    // Validate Degree
+    if (degreeLimit != 'All') {
+      if (degreeLimit.toLowerCase() != studentDegree.toLowerCase()) {
+        return false;
+      }
+    }
+
+    // Validate Groups
+    if (targetGroups.isNotEmpty) {
+      if (!targetGroups.contains(studentGroupNo)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

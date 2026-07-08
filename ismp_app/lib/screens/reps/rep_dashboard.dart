@@ -17,7 +17,8 @@ class _RepDashboardState extends State<RepDashboard> {
   final _eventNameCtrl = TextEditingController();
   final _eventVenueCtrl = TextEditingController();
   final _eventDescCtrl = TextEditingController();
-  final _groupNoCtrl = TextEditingController();
+  String _selectedDegree = 'All';
+  final List<int> _selectedGroups = [];
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay _endTime = TimeOfDay(
@@ -34,7 +35,6 @@ class _RepDashboardState extends State<RepDashboard> {
     _eventNameCtrl.dispose();
     _eventVenueCtrl.dispose();
     _eventDescCtrl.dispose();
-    _groupNoCtrl.dispose();
     super.dispose();
   }
 
@@ -71,8 +71,10 @@ class _RepDashboardState extends State<RepDashboard> {
     try {
       final club = FirebaseService.instance.getClubForEmail(_repEmail);
       
-      // Target audience
-      final targetAudience = _groupNoCtrl.text.trim();
+      // Target audience serialization
+      final targetAudience = _selectedGroups.isEmpty 
+          ? "$_selectedDegree: all" 
+          : "$_selectedDegree: ${_selectedGroups.join(', ')}";
 
       await FirebaseService.instance.postEvent(
         title: _eventNameCtrl.text.trim(),
@@ -91,7 +93,10 @@ class _RepDashboardState extends State<RepDashboard> {
         _eventNameCtrl.clear();
         _eventVenueCtrl.clear();
         _eventDescCtrl.clear();
-        _groupNoCtrl.clear();
+        setState(() {
+          _selectedDegree = 'All';
+          _selectedGroups.clear();
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Event posted successfully!'),
@@ -239,12 +244,58 @@ class _RepDashboardState extends State<RepDashboard> {
             ),
             const SizedBox(height: 16),
 
-            _buildTextField(
-              controller: _groupNoCtrl,
-              label: 'Target Audience (e.g., all members, 6 7)',
-              icon: Icons.group,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+            const Text(
+              'Target Degree',
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: ['All', 'B.Tech', 'M.Tech'].map((degree) {
+                final isSel = _selectedDegree == degree;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(degree, style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 13)),
+                    selected: isSel,
+                    selectedColor: const Color(0xFF8B78FF),
+                    backgroundColor: const Color(0xFF1C1C23),
+                    onSelected: (selected) {
+                      if (selected) setState(() => _selectedDegree = degree);
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+
+            const Text(
+              'Target Groups (Optional - leave empty for all)',
+              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: List.generate(12, (index) {
+                final group = index + 1;
+                final isSel = _selectedGroups.contains(group);
+                return FilterChip(
+                  label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
+                  selected: isSel,
+                  selectedColor: const Color(0xFF8B78FF),
+                  backgroundColor: const Color(0xFF1C1C23),
+                  checkmarkColor: Colors.white,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedGroups.add(group);
+                      } else {
+                        _selectedGroups.remove(group);
+                      }
+                    });
+                  },
+                );
+              }),
             ),
             const SizedBox(height: 16),
 

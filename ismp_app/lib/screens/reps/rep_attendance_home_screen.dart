@@ -82,7 +82,33 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
     final titleCtrl = TextEditingController(text: event.title);
     final venueCtrl = TextEditingController(text: event.venue);
     final descCtrl = TextEditingController(text: event.description);
-    final groupCtrl = TextEditingController(text: event.targetAudience);
+
+    // Parse targetAudience
+    String initialDegree = 'All';
+    List<int> initialGroups = [];
+    final raw = event.targetAudience.trim();
+    if (raw.isNotEmpty) {
+      if (raw.contains(':')) {
+        final parts = raw.split(':');
+        initialDegree = parts[0].trim();
+        final groupsPart = parts[1].trim().toLowerCase();
+        if (groupsPart != 'all' && groupsPart != 'all members' && groupsPart.isNotEmpty) {
+          initialGroups = groupsPart
+              .split(RegExp(r'[\s,]+'))
+              .map((s) => int.tryParse(s))
+              .whereType<int>()
+              .toList();
+        }
+      } else {
+        if (raw.toLowerCase() != 'all' && raw.toLowerCase() != 'all members') {
+          initialGroups = raw
+              .split(RegExp(r'[\s,]+'))
+              .map((s) => int.tryParse(s))
+              .whereType<int>()
+              .toList();
+        }
+      }
+    }
 
     DateTime selectedDate = DateTime.tryParse(event.date) ?? DateTime(2026, 8, 1);
     TimeOfDay startTime = _parseTimeString(event.startTime);
@@ -96,6 +122,8 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (bctx) {
+        String selectedDegree = initialDegree;
+        List<int> selectedGroups = List.from(initialGroups);
         return StatefulBuilder(
           builder: (context, setModalState) {
             Future<void> pickDate() async {
@@ -207,12 +235,58 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Target Audience
-                      _buildModalField(
-                        controller: groupCtrl,
-                        label: 'Target Audience (e.g. all members, 6 7)',
-                        icon: Icons.group,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                      const Text(
+                        'Target Degree',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: ['All', 'B.Tech', 'M.Tech'].map((degree) {
+                          final isSel = selectedDegree == degree;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(degree, style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 13)),
+                              selected: isSel,
+                              selectedColor: const Color(0xFF8B78FF),
+                              backgroundColor: const Color(0xFF1C1C23),
+                              onSelected: (selected) {
+                                if (selected) setModalState(() => selectedDegree = degree);
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      const Text(
+                        'Target Groups (Optional - leave empty for all)',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: List.generate(12, (index) {
+                          final group = index + 1;
+                          final isSel = selectedGroups.contains(group);
+                          return FilterChip(
+                            label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
+                            selected: isSel,
+                            selectedColor: const Color(0xFF8B78FF),
+                            backgroundColor: const Color(0xFF1C1C23),
+                            checkmarkColor: Colors.white,
+                            onSelected: (selected) {
+                              setModalState(() {
+                                if (selected) {
+                                  selectedGroups.add(group);
+                                } else {
+                                  selectedGroups.remove(group);
+                                }
+                              });
+                            },
+                          );
+                        }),
                       ),
                       const SizedBox(height: 16),
 
@@ -251,7 +325,9 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     venue: venueCtrl.text.trim(),
                                     description: descCtrl.text.trim(),
                                     day: selectedDate.day,
-                                    targetAudience: groupCtrl.text.trim(),
+                                    targetAudience: selectedGroups.isEmpty 
+                                        ? "$selectedDegree: all" 
+                                        : "$selectedDegree: ${selectedGroups.join(', ')}",
                                   );
                                   if (context.mounted) {
                                     Navigator.pop(context);

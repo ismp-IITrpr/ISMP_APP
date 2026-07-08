@@ -691,23 +691,16 @@ class FirebaseService {
     }
 
     // 2. Mark absent for target audience students who did not scan
-    final targetAudienceLower = (event?.targetAudience ?? '').trim().toLowerCase();
     for (var doc in studentsSnapshot.docs) {
       final rollNo = doc.id.toUpperCase().trim();
       if (presentRollNos.contains(rollNo)) continue;
 
       final data = doc.data();
-      final studentGroup = data['groupNo']?.toString() ?? '';
+      final studentDegree = data['degree'] ?? 'B.Tech';
+      final studentGroupNo = data['groupNo'] is int ? data['groupNo'] as int : (int.tryParse(data['groupNo']?.toString() ?? '') ?? 7);
 
       // Check if student is in the target audience
-      bool isTarget = false;
-      if (targetAudienceLower.isEmpty || 
-          targetAudienceLower == 'all' || 
-          targetAudienceLower == 'all members') {
-        isTarget = true;
-      } else {
-        isTarget = targetAudienceLower.contains(studentGroup.toLowerCase());
-      }
+      final bool isTarget = event == null ? true : event.isStudentTargeted(studentDegree, studentGroupNo);
 
       if (isTarget) {
         final attendanceRef = _firestore

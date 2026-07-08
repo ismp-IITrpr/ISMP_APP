@@ -411,20 +411,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                     // Combine persistent events list with live marked student records (filtered by student's target group)
                     List<AttendanceRecord> records = [];
+                    final studentDegree = profile?.degree ?? 'B.Tech';
                     for (var event in allEvents) {
-                      final targetAudienceLower = event.targetAudience.trim().toLowerCase();
-                      final studentGroup = groupNo.toString();
-
-                      bool isTarget = false;
-                      if (targetAudienceLower.isEmpty || 
-                          targetAudienceLower == 'all' || 
-                          targetAudienceLower == 'all members') {
-                        isTarget = true;
-                      } else {
-                        isTarget = targetAudienceLower.contains(studentGroup.toLowerCase());
-                      }
-
-                      if (isTarget) {
+                      if (event.isStudentTargeted(studentDegree, groupNo)) {
                         final matchingRecord = studentRecords.firstWhere(
                           (r) => r.eventId == event.id,
                           orElse: () => AttendanceRecord(

@@ -196,24 +196,38 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: FutureBuilder<List<EventModel>>(
-                future: DatabaseService().getPersistentEventsForDay(_selectedDay),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
-                  }
-                  final dailyEvents = snapshot.data ?? [];
-                  if (dailyEvents.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No events scheduled for this day.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    );
-                  }
+              child: FutureBuilder<UserProfile?>(
+                future: widget.isRep
+                    ? Future.value(null)
+                    : DatabaseService().getUserProfile(FirebaseService.instance.currentStudentRollNo),
+                builder: (context, profileSnapshot) {
+                  final profile = profileSnapshot.data;
+                  final studentDegree = profile?.degree ?? 'B.Tech';
+                  final studentGroupNo = profile?.groupNo ?? 7;
+
+                  return FutureBuilder<List<EventModel>>(
+                    future: DatabaseService().getPersistentEventsForDay(_selectedDay),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                      }
+
+                      final allDailyEvents = snapshot.data ?? [];
+                      final dailyEvents = widget.isRep
+                          ? allDailyEvents
+                          : allDailyEvents.where((e) => e.isStudentTargeted(studentDegree, studentGroupNo)).toList();
+
+                      if (dailyEvents.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No events scheduled for this day.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        );
+                      }
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     itemCount: dailyEvents.length,
@@ -389,9 +403,11 @@ class _EventsScreenState extends State<EventsScreen> {
                       ).animate().fadeIn(duration: 500.ms, delay: (index * 50).ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
                       },
                   );
-                }
-              ),
-            ),
+                },
+              );
+            },
+          ),
+        ),
           ],
         ),
       ),

@@ -324,7 +324,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     endTime: endTime.format(context),
                                     venue: venueCtrl.text.trim(),
                                     description: descCtrl.text.trim(),
-                                    day: selectedDate.day,
+                                    day: selectedDate.difference(DateTime(2026, 7, 7)).inDays + 1,
                                     targetAudience: selectedGroups.isEmpty 
                                         ? "$selectedDegree: all" 
                                         : "$selectedDegree: ${selectedGroups.join(', ')}",

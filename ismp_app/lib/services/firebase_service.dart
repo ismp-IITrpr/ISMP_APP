@@ -9,7 +9,6 @@ import '../models/attendance.dart';
 import '../models/moment.dart';
 import '../models/profile_data.dart';
 import '../models/mock_data/blog_mock.dart';
-import '../models/mock_data/attendance_mock.dart';
 import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
 
@@ -237,17 +236,8 @@ class FirebaseService {
       // 2. Events are now managed through Firebase console only
       // No seeding from mock data
 
-      // 3. Seed Attendance if empty
-      final attendanceSnapshot = await _firestore
-          .collection('attendance')
-          .limit(1)
-          .get();
-      if (attendanceSnapshot.docs.isEmpty) {
-        debugPrint('Seeding attendance collection...');
-        for (var record in recentSessions) {
-          await _firestore.collection('attendance').add(record.toMap());
-        }
-      }
+      // 3. Attendance is now managed through Firebase Firestore only
+      // No seeding from mock data
 
       // 4. Seed Moments if empty
       final momentsSnapshot = await _firestore

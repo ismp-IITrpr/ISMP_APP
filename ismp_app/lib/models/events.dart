@@ -139,7 +139,9 @@ class EventModel {
 
     // Validate Degree
     if (degreeLimit != 'All') {
-      if (degreeLimit.toLowerCase() != studentDegree.toLowerCase()) {
+      // if (degreeLimit.toLowerCase() != studentDegree.toLowerCase()) {
+      if (_normalizeDegree(degreeLimit) != _normalizeDegree(studentDegree)) {
+      
         return false;
       }
     }
@@ -152,6 +154,34 @@ class EventModel {
     }
 
     return true;
+  }
+  
+  // Returns true if an event matches the student's degree. 
+  // It ignores group constraints but still filters by degree.
+  bool isDegreeTargeted(String studentDegree) {
+    final raw = targetAudience.trim();
+    if (raw.isEmpty) return true;
+
+    String degreeLimit = 'All';
+
+    // Parse encoded representation e.g. "B.Tech: 1, 2, 7"
+    if (raw.contains(':')) {
+      final parts = raw.split(':');
+      degreeLimit = parts[0].trim();
+    }
+
+    if (degreeLimit != 'All') {
+      if (_normalizeDegree(degreeLimit) != _normalizeDegree(studentDegree)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Helper method to normalize degree strings for robust comparison
+  String _normalizeDegree(String degree) {
+    return degree.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
   }
 
   // Returns a user-friendly formatted string representing the targeted audience of this event.

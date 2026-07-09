@@ -17,6 +17,7 @@ import 'moments_screen.dart';
 import 'blogs_screen.dart';
 import '../attendance_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../pdf_viewer_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onNavigateToTab;
@@ -55,6 +56,25 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const DevTeamScreen()),
+        ),
+      ),
+      _QuickLink(
+        title: 'ISMP Handbook',
+        subtitle: 'Start your IIT journey\nwith confidence.',
+        icon: Icons.book,
+        bgImage: 'assets/Theme images/iitrpr_logo_2.png',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF561541), Color(0xFF27061C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        color: const Color(0xFFFFB020),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PdfViewerScreen(
+            pdfAssetPath: 'assets/handbook.pdf',
+            title: 'ISMP Handbook',
+          )),
         ),
       ),
       if (!isRep)

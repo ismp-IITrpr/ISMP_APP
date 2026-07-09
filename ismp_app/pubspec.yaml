@@ -44,11 +44,12 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_animate: ^4.5.2
   font_awesome_flutter: ^11.0.0
-  csv: ^6.0.0
+  csv: ^8.0.0
   path_provider: ^2.1.2
-  share_plus: ^10.1.4
+  share_plus: ^13.2.0
   shared_preferences: ^2.3.0
-
+  syncfusion_flutter_pdfviewer: ^34.1.30
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -72,6 +73,7 @@ flutter:
     - img/2026/
     - assets/images/carousel/
     - assets/images/clubs/
+    - assets/handbook.pdf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

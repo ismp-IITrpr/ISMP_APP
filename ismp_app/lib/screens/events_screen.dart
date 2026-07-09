@@ -26,13 +26,14 @@ class _EventsScreenState extends State<EventsScreen> {
   late int _selectedDay;
   late DateTime _startDate;
   final DateTime _eventStartDate = DateTime(2026, 7, 7);
+  bool _showAllEvents = false;
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-
+  
     // Hide past dates by starting the scrollbar at today's date
     if (today.isBefore(_eventStartDate)) {
       _startDate = _eventStartDate;
@@ -118,6 +119,36 @@ class _EventsScreenState extends State<EventsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
+            if (!widget.isRep) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _showAllEvents ? 'All Events' : 'Relevant Events',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Switch(
+                      value: _showAllEvents,
+                      onChanged: (value) {
+                        setState(() {
+                          _showAllEvents = value;
+                        });
+                      },
+                      activeColor: const Color(0xFF8B78FF),
+                      inactiveThumbColor: Colors.grey,
+                      inactiveTrackColor: Colors.grey.withOpacity(0.3),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             SizedBox(
               height: 95,
               child: ListView.builder(
@@ -228,7 +259,14 @@ class _EventsScreenState extends State<EventsScreen> {
                       final allDailyEvents = snapshot.data ?? [];
                       final dailyEvents = widget.isRep
                           ? allDailyEvents
-                          : allDailyEvents.where((e) => e.isStudentTargeted(studentDegree, studentGroupNo)).toList();
+                          // : allDailyEvents.where((e) => e.isStudentTargeted(studentDegree, studentGroupNo)).toList();
+                        : allDailyEvents.where((e) {
+                              if (_showAllEvents) {
+                                return e.isDegreeTargeted(studentDegree);
+                              } else {
+                                return e.isStudentTargeted(studentDegree, studentGroupNo);
+                              }
+                            }).toList();
 
                       if (dailyEvents.isEmpty) {
                         return const Center(

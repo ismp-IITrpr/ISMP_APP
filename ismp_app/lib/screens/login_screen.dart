@@ -3,7 +3,6 @@ import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
 import '../widgets/rep_main_layout.dart';
-import 'reps/rep_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -210,176 +209,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () => _showTesterLoginSheet(context),
-                  child: const Text(
-                    'Tester Sign In',
-                    style: TextStyle(
-                      color: Color(0xFF8B78FF),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  void _showTesterLoginSheet(BuildContext context) {
-    final emailCtrl = TextEditingController(text: 'repaccess@gmail.com');
-    final passCtrl = TextEditingController(text: '12345678');
-    bool isTesterLoading = false;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xFF1C1C23),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 24,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Tester / Representative Login',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: emailCtrl,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFF0F0F13),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: passCtrl,
-                    obscureText: true,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFF0F0F13),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: isTesterLoading
-                        ? null
-                        : () async {
-                            setSheetState(() {
-                              isTesterLoading = true;
-                            });
-                            try {
-                              final user = await FirebaseService.instance.signInWithEmail(
-                                emailCtrl.text,
-                                passCtrl.text,
-                              );
-                              final currentEmail = FirebaseService.instance.currentUserEmail;
-                              if ((user != null || currentEmail == 'repaccess@gmail.com') && mounted) {
-                                FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
-                                  debugPrint('Post-login seeding failed: $e');
-                                });
-                                Navigator.pop(context); // Close bottom sheet
-                                final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
-                                await AuthPreferences.saveLogin(FirebaseService.instance.currentUserEmail ?? '', isRep);
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => isRep
-                                        ? const RepMainLayout()
-                                        : const MainLayout(isRep: false),
-                                  ),
-                                );
-                              } else {
-                                setSheetState(() {
-                                  isTesterLoading = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Login Failed: Unable to verify account.'),
-                                    backgroundColor: Colors.redAccent,
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              setSheetState(() {
-                                isTesterLoading = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Login Failed: $e'),
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                              );
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B78FF),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: isTesterLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

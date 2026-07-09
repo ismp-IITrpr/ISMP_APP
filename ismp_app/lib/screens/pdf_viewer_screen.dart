@@ -83,11 +83,6 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                     _pdfBytes!,
                     canShowScrollHead: false,
                     canShowScrollStatus: false,
-                    onDocumentLoaded: (PdfDocumentLoadedDetails details) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('PDF Loaded Successfully!')),
-                      );
-                    },
                     onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error rendering PDF: ${details.description}')),

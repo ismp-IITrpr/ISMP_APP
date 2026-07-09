@@ -109,28 +109,42 @@ class DetailedAttendanceScreen extends StatelessWidget {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);
 
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-            centerTitle: true,
-            title: const Text(
-              'Sticker Collection',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF2B124C), // Shiny Purple
+                Color(0xFF0F0F13), // Midnight Dark
+                Color(0xFF1E103C), // Deep Indigo
+                Color(0xFF0F0F13), // Midnight Dark
+              ],
+              stops: [0.0, 0.4, 0.7, 1.0],
             ),
           ),
-          body: SafeArea(
-            child: SingleChildScrollView(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              centerTitle: true,
+              title: const Text(
+                'Sticker Collection',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               child: Column(
@@ -164,13 +178,13 @@ class DetailedAttendanceScreen extends StatelessWidget {
                     ).slideY(begin: 0.08);
                   }),
                 ],
-              ),
             ),
           ),
-        );
-      }
+        ),
+      ),
     );
-  }
+  });
+}
 
   // ── Stickers Collected Header ──────────────────────────────────────
   Widget _buildStickersHeader(int collected) {

@@ -414,6 +414,7 @@ class FirebaseService {
     'debsoc@iitrpr.ac.in': 'Debsoc',
     'mun@iitrpr.ac.in': 'MuN',
     'fineartsclub@iitrpr.ac.in': 'Vibgyor',
+    'ismp@iitrpr.ac.in': 'ISMP',
   };
 
   /// Returns true if the given email belongs to an authorized club rep.

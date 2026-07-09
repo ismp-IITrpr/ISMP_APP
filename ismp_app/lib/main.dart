@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'services/firebase_service.dart';
@@ -16,6 +17,10 @@ void main() async {
   FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
     debugPrint('Seeding failed: $e');
   });
+  
+  // Remove the splash screen once Flutter has initialized
+  FlutterNativeSplash.remove();
+  
   runApp(const MyApp());
 }
 

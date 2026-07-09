@@ -651,11 +651,13 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                 ],
                               ),
                             )
-                          : ActiveSessionButton(
-                              event: event,
-                              defaultText: 'Start',
-                              defaultIcon: Icons.qr_code_scanner,
-                            ),
+                          : (event.getFormattedAudience() == 'All Members'
+                              ? const SizedBox()
+                              : ActiveSessionButton(
+                                  event: event,
+                                  defaultText: 'Start',
+                                  defaultIcon: Icons.qr_code_scanner,
+                                )),
                     ],
                   ),
                 );

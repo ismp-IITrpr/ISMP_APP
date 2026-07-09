@@ -81,15 +81,6 @@ class _EventsScreenState extends State<EventsScreen> {
         elevation: 0,
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white70),
-            onPressed: () async {
-              await DatabaseService.clearPersistentEventsCache();
-              await DatabaseService.clearCache();
-              setState(() {});
-            },
-            tooltip: 'Refresh Schedule',
-          ),
           if (widget.isRep)
             Container(
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
@@ -245,9 +236,8 @@ class _EventsScreenState extends State<EventsScreen> {
                         final event = dailyEvents[index];
                         final isLast = index == dailyEvents.length - 1;
 
-                      // Only club sessions ('C') that match this rep's club get
-                      // a "Start Attendance" action (with Firebase session creation).
                       final bool showStartAttendance = isRep && event.type == 'C'
+                          && event.getFormattedAudience() != 'All Members'
                           && (widget.repClub.isEmpty || event.club == widget.repClub);
 
                       return IntrinsicHeight(

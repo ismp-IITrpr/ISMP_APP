@@ -85,7 +85,7 @@ class _RepDashboardState extends State<RepDashboard> {
         description: _eventDescCtrl.text.trim(),
         day: _selectedDate.difference(DateTime(2026, 7, 7)).inDays + 1,
         targetAudience: targetAudience,
-        type: 'C',
+        type: _repEmail.trim().toLowerCase() == 'ismp@iitrpr.ac.in' ? 'E' : 'C',
         club: club,
       );
 

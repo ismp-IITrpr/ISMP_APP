@@ -414,21 +414,25 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     final studentDegree = profile?.degree ?? 'B.Tech';
                     for (var event in allEvents) {
                       if (event.isStudentTargeted(studentDegree, groupNo)) {
-                        final matchingRecord = studentRecords.firstWhere(
-                          (r) => r.eventId == event.id,
-                          orElse: () => AttendanceRecord(
-                            eventId: event.id,
-                            eventType: event.type,
-                            title: event.title,
-                            club: event.club,
-                            date: event.date,
-                            time: event.time,
-                            venue: event.venue,
-                            isPresent: false,
-                            iconColor: event.dotColor,
-                          ),
-                        );
-                        records.add(matchingRecord);
+                        final hasRecord = studentRecords.any((r) => r.eventId == event.id);
+                        if (hasRecord) {
+                          final matchingRecord = studentRecords.firstWhere((r) => r.eventId == event.id);
+                          records.add(matchingRecord);
+                        } else {
+                          if (event.isCompleted) {
+                            records.add(AttendanceRecord(
+                              eventId: event.id,
+                              eventType: event.type,
+                              title: event.title,
+                              club: event.club,
+                              date: event.date,
+                              time: event.time,
+                              venue: event.venue,
+                              isPresent: false,
+                              iconColor: event.dotColor,
+                            ));
+                          }
+                        }
                       }
                     }
 

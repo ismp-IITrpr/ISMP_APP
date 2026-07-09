@@ -70,6 +70,13 @@ class UserProfile {
     this.clubId,
   });
 
+  static int _parseInt(dynamic value, [int defaultValue = 0]) {
+    if (value == null) return defaultValue;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? defaultValue;
+    return defaultValue;
+  }
   // THE TRANSLATOR: Converts raw Firebase data into a UserProfile object
   factory UserProfile.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
@@ -78,8 +85,10 @@ class UserProfile {
       rollNo: doc.id,
       degree: data['degree'] ?? '',
       branch: data['branch'] ?? '',
-      groupNo: data['groupNo'] ?? 0,
-      stickersCollected: data['stickersCollected'] ?? 0,
+      // groupNo: data['groupNo'] ?? 0,
+      // stickersCollected: data['stickersCollected'] ?? 0,
+      groupNo: _parseInt(data['groupNo'], 0),
+      stickersCollected: _parseInt(data['stickersCollected'], 0),
       profileUrl: data['profileUrl'] ?? '',
       mentorRollNo: data['mentorRollNo'], // Grabs the assigned mentor's ID
       clubName: data['clubName'],
@@ -93,8 +102,10 @@ class UserProfile {
       rollNo: data['rollNo'] ?? '',
       degree: data['degree'] ?? '',
       branch: data['branch'] ?? '',
-      groupNo: data['groupNo'] ?? 0,
-      stickersCollected: data['stickersCollected'] ?? 0,
+      // groupNo: data['groupNo'] ?? 0,
+      // stickersCollected: data['stickersCollected'] ?? 0,
+      groupNo: _parseInt(data['groupNo'], 0),
+      stickersCollected: _parseInt(data['stickersCollected'], 0),
       profileUrl: data['profileUrl'] ?? '',
       mentorRollNo: data['mentorRollNo'],
       mentor: data['mentor'] != null ? MentorProfile.fromMap(Map<String, dynamic>.from(data['mentor'])) : null,

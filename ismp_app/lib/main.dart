@@ -12,7 +12,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseService.instance.seedDatabaseIfNeeded();
+  // Run seeding asynchronously so it doesn't block the splash screen if the user is offline
+  FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+    debugPrint('Seeding failed: $e');
+  });
   runApp(const MyApp());
 }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../widgets/active_session_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/events.dart';
 import '../../services/firebase_service.dart';
 import '../../services/database_service.dart';
-import '../live_attendance_screen.dart';
+import 'live_attendance_screen.dart';
 import 'rep_access.dart';
 
 class RepEventsScreen extends StatefulWidget {
@@ -341,66 +343,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                     ],
                                                   ),
                                                 )
-                                              : GestureDetector(
-                                                  onTap: () async {
-                                                    try {
-                                                      final sessionId = await FirebaseService.instance.startAttendanceSession(
-                                                        eventName: event.title,
-                                                        venue: event.venue,
-                                                        repEmail: FirebaseService.instance.currentUserEmail ?? '',
-                                                        eventId: event.id,
-                                                      );
-                                                      if (context.mounted) {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (_) => LiveAttendanceScreen(
-                                                              sessionId: sessionId,
-                                                              eventName: event.title,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    } catch (e) {
-                                                      if (context.mounted) {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(content: Text('Failed to start session: $e')),
-                                                        );
-                                                      }
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    padding: const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 6,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xFF4A3AFF).withOpacity(0.15),
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      border: Border.all(
-                                                        color: const Color(0xFF4A3AFF).withOpacity(0.5),
-                                                      ),
-                                                    ),
-                                                    child: const Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          Icons.qr_code_scanner,
-                                                          size: 14,
-                                                          color: Color(0xFF8B78FF),
-                                                        ),
-                                                        SizedBox(width: 6),
-                                                        Text(
-                                                          'Start Attendance',
-                                                          style: TextStyle(
-                                                            color: Color(0xFF8B78FF),
-                                                            fontSize: 12,
-                                                            fontWeight: FontWeight.w700,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                              : ActiveSessionButton(
+                                                  event: event,
+                                                  defaultText: 'Start Attendance',
+                                                  defaultIcon: Icons.qr_code_scanner,
                                                 ),
                                       ],
                                     ),

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/firebase_service.dart';
-import '../models/profile_data.dart';
+import '../../services/firebase_service.dart';
+import '../../models/profile_data.dart';
 
 class LiveAttendanceScreen extends StatefulWidget {
   final String sessionId;
@@ -349,7 +349,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: QrImageView(
-                            data: widget.sessionId,
+                            data: '${widget.sessionId}:${DateTime.now().millisecondsSinceEpoch ~/ 30000}',
                             version: QrVersions.auto,
                             size: 200,
                             backgroundColor: Colors.white,

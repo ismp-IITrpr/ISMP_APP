@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/firebase_service.dart';
-import '../live_attendance_screen.dart';
+import 'live_attendance_screen.dart';
 import '../login_screen.dart';
 
 class RepDashboard extends StatefulWidget {

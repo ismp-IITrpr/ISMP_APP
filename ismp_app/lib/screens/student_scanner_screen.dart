@@ -27,7 +27,25 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
         _isProcessing = true;
       });
 
-      final String sessionId = scannedCode.trim();
+      final String rawCode = scannedCode.trim();
+      final parts = rawCode.split(':');
+      
+      if (parts.length != 2) {
+        cameraController.stop();
+        _showFailedDialog('Invalid QR code format.');
+        return;
+      }
+      
+      final String sessionId = parts[0];
+      final int scannedTimeBlock = int.tryParse(parts[1]) ?? 0;
+      final int currentTimeBlock = DateTime.now().millisecondsSinceEpoch ~/ 30000;
+      
+      // Allow current block or the previous block (to account for a few seconds of network/scan delay)
+      if (scannedTimeBlock != currentTimeBlock && scannedTimeBlock != (currentTimeBlock - 1)) {
+        cameraController.stop();
+        _showFailedDialog('QR code has expired. Please scan the newly generated code.');
+        return;
+      }
 
       // Stop camera while processing and showing dialog
       cameraController.stop();

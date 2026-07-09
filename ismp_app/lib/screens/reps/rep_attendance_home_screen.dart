@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/events.dart';
 import '../../services/firebase_service.dart';
-import '../live_attendance_screen.dart';
+import '../reps/live_attendance_screen.dart';
+import '../../widgets/active_session_button.dart';
 import 'rep_access.dart';
 
 class RepAttendanceHomeScreen extends StatefulWidget {
@@ -650,66 +651,10 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                 ],
                               ),
                             )
-                          : GestureDetector(
-                              onTap: () async {
-                                try {
-                                  final sessionId = await FirebaseService.instance.startAttendanceSession(
-                                    eventId: event.id,
-                                    eventName: event.title,
-                                    venue: event.venue,
-                                    repEmail: FirebaseService.instance.currentUserEmail ?? '',
-                                  );
-                                  if (context.mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => LiveAttendanceScreen(
-                                          sessionId: sessionId,
-                                          eventName: event.title,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Failed to start session: $e')),
-                                    );
-                                  }
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF4A3AFF).withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: const Color(0xFF4A3AFF).withOpacity(0.5),
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.qr_code_scanner,
-                                      size: 14,
-                                      color: Color(0xFF8B78FF),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Start',
-                                      style: TextStyle(
-                                        color: Color(0xFF8B78FF),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          : ActiveSessionButton(
+                              event: event,
+                              defaultText: 'Start',
+                              defaultIcon: Icons.qr_code_scanner,
                             ),
                     ],
                   ),

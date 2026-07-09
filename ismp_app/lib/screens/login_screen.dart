@@ -30,6 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
+          FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+            debugPrint('Post-login seeding failed: $e');
+          });
           final isRep = FirebaseService.instance.isClubRep(user.email);
           await AuthPreferences.saveLogin(user.email ?? '', isRep);
           Navigator.pushReplacement(
@@ -309,6 +312,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                               final currentEmail = FirebaseService.instance.currentUserEmail;
                               if ((user != null || currentEmail == 'repaccess@gmail.com') && mounted) {
+                                FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+                                  debugPrint('Post-login seeding failed: $e');
+                                });
                                 Navigator.pop(context); // Close bottom sheet
                                 final isRep = FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail);
                                 await AuthPreferences.saveLogin(FirebaseService.instance.currentUserEmail ?? '', isRep);

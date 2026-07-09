@@ -439,6 +439,14 @@ class FirebaseService {
   }
 
   // ─── ATTENDANCE SESSION MANAGEMENT ─────────────────────────────────
+  Stream<QuerySnapshot<Map<String, dynamic>>> getActiveSessionForEvent(String eventId, String repEmail) {
+    return _firestore.collection('attendance_sessions')
+        .where('eventId', isEqualTo: eventId)
+        .where('repEmail', isEqualTo: repEmail)
+        .where('status', isEqualTo: 'active')
+        .limit(1)
+        .snapshots();
+  }
 
   /// Creates a new attendance session and returns the generated sessionId.
   Future<String> startAttendanceSession({

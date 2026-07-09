@@ -8,7 +8,7 @@ import '../services/database_service.dart';
 import '../models/profile_data.dart';
 import 'student_scanner_screen.dart';
 import 'detailed_attendance_screen.dart';
-import 'live_attendance_screen.dart';
+import 'reps/live_attendance_screen.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final bool isRep;

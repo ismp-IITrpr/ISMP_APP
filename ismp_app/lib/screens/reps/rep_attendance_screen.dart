@@ -5,14 +5,6 @@ import '../../models/events.dart';
 /// Rep-facing Attendance screen — brand-new file (per Gorish's note, this
 /// stays separate from the student attendance file since the club-id
 /// batching logic will live here).
-///
-/// UI covers:
-///  - time-bound QR code that auto-expires
-///  - manual "stop QR early" switch
-///  - manual name addition (for students who couldn't scan)
-///  - a running list of everyone marked present so far
-///  - final "Submit Attendance" batch action
-///
 /// TODO (logic owner / Gorish):
 ///  - Wire real QR payload generation (session token + club id + expiry).
 ///  - Wire live scan stream to populate `_presentStudents` instead of the
@@ -26,7 +18,7 @@ class RepAttendanceScreen extends StatefulWidget {
   const RepAttendanceScreen({
     super.key,
     required this.event,
-    this.qrDuration = const Duration(minutes: 5),
+    this.qrDuration = const Duration(minutes: 10),
   });
 
   @override
@@ -68,7 +60,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
   // TODO (logic owner): replace with the actual rotating QR payload
   // (e.g. session token signed with club id + timestamp).
   String get _qrPayload =>
-      'session:${widget.event.id}:${DateTime.now().minute}';
+      'session:${widget.event.id}:${DateTime.now().millisecondsSinceEpoch ~/ 30000}';
 
   @override
   void initState() {

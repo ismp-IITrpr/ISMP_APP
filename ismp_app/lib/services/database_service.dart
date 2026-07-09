@@ -148,9 +148,9 @@ class DatabaseService {
 
     final int currentTime = DateTime.now().millisecondsSinceEpoch;
     
-    // 24 HOURS IN MILLISECONDS: 24 * 60 * 60 * 1000 = 86,400,000 ms
-    // To change the cache duration, simply change this number (e.g. 12 * 60 * 60 * 1000 for 12 hours)
-    const int cacheDuration = 24 * 60 * 60 * 1000; 
+    // 4 HOURS IN MILLISECONDS: 4 * 60 * 60 * 1000 = 14,400,000 ms
+    // To change the cache duration, simply change this number
+    const int cacheDuration = 4 * 60 * 60 * 1000; 
 
     // 1. If we have saved data and it hasn't expired yet, use the cache!
     if (lastFetchTime != null && 
@@ -207,7 +207,7 @@ class DatabaseService {
     final String? savedJson = prefs.getString('cached_attendance_$studentRollNo');
 
     final int currentTime = DateTime.now().millisecondsSinceEpoch;
-    const int cacheDuration = 24 * 60 * 60 * 1000; 
+    const int cacheDuration = 4 * 60 * 60 * 1000; 
 
     if (lastFetchTime != null && 
         savedJson != null && 

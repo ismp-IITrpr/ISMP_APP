@@ -6,7 +6,7 @@ import '../services/firebase_service.dart';
 import '../services/database_service.dart';
 import 'reps/rep_access.dart';
 import 'reps/rep_attendance_screen.dart';
-import 'live_attendance_screen.dart';
+import 'reps/live_attendance_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   final bool isRep;

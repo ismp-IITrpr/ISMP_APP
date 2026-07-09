@@ -18,7 +18,8 @@ final List<MomentModel> mockMoments = [
   ),
   MomentModel(
     id: 'm4',
-    imageUrl: 'https://images.unsplash.com/photo-1523580494112-071d16940d14?w=500&q=80',
+    // imageUrl: 'https://images.unsplash.com/photo-1523580494112-071d16940d14?w=500&q=80',
+    imageUrl: 'https://picsum.photos/seed/orientation/500/500',
     title: 'Campus Orientation Tour',
   ),
   MomentModel(

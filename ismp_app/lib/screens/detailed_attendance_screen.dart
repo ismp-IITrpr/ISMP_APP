@@ -193,9 +193,9 @@ class DetailedAttendanceScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: [
@@ -205,10 +205,10 @@ class DetailedAttendanceScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                  color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFF4A3AFF).withOpacity(0.3),
+                    color: const Color(0xFF4A3AFF).withValues(alpha: 0.3),
                   ),
                 ),
                 child: const Icon(
@@ -264,7 +264,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.06),
+              backgroundColor: Colors.white.withValues(alpha: 0.06),
               valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
               minHeight: 8,
             ),
@@ -294,7 +294,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
         const SizedBox(width: 20),
         _legendDot(Colors.grey.shade700, 'Missed'),
         const SizedBox(width: 20),
-        _legendDot(Colors.grey.shade800.withOpacity(0.5), 'Locked'),
+        _legendDot(Colors.grey.shade800.withValues(alpha: 0.5), 'Locked'),
       ],
     );
   }
@@ -336,9 +336,9 @@ class DetailedAttendanceScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         children: [
@@ -352,11 +352,11 @@ class DetailedAttendanceScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: color.withOpacity(0.5), width: 2),
+                    border: Border.all(color: color.withValues(alpha: 0.5), width: 2),
                   ),
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundColor: Colors.white.withOpacity(0.05),
+                    backgroundColor: Colors.white.withValues(alpha: 0.05),
                     backgroundImage: AssetImage('assets/images/clubs/$boardName.png'),
                   ),
                 ),
@@ -389,9 +389,9 @@ class DetailedAttendanceScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: color.withOpacity(0.35)),
+                    border: Border.all(color: color.withValues(alpha: 0.35)),
                   ),
                   child: Text(
                     '$collected / ${clubs.length}',
@@ -406,7 +406,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
             ),
           ),
 
-          Divider(color: Colors.white.withOpacity(0.06), height: 1),
+          Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
 
           // Club stickers grid
           Padding(
@@ -449,7 +449,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
       borderColor = boardColor;
       shadow = [
         BoxShadow(
-          color: boardColor.withOpacity(0.3),
+          color: boardColor.withValues(alpha: 0.3),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),
@@ -458,7 +458,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
       borderColor = Colors.grey.shade800;
       shadow = null;
     } else {
-      borderColor = Colors.white.withOpacity(0.04);
+      borderColor = Colors.white.withValues(alpha: 0.04);
       shadow = null;
     }
 
@@ -481,7 +481,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
               opacity: isPresent ? 1.0 : (isAbsent ? 0.3 : 0.15),
               child: CircleAvatar(
                 radius: 28,
-                backgroundColor: Colors.white.withOpacity(0.05),
+                backgroundColor: Colors.white.withValues(alpha: 0.05),
                 backgroundImage: AssetImage('assets/images/clubs/$imagePath'),
               ),
             ),
@@ -513,7 +513,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
                   ? boardColor
                   : (isAbsent
                       ? Colors.grey.shade700
-                      : Colors.white.withOpacity(0.08)),
+                      : Colors.white.withValues(alpha: 0.08)),
             ),
           ),
         ],

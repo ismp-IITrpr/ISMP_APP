@@ -115,10 +115,10 @@ class _BlogsScreenState extends State<BlogsScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withOpacity(0.1),
+          color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withOpacity(0.2),
+            color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withValues(alpha: 0.2),
           ),
         ),
         child: Center(
@@ -150,7 +150,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
         decoration: BoxDecoration(
         color: const Color(0xFF15151A),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +162,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
                 decoration: BoxDecoration(
                   color: blog.tag.bgColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: blog.tag.color.withOpacity(0.5)),
+                  border: Border.all(color: blog.tag.color.withValues(alpha: 0.5)),
                 ),
                 child: Text(
                   blog.tag.label,
@@ -210,11 +210,15 @@ class _BlogsScreenState extends State<BlogsScreen> {
                 child: Icon(Icons.person, size: 14, color: Colors.white54),
               ),
               const SizedBox(width: 8),
-              Text(
-                blog.author,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+              Expanded(
+                child: Text(
+                  blog.author,
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Text(
                 blog.date,
                 style: const TextStyle(color: Colors.white54, fontSize: 12),

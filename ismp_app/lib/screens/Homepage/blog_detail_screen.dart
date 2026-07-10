@@ -31,7 +31,7 @@ class BlogDetailScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: blog.tag.bgColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: blog.tag.color.withOpacity(0.5)),
+                    border: Border.all(color: blog.tag.color.withValues(alpha: 0.5)),
                   ),
                   child: Text(
                     blog.tag.label,

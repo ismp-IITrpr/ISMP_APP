@@ -52,18 +52,12 @@ class FirebaseService {
   // Google Sign-In with Batch 2026/Fresher and Rep restriction
   Future<User?> signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId:
-            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
-      );
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return null; // User cancelled
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -166,10 +160,7 @@ class FirebaseService {
     DatabaseService.clearCache();
     await _auth.signOut();
     try {
-      await GoogleSignIn(
-        clientId:
-            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
-      ).signOut();
+      await GoogleSignIn.instance.signOut();
     } catch (_) {}
   }
 
@@ -1014,7 +1005,7 @@ class FirebaseService {
           .where(FieldPath.documentId, isGreaterThanOrEqualTo: upperQuery)
           .where(
             FieldPath.documentId,
-            isLessThanOrEqualTo: upperQuery + '\uf8ff',
+            isLessThanOrEqualTo: '$upperQuery\uf8ff',
           )
           .limit(5)
           .get();

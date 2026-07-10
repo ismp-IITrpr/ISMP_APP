@@ -253,7 +253,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                   decoration: BoxDecoration(
                     color: card,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
                   child: Row(
                     children: [
@@ -261,7 +261,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: primary.withOpacity(0.15),
+                          color: primary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(13),
                         ),
                         child: const Icon(Icons.groups_outlined, color: primaryLight, size: 22),
@@ -299,12 +299,12 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                     color: surface,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: isActive ? primary.withOpacity(0.3) : Colors.white.withOpacity(0.05),
+                      color: isActive ? primary.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.05),
                     ),
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                              color: primary.withOpacity(0.15),
+                              color: primary.withValues(alpha: 0.15),
                               blurRadius: 20,
                               offset: const Offset(0, 8),
                             )
@@ -392,7 +392,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                               ),
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(
-                                  color: (isActive ? error : Colors.grey).withOpacity(0.4),
+                                  color: (isActive ? error : Colors.grey).withValues(alpha: 0.4),
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
@@ -423,7 +423,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                       decoration: BoxDecoration(
                         color: card,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,7 +438,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: primary.withOpacity(0.12),
+                                  color: primary.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -454,7 +454,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Text(
                                 'No one marked yet — scans and manual adds will show up here.',
-                                style: TextStyle(color: textGray.withOpacity(0.8), fontSize: 12),
+                                style: TextStyle(color: textGray.withValues(alpha: 0.8), fontSize: 12),
                               ),
                             )
                           else
@@ -512,7 +512,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isActive ? primary : success,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: primary.withOpacity(0.5),
+                      disabledBackgroundColor: primary.withValues(alpha: 0.5),
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -542,7 +542,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
       decoration: BoxDecoration(
         color: card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -647,7 +647,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
               icon: const Icon(Icons.person_add_alt_1_rounded, size: 18, color: primaryLight),
               label: const Text('Add student', style: TextStyle(color: primaryLight, fontWeight: FontWeight.w600)),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: primaryLight.withOpacity(0.35)),
+                side: BorderSide(color: primaryLight.withValues(alpha: 0.35)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),

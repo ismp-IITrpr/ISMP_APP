@@ -194,9 +194,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               margin: const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
               ),
               child: Center(
                 child: Text(
@@ -244,10 +244,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C1C23),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -258,7 +258,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(
@@ -331,12 +331,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          backgroundColor: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                            side: BorderSide(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
                           ),
                         ),
                       ),
@@ -462,12 +462,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                              color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
                           ],
-                          border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                          border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,7 +480,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                        color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: const Icon(
@@ -537,7 +537,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                                    color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -617,15 +617,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.03),
+                                    color: Colors.white.withValues(alpha: 0.03),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.08),
+                                      color: Colors.white.withValues(alpha: 0.08),
                                       width: 1,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 10,
                                         offset: const Offset(0, 4),
                                       ),
@@ -636,7 +636,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                       Container(
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          color: record.iconColor.withOpacity(0.1),
+                                          color: record.iconColor.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Icon(

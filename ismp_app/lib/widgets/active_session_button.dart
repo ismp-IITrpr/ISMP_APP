@@ -78,9 +78,9 @@ class _ActiveSessionButtonState extends State<ActiveSessionButton> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A3AFF).withOpacity(0.12),
+                color: const Color(0xFF4A3AFF).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.4)),
+                border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.4)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -133,9 +133,9 @@ class _ActiveSessionButtonState extends State<ActiveSessionButton> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withOpacity(0.12),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.4)),
+              border: Border.all(color: const Color(0xFF4CAF50).withValues(alpha: 0.4)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

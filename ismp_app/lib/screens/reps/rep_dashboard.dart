@@ -130,41 +130,6 @@ class _RepDashboardState extends State<RepDashboard> {
         ),
         backgroundColor: const Color(0xFF1C1C23),
         elevation: 0,
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4A3AFF).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
-            ),
-            child: Center(
-              child: Text(
-                clubName.toUpperCase(),
-                style: const TextStyle(
-                  color: Color(0xFF8B78FF),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white70),
-            onPressed: () async {
-              await FirebaseService.instance.signOut();
-              if (mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false,
-                );
-              }
-            },
-          ),
-        ],
       ),
       body: _buildEventCreatorTab(),
     );

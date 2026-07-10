@@ -6,7 +6,7 @@ import '../../models/events.dart';
 import '../../services/firebase_service.dart';
 import '../../services/database_service.dart';
 import 'live_attendance_screen.dart';
-import 'rep_access.dart';
+import '../../services/rep_access.dart';
 
 class RepEventsScreen extends StatefulWidget {
   const RepEventsScreen({super.key});
@@ -74,26 +74,6 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
             },
             tooltip: 'Refresh Schedule',
           ),
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4A3AFF).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF4A3AFF).withOpacity(0.5),
-              ),
-            ),
-            child: const Text(
-              'REP',
-              style: TextStyle(
-                color: Color(0xFF8B78FF),
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
         ],
       ),
       body: SafeArea(
@@ -142,7 +122,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFF4A3AFF).withOpacity(0.5),
+                            color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -173,7 +153,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                             monthName,
                             style: TextStyle(
                               color: isSelected
-                                  ? Colors.white.withOpacity(0.9)
+                                  ? Colors.white.withValues(alpha: 0.9)
                                   : Colors.grey.shade700,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -235,7 +215,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                       borderRadius: BorderRadius.circular(4),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: event.dotColor.withOpacity(0.4),
+                                          color: event.dotColor.withValues(alpha: 0.4),
                                           blurRadius: 6,
                                           offset: const Offset(0, 2),
                                         )
@@ -246,7 +226,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                     Expanded(
                                       child: Container(
                                         width: 2,
-                                        color: event.dotColor.withOpacity(0.4),
+                                        color: event.dotColor.withValues(alpha: 0.4),
                                       ),
                                     ),
                                 ],
@@ -258,14 +238,14 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.03),
+                                  color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(16),
                                   border: isClubSession
-                                      ? Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3), width: 1.5)
-                                      : Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+                                      ? Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3), width: 1.5)
+                                      : Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -317,10 +297,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                     vertical: 6,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: const Color(0xFF4CAF50).withOpacity(0.12),
+                                                    color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
                                                     borderRadius: BorderRadius.circular(10),
                                                     border: Border.all(
-                                                      color: const Color(0xFF4CAF50).withOpacity(0.4),
+                                                      color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                                                     ),
                                                   ),
                                                   child: const Row(

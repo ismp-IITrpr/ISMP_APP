@@ -4,7 +4,7 @@ import '../models/events.dart';
 import '../models/profile_data.dart';
 import '../services/firebase_service.dart';
 import '../services/database_service.dart';
-import 'reps/rep_access.dart';
+import '../services/rep_access.dart';
 import 'reps/rep_attendance_screen.dart';
 import 'reps/live_attendance_screen.dart';
 
@@ -87,9 +87,9 @@ class _EventsScreenState extends State<EventsScreen> {
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
               ),
               child: const Center(
                 child: Text(
@@ -133,7 +133,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       },
                       activeColor: const Color(0xFF8B78FF),
                       inactiveThumbColor: Colors.grey,
-                      inactiveTrackColor: Colors.grey.withOpacity(0.3),
+                      inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
                     ),
                   ],
                 ),
@@ -318,15 +318,15 @@ class _EventsScreenState extends State<EventsScreen> {
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.03),
+                                  color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.08),
+                                    color: Colors.white.withValues(alpha: 0.08),
                                     width: 1,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -421,12 +421,12 @@ class _EventsScreenState extends State<EventsScreen> {
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF4A3AFF).withOpacity(0.15),
+                                            backgroundColor: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                                             elevation: 0,
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(8),
-                                              side: BorderSide(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                                              side: BorderSide(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
                                             ),
                                           ),
                                         ),

@@ -34,7 +34,7 @@ class CoreTeamScreen extends StatelessWidget {
           backgroundColor: const Color(0xFF15151A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+            side: BorderSide(color: const Color(0xFF00FFCC).withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -116,9 +116,9 @@ class CoreTeamScreen extends StatelessWidget {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Colors.white),
             ),
@@ -151,7 +151,7 @@ class CoreTeamScreen extends StatelessWidget {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
               ),
             ).animate().fadeIn(duration: 2.seconds).scale(begin: const Offset(0.8, 0.8)),
           ),
@@ -163,7 +163,7 @@ class CoreTeamScreen extends StatelessWidget {
               height: 400,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF00FFCC).withOpacity(0.1), // ISMP Neon Cyan Accent
+                color: const Color(0xFF00FFCC).withValues(alpha: 0.1), // ISMP Neon Cyan Accent
               ),
             ).animate().fadeIn(duration: 2.seconds, delay: 500.ms).scale(begin: const Offset(0.8, 0.8)),
           ),
@@ -186,9 +186,9 @@ class CoreTeamScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.3)),
+                          border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
                         ),
                         child: const Text(
                           'IIT ROPAR ISMP',
@@ -299,12 +299,12 @@ class CoreTeamScreen extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(10, cardPaddingTop, 10, 24),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
+              color: Colors.white.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               boxShadow: [
                 BoxShadow(
-                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.05),
+                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.05),
                   blurRadius: 40,
                   offset: const Offset(0, 20),
                 ),
@@ -328,10 +328,10 @@ class CoreTeamScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.1),
+                    color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.3),
+                      color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -381,7 +381,7 @@ class CoreTeamScreen extends StatelessWidget {
                     child: Text(
                       member.bio!,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 11,
                         height: 1.4,
                       ),
@@ -394,7 +394,7 @@ class CoreTeamScreen extends StatelessWidget {
                   Text(
                     'Click to view more',
                     style: TextStyle(
-                      color: const Color(0xFF00FFCC).withOpacity(0.8),
+                      color: const Color(0xFF00FFCC).withValues(alpha: 0.8),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -412,14 +412,14 @@ class CoreTeamScreen extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: isSpecial
-                    ? [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withOpacity(0.2)]
+                    ? [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withValues(alpha: 0.2)]
                     : [const Color(0xFF4A3AFF), const Color(0xFF00FFCC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withOpacity(0.3),
+                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -444,12 +444,12 @@ class CoreTeamScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 24),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
+          color: Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00FFCC).withOpacity(0.05),
+              color: const Color(0xFF00FFCC).withValues(alpha: 0.05),
               blurRadius: 40,
               offset: const Offset(0, 20),
             ),
@@ -466,13 +466,13 @@ class CoreTeamScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withOpacity(0.2)],
+                      colors: [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withValues(alpha: 0.2)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF00FFCC).withOpacity(0.3),
+                        color: const Color(0xFF00FFCC).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -513,10 +513,10 @@ class CoreTeamScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00FFCC).withOpacity(0.1),
+                      color: const Color(0xFF00FFCC).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFF00FFCC).withOpacity(0.3),
+                        color: const Color(0xFF00FFCC).withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
@@ -543,7 +543,7 @@ class CoreTeamScreen extends StatelessWidget {
                       child: Text(
                         member.bio!,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 11,
                           height: 1.5,
                         ),
@@ -555,7 +555,7 @@ class CoreTeamScreen extends StatelessWidget {
                     Text(
                       'Click to view more',
                       style: TextStyle(
-                        color: const Color(0xFF00FFCC).withOpacity(0.8),
+                        color: const Color(0xFF00FFCC).withValues(alpha: 0.8),
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -587,12 +587,12 @@ class _SocialButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: EdgeInsets.all(small ? 14 : 18),
         decoration: BoxDecoration(
-          color: const Color(0xFF4A3AFF).withOpacity(0.1),
+          color: const Color(0xFF4A3AFF).withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF4A3AFF).withOpacity(0.6)),
+          border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.6)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4A3AFF).withOpacity(0.5),
+              color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
               blurRadius: 10,
               spreadRadius: 2,
             ),

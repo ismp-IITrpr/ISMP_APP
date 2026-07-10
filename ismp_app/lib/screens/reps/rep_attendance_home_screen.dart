@@ -4,7 +4,7 @@ import '../../models/events.dart';
 import '../../services/firebase_service.dart';
 import '../reps/live_attendance_screen.dart';
 import '../../widgets/active_session_button.dart';
-import 'rep_access.dart';
+import '../../services/rep_access.dart';
 
 class RepAttendanceHomeScreen extends StatefulWidget {
   const RepAttendanceHomeScreen({super.key});
@@ -394,7 +394,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
         fillColor: const Color(0xFF0F0F13),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -425,7 +425,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFF0F0F13),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
@@ -462,30 +462,6 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4A3AFF).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF4A3AFF).withOpacity(0.5),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                repClub.toUpperCase(),
-                style: const TextStyle(
-                  color: Color(0xFF8B78FF),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: StreamBuilder<List<EventModel>>(
@@ -533,7 +509,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                     color: const Color(0xFF1C1C23),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                      color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -542,7 +518,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(13),
                         ),
                         child: const Icon(
@@ -625,10 +601,10 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.12),
+                                color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFF4CAF50).withOpacity(0.4),
+                                  color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                                 ),
                               ),
                               child: const Row(

@@ -72,7 +72,7 @@ class RepProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primaryPurple.withOpacity(0.25)),
+        border: Border.all(color: primaryPurple.withValues(alpha: 0.25)),
       ),
       child: Column(
         children: [
@@ -81,9 +81,9 @@ class RepProfileScreen extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: primaryPurple.withOpacity(0.15),
+              color: primaryPurple.withValues(alpha: 0.15),
               shape: BoxShape.circle,
-              border: Border.all(color: primaryPurple.withOpacity(0.4), width: 2),
+              border: Border.all(color: primaryPurple.withValues(alpha: 0.4), width: 2),
             ),
             child: ClipOval(
               child: googlePhotoUrl.isNotEmpty
@@ -121,9 +121,9 @@ class RepProfileScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: primaryPurple.withOpacity(0.15),
+              color: primaryPurple.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: primaryPurple.withOpacity(0.4)),
+              border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
             ),
             child: const Text(
               'CLUB REPRESENTATIVE',
@@ -136,7 +136,7 @@ class RepProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Divider(color: Colors.white.withOpacity(0.05), height: 1),
+          Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
           const SizedBox(height: 16),
           // Email
           Row(
@@ -184,7 +184,7 @@ class RepProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primaryPurple.withOpacity(0.25)),
+        border: Border.all(color: primaryPurple.withValues(alpha: 0.25)),
       ),
       child: Column(
         children: [
@@ -194,7 +194,7 @@ class RepProfileScreen extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: primaryPurple.withOpacity(0.15),
+                  color: primaryPurple.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(13),
                 ),
                 child: const Icon(
@@ -231,9 +231,9 @@ class RepProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: primaryPurple.withOpacity(0.15),
+                  color: primaryPurple.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: primaryPurple.withOpacity(0.4)),
+                  border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
                 ),
                 child: const Text(
                   'REP',
@@ -248,7 +248,7 @@ class RepProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Divider(color: Colors.white.withOpacity(0.05), height: 1),
+          Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -300,7 +300,7 @@ class RepProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.04)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,9 +343,9 @@ class RepProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: primaryPurple.withOpacity(0.15),
+                  color: primaryPurple.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: primaryPurple.withOpacity(0.3)),
+                  border: Border.all(color: primaryPurple.withValues(alpha: 0.3)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -511,10 +511,10 @@ class RepProfileScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: surfaceColor,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: primaryPurple.withOpacity(0.3)),
+          border: Border.all(color: primaryPurple.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
-              color: primaryPurple.withOpacity(0.08),
+              color: primaryPurple.withValues(alpha: 0.08),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -528,14 +528,14 @@ class RepProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    primaryPurple.withOpacity(0.3),
-                    primaryPurple.withOpacity(0.1),
+                    primaryPurple.withValues(alpha: 0.3),
+                    primaryPurple.withValues(alpha: 0.1),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: primaryPurple.withOpacity(0.4)),
+                border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
               ),
               child: const Icon(
                 Icons.add_circle_outline_rounded,
@@ -593,7 +593,7 @@ class RepProfileScreen extends StatelessWidget {
           }
         },
         style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFF44336).withOpacity(0.1),
+          backgroundColor: const Color(0xFFF44336).withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

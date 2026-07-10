@@ -5,9 +5,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
 import '../../models/team_member.dart';
-import '../../models/profile_data.dart';
+
 import '../../models/moment.dart';
-import '../../services/database_service.dart';
+
 import 'core_team_screen.dart';
 import '../events_screen.dart';
 import '../profile_screen.dart';
@@ -15,7 +15,7 @@ import 'dev_team_screen.dart';
 import '../notifications_screen.dart';
 import 'moments_screen.dart';
 import 'blogs_screen.dart';
-import '../attendance_screen.dart';
+
 import 'package:flutter_animate/flutter_animate.dart';
 import '../pdf_viewer_screen.dart';
 
@@ -133,10 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 5.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: link.color.withOpacity(0.3), width: 1.5),
+            border: Border.all(color: link.color.withValues(alpha: 0.3), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: link.color.withOpacity(0.15),
+                color: link.color.withValues(alpha: 0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -156,8 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       colors: [
-                        Colors.black.withOpacity(0.85),
-                        Colors.black.withOpacity(0.3),
+                        Colors.black.withValues(alpha: 0.85),
+                        Colors.black.withValues(alpha: 0.3),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.5, 1.0],
@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           link.subtitle,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 14,
                             height: 1.4,
                           ),
@@ -391,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   shape: BoxShape.circle,
                   color: _currentCarouselIndex == entry.key
                       ? const Color(0xFF00FFCC)
-                      : Colors.white.withOpacity(0.2),
+                      : Colors.white.withValues(alpha: 0.2),
                 ),
               );
             }).toList(),
@@ -615,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFF15151A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+            side: BorderSide(color: const Color(0xFF00FFCC).withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -688,9 +688,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(8, 82, 8, 12),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -733,11 +733,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   colors: isFaculty
                       ? [
                           const Color(0xFF00FFCC),
-                          const Color(0xFF00FFCC).withOpacity(0.1),
+                          const Color(0xFF00FFCC).withValues(alpha: 0.1),
                         ]
                       : [
                           const Color(0xFF4A3AFF),
-                          const Color(0xFF00FFCC).withOpacity(0.5),
+                          const Color(0xFF00FFCC).withValues(alpha: 0.5),
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -748,7 +748,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         (isFaculty
                                 ? const Color(0xFF00FFCC)
                                 : const Color(0xFF4A3AFF))
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -854,7 +854,7 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
               decoration: BoxDecoration(
                 color: _currentPage == i
                     ? const Color(0xFF4A3AFF)
-                    : Colors.white.withOpacity(0.22),
+                    : Colors.white.withValues(alpha: 0.22),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -878,7 +878,7 @@ class _BlogCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1C1C23),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: post.tag.color.withOpacity(0.15), width: 1),
+          border: Border.all(color: post.tag.color.withValues(alpha: 0.15), width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18),
@@ -921,7 +921,7 @@ class _BlogCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 13,
-                    backgroundColor: post.tag.color.withOpacity(0.25),
+                    backgroundColor: post.tag.color.withValues(alpha: 0.25),
                     child: Text(
                       post.author[0],
                       style: TextStyle(
@@ -974,7 +974,7 @@ class _TagBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: tag.bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: tag.color.withOpacity(0.4), width: 1),
+        border: Border.all(color: tag.color.withValues(alpha: 0.4), width: 1),
       ),
       child: Text(
         tag.label,
@@ -1030,7 +1030,7 @@ class _BlogDetailScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor: post.tag.color.withOpacity(0.25),
+                  backgroundColor: post.tag.color.withValues(alpha: 0.25),
                   child: Text(
                     post.author[0],
                     style: TextStyle(
@@ -1064,7 +1064,7 @@ class _BlogDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            Container(height: 1, color: Colors.white.withOpacity(0.06)),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.06)),
             const SizedBox(height: 24),
             Text(
               post.content,

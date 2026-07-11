@@ -24,7 +24,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (!kIsWeb) {
+  if (kIsWeb) {
+    await GoogleSignIn.instance.initialize();
+  } else {
     await GoogleSignIn.instance.initialize(
       serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
     );

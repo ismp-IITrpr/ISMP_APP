@@ -50,10 +50,13 @@ class FirebaseService {
   // Get current user email (checks mock email first for testing)
   String? get currentUserEmail => _mockEmail ?? _auth.currentUser?.email;
 
-  // Google Sign-In with Batch 2026/Fresher and Rep restriction
   Future<User?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
+
+      if (googleUser == null) {
+        return null;
+      }
 
       final GoogleSignInAuthentication googleAuth =
           googleUser.authentication;

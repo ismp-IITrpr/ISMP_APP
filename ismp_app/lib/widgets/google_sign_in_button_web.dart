@@ -16,6 +16,8 @@ Widget buildGoogleSignInButton({
         theme: web.GSIButtonTheme.outline,
         size: web.GSIButtonSize.large,
         shape: web.GSIButtonShape.rectangular,
+        text: web.GSIButtonText.continueWith,
+        logoAlignment: web.GSIButtonLogoAlignment.left,
       ),
     ),
   );

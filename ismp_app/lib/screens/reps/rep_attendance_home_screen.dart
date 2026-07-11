@@ -557,39 +557,40 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Edit & Delete row
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () => _showEditSheet(context, event),
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.edit, size: 14, color: Colors.grey.shade400),
-                                        const SizedBox(width: 4),
-                                        Text('Edit', style: TextStyle(color: Colors.grey.shade400, fontSize: 11)),
-                                      ],
+                            if (!event.isCompleted)
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () => _showEditSheet(context, event),
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 14, color: Colors.grey.shade400),
+                                          const SizedBox(width: 4),
+                                          Text('Edit', style: TextStyle(color: Colors.grey.shade400, fontSize: 11)),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                InkWell(
-                                  onTap: () => _confirmDelete(context, event),
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.delete, size: 14, color: Color(0xFFFF2450)),
-                                        const SizedBox(width: 4),
-                                        Text('Delete', style: TextStyle(color: Color(0xFFFF2450), fontSize: 11)),
-                                      ],
+                                  const SizedBox(width: 12),
+                                  InkWell(
+                                    onTap: () => _confirmDelete(context, event),
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete, size: 14, color: Color(0xFFFF2450)),
+                                          const SizedBox(width: 4),
+                                          Text('Delete', style: TextStyle(color: Color(0xFFFF2450), fontSize: 11)),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                           ],
                         ),
                       ),

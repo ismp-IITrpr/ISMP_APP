@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
 import 'blog_detail_screen.dart';
+import '../../theme/app_theme.dart';
 
 class BlogsScreen extends StatefulWidget {
   const BlogsScreen({super.key});
@@ -21,8 +22,8 @@ class _BlogsScreenState extends State<BlogsScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F0920),
-            body: Center(child: CircularProgressIndicator(color: Color(0xFFD9278D))),
+            backgroundColor: AppColors.background,
+            body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
           );
         }
         final posts = snapshot.data ?? [];
@@ -51,17 +52,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
           ),
           body: Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1F1635), // Shiny Purple
-                  Color(0xFF0F0920), // Midnight Dark
-                  Color(0xFF1F1635), // Deep Indigo
-                  Color(0xFF0F0920), // Midnight Dark
-                ],
-                stops: [0.0, 0.4, 0.7, 1.0],
-              ),
+              gradient: AppTheme.backgroundGradient,
             ),
             child: SafeArea(
               child: Column(
@@ -115,10 +106,10 @@ class _BlogsScreenState extends State<BlogsScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD9278D) : Colors.white.withValues(alpha: 0.1),
+          color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFD9278D) : Colors.white.withValues(alpha: 0.2),
+            color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.2),
           ),
         ),
         child: Center(
@@ -148,10 +139,10 @@ class _BlogsScreenState extends State<BlogsScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-        color: const Color(0xFF1F1635),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -206,7 +197,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
             children: [
               const CircleAvatar(
                 radius: 12,
-                backgroundColor: Color(0xFF1F1635),
+                backgroundColor: AppColors.surface,
                 child: Icon(Icons.person, size: 14, color: Colors.white54),
               ),
               const SizedBox(width: 8),

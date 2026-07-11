@@ -21,8 +21,8 @@ class _BlogsScreenState extends State<BlogsScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F0F13),
-            body: Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF))),
+            backgroundColor: Color(0xFF0F0920),
+            body: Center(child: CircularProgressIndicator(color: Color(0xFFD9278D))),
           );
         }
         final posts = snapshot.data ?? [];
@@ -55,10 +55,10 @@ class _BlogsScreenState extends State<BlogsScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF2B124C), // Shiny Purple
-                  Color(0xFF0F0F13), // Midnight Dark
-                  Color(0xFF1E103C), // Deep Indigo
-                  Color(0xFF0F0F13), // Midnight Dark
+                  Color(0xFF1F1635), // Shiny Purple
+                  Color(0xFF0F0920), // Midnight Dark
+                  Color(0xFF1F1635), // Deep Indigo
+                  Color(0xFF0F0920), // Midnight Dark
                 ],
                 stops: [0.0, 0.4, 0.7, 1.0],
               ),
@@ -115,10 +115,10 @@ class _BlogsScreenState extends State<BlogsScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withValues(alpha: 0.1),
+          color: isSelected ? const Color(0xFFD9278D) : Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4A3AFF) : Colors.white.withValues(alpha: 0.2),
+            color: isSelected ? const Color(0xFFD9278D) : Colors.white.withValues(alpha: 0.2),
           ),
         ),
         child: Center(
@@ -148,7 +148,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-        color: const Color(0xFF15151A),
+        color: const Color(0xFF1F1635),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -206,7 +206,7 @@ class _BlogsScreenState extends State<BlogsScreen> {
             children: [
               const CircleAvatar(
                 radius: 12,
-                backgroundColor: Color(0xFF2A2A35),
+                backgroundColor: Color(0xFF1F1635),
                 child: Icon(Icons.person, size: 14, color: Colors.white54),
               ),
               const SizedBox(width: 8),

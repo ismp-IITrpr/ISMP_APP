@@ -23,7 +23,7 @@ class AttendanceRecord {
     this.time = '',
     this.venue = '',
     required this.isPresent,
-    this.iconColor = const Color(0xFF4A3AFF),
+    this.iconColor = const Color(0xFFD9278D),
     this.markedAt,
   });
 
@@ -52,7 +52,7 @@ class AttendanceRecord {
       time: map['time'] ?? '',
       venue: map['venue'] ?? '',
       isPresent: map['isPresent'] ?? false,
-      iconColor: Color(map['iconColor'] ?? 0xFF4A3AFF),
+      iconColor: Color(map['iconColor'] ?? 0xFFD9278D),
       markedAt: map['markedAt'] is Timestamp
           ? (map['markedAt'] as Timestamp).toDate()
           : (map['markedAt'] != null ? DateTime.tryParse(map['markedAt'].toString()) : null),

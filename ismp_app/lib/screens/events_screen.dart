@@ -87,20 +87,9 @@ class _EventsScreenState extends State<EventsScreen> {
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A3AFF).withValues(alpha: 0.2),
+                color: const Color(0xFFD9278D).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
-              ),
-              child: const Center(
-                child: Text(
-                  'REP',
-                  style: TextStyle(
-                    color: Color(0xFF8B78FF),
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
-                ),
+                border: Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
               ),
             ),
         ],
@@ -131,7 +120,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           _showAllEvents = value;
                         });
                       },
-                      activeColor: const Color(0xFF8B78FF),
+                      activeColor: const Color(0xFFD9278D),
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
                     ),
@@ -169,9 +158,9 @@ class _EventsScreenState extends State<EventsScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Color(0xFF7A6BFF),
-                            Color(0xFF4A3AFF),
-                            Color(0xFF3320D6),
+                            Color(0xFFD9278D),
+                            Color(0xFFD9278D),
+                            Color(0xFFD9278D),
                           ],
                           stops: [0.0, 0.5, 1.0],
                         )
@@ -181,7 +170,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
+                            color: const Color(0xFFD9278D).withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -241,10 +230,10 @@ class _EventsScreenState extends State<EventsScreen> {
                     future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
                       }
                       if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Color(0xFFFF2450))));
                       }
 
                       final allDailyEvents = snapshot.data ?? [];
@@ -411,22 +400,22 @@ class _EventsScreenState extends State<EventsScreen> {
                                               }
                                             }
                                           },
-                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFF8B78FF)),
+                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFFD9278D)),
                                           label: const Text(
                                             'Start Attendance',
                                             style: TextStyle(
-                                              color: Color(0xFF8B78FF),
+                                              color: Color(0xFFD9278D),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
+                                            backgroundColor: const Color(0xFFD9278D).withValues(alpha: 0.15),
                                             elevation: 0,
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(8),
-                                              side: BorderSide(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
+                                              side: BorderSide(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
                                             ),
                                           ),
                                         ),

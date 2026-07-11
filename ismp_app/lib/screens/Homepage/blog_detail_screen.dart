@@ -9,7 +9,7 @@ class BlogDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -64,7 +64,7 @@ class BlogDetailScreen extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 16,
-                  backgroundColor: Color(0xFF2A2A35),
+                  backgroundColor: Color(0xFF1F1635),
                   child: Icon(Icons.person, size: 18, color: Colors.white54),
                 ),
                 const SizedBox(width: 10),

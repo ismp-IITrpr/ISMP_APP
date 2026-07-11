@@ -86,7 +86,7 @@ class EventModel {
       club: map['club'] ?? '',
       targetAudience: audience,
       description: map['description'] ?? '',
-      dotColor: Color(map['dotColor'] ?? 0xFF4A3AFF),
+      dotColor: Color(map['dotColor'] ?? 0xFFD9278D),
       startTime: start,
       endTime: end,
       day: map['day'] ?? 0,

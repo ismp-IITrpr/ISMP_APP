@@ -110,9 +110,9 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Color(0xFF7A6BFF),
-                            Color(0xFF4A3AFF),
-                            Color(0xFF3320D6),
+                            Color(0xFFD9278D),
+                            Color(0xFFD9278D),
+                            Color(0xFFD9278D),
                           ],
                           stops: [0.0, 0.5, 1.0],
                         )
@@ -122,7 +122,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
+                            color: const Color(0xFFD9278D).withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -173,10 +173,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                 future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Color(0xFFFF2450))));
                   }
                   final dailyEvents = snapshot.data ?? [];
                   if (dailyEvents.isEmpty) {
@@ -241,7 +241,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                   color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(16),
                                   border: isClubSession
-                                      ? Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3), width: 1.5)
+                                      ? Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.3), width: 1.5)
                                       : Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
                                   boxShadow: [
                                     BoxShadow(
@@ -297,10 +297,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                     vertical: 6,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
+                                                    color: const Color(0xFFD9278D).withValues(alpha: 0.12),
                                                     borderRadius: BorderRadius.circular(10),
                                                     border: Border.all(
-                                                      color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
+                                                      color: const Color(0xFFD9278D).withValues(alpha: 0.4),
                                                     ),
                                                   ),
                                                   child: const Row(
@@ -309,13 +309,13 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                       Icon(
                                                         Icons.check_circle_outline,
                                                         size: 14,
-                                                        color: Color(0xFF4CAF50),
+                                                        color: Color(0xFFD9278D),
                                                       ),
                                                       SizedBox(width: 6),
                                                       Text(
                                                         'Completed',
                                                         style: TextStyle(
-                                                          color: Color(0xFF4CAF50),
+                                                          color: Color(0xFFD9278D),
                                                           fontSize: 12,
                                                           fontWeight: FontWeight.w700,
                                                         ),

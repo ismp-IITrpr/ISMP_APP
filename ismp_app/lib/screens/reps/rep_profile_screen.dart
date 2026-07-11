@@ -7,12 +7,12 @@ import '../../services/firebase_service.dart';
 class RepProfileScreen extends StatelessWidget {
   const RepProfileScreen({super.key});
 
-  static const Color bgColor = Color(0xFF090A0F);
-  static const Color surfaceColor = Color(0xFF12131A);
-  static const Color iconBgColor = Color(0xFF1C1C23);
-  static const Color primaryPurple = Color(0xFF8B78FF);
-  static const Color textGray = Color(0xFF8B8B9B);
-  static const Color dividerColor = Color(0xFF1A1A24);
+  static const Color bgColor = Color(0xFF0F0920);
+  static const Color surfaceColor = Color(0xFF0F0920);
+  static const Color iconBgColor = Color(0xFF1F1635);
+  static const Color primaryPurple = Color(0xFFD9278D);
+  static const Color textGray = Color(0xFFD6A3C4);
+  static const Color dividerColor = Color(0xFF0F0920);
 
   @override
   Widget build(BuildContext context) {
@@ -123,12 +123,12 @@ class RepProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: primaryPurple.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
+              border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
             ),
             child: const Text(
               'CLUB REPRESENTATIVE',
               style: TextStyle(
-                color: primaryPurple,
+                color: Color(0xFFE0B0FF),
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -145,10 +145,10 @@ class RepProfileScreen extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: iconBgColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
                 ),
-                child: const Icon(Icons.email_outlined, color: primaryPurple, size: 22),
+                child: const Icon(Icons.email_outlined, color: Color(0xFFE0B0FF), size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -294,212 +294,6 @@ class RepProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUserContainer(UserProfile user) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildUserHeader(user),
-          const SizedBox(height: 24),
-          _buildDetailRow(Icons.badge_outlined, 'Roll Number', user.rollNo),
-          _buildListDivider(),
-          _buildDetailRow(Icons.email_outlined, 'Email', 'robotics@iitrpr.ac.in'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserHeader(UserProfile user) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildAvatar(
-          name: user.name,
-          url: user.profileUrl,
-          radius: 36,
-          fontSize: 28,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                user.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: primaryPurple.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: primaryPurple.withValues(alpha: 0.3)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.verified_outlined, color: primaryPurple, size: 14),
-                    SizedBox(width: 6),
-                    Text(
-                      'Club Representative',
-                      style: TextStyle(
-                        color: primaryPurple,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: iconBgColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: primaryPurple, size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: textGray,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildListDivider() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 60),
-      child: Divider(color: dividerColor, height: 16, thickness: 1),
-    );
-  }
-
-  Widget _buildAvatar({
-    required String name,
-    required String url,
-    required double radius,
-    required double fontSize,
-  }) {
-    final String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-
-    if (url.isEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: iconBgColor,
-        child: Text(
-          initial,
-          style: TextStyle(
-            color: primaryPurple,
-            fontSize: fontSize,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      width: radius * 2,
-      height: radius * 2,
-      decoration: BoxDecoration(
-        color: iconBgColor,
-        shape: BoxShape.circle,
-      ),
-      child: ClipOval(
-        child: url.startsWith('http')
-            ? Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Text(
-                      initial,
-                      style: TextStyle(
-                        color: primaryPurple,
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: primaryPurple,
-                      strokeWidth: 2,
-                    ),
-                  );
-                },
-              )
-            : Image.asset(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Text(
-                      initial,
-                      style: TextStyle(
-                        color: primaryPurple,
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  );
-                },
-              ),
-      ),
-    );
-  }
-
   Widget _buildCreateEventCard(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -526,20 +320,12 @@ class RepProfileScreen extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    primaryPurple.withValues(alpha: 0.3),
-                    primaryPurple.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
+                border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
               ),
               child: const Icon(
                 Icons.add_circle_outline_rounded,
-                color: primaryPurple,
+                color: Color(0xFFE0B0FF),
                 size: 24,
               ),
             ),
@@ -593,7 +379,7 @@ class RepProfileScreen extends StatelessWidget {
           }
         },
         style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFF44336).withValues(alpha: 0.1),
+          backgroundColor: const Color(0xFFFF2450).withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -601,7 +387,7 @@ class RepProfileScreen extends StatelessWidget {
         child: const Text(
           'Log Out',
           style: TextStyle(
-            color: Color(0xFFF44336),
+            color: Color(0xFFFF2450),
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

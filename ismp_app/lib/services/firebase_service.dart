@@ -651,7 +651,7 @@ class FirebaseService {
     final clubName = event?.club ?? '';
     final date = event?.date ?? '';
     final time = event?.time ?? '';
-    final dotColor = event?.dotColor ?? const Color(0xFF4A3AFF);
+    final dotColor = event?.dotColor ?? const Color(0xFFD9278D);
 
     final scansSnapshot = await _firestore
         .collection('attendance_sessions')
@@ -870,8 +870,8 @@ class FirebaseService {
     String club = '',
   }) async {
     final color = type == 'C'
-        ? const Color(0xFF8B78FF)
-        : const Color(0xFFB0C4DE);
+        ? const Color(0xFFD9278D)
+        : const Color(0xFFD6A3C4);
     await _firestore.collection('events').add({
       'title': title,
       'date': date,

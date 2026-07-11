@@ -52,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final rollNo = FirebaseService.instance.currentStudentRollNo;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -96,11 +96,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 final iconType = data['iconType'] ?? 'info';
 
                 IconData icon = Icons.info_outline;
-                Color iconColor = const Color(0xFF4A3AFF);
+                Color iconColor = const Color(0xFFD9278D);
 
                 if (iconType == 'attendance') {
                   icon = Icons.check_circle_outline;
-                  iconColor = const Color(0xFF00FFCC);
+                  iconColor = const Color(0xFFD9278D);
                 } else if (iconType == 'event') {
                   icon = Icons.event;
                   iconColor = const Color(0xFFFFB020);
@@ -125,14 +125,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               // ),
               // _buildNotificationCard(
               //   icon: Icons.check_circle_outline,
-              //   iconColor: const Color(0xFF00FFCC),
+              //   iconColor: const Color(0xFFD9278D),
               //   title: 'Attendance Updated',
               //   description: 'Your attendance for the mentoring session on Friday has been marked present.',
               //   time: '1 day ago',
               // ),
               // _buildNotificationCard(
               //   icon: Icons.info_outline,
-              //   iconColor: const Color(0xFF4A3AFF),
+              //   iconColor: const Color(0xFFD9278D),
               //   title: 'Welcome to ISMP!',
               //   description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
               //   time: '2 days ago',
@@ -155,7 +155,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF15151A),
+        color: const Color(0xFF1F1635),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),

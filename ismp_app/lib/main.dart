@@ -39,11 +39,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F0F13),
-        primaryColor: const Color(0xFF4A3AFF),
+        scaffoldBackgroundColor: const Color(0xFF0F0920),
+        primaryColor: const Color(0xFFD9278D),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF1C1C23),
-          selectedItemColor: Color(0xFF4A3AFF),
+          backgroundColor: Color(0xFF1F1635),
+          selectedItemColor: Color(0xFFD9278D),
           unselectedItemColor: Colors.grey,
         ),
       ),
@@ -65,9 +65,9 @@ class AuthGate extends StatelessWidget {
         // Show a splash-style loading while checking
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F0F13),
+            backgroundColor: Color(0xFF0F0920),
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+              child: CircularProgressIndicator(color: Color(0xFFD9278D)),
             ),
           );
         }
@@ -84,9 +84,9 @@ class AuthGate extends StatelessWidget {
           builder: (context, repSnapshot) {
             if (repSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                backgroundColor: Color(0xFF0F0F13),
+                backgroundColor: Color(0xFF0F0920),
                 body: Center(
-                  child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+                  child: CircularProgressIndicator(color: Color(0xFFD9278D)),
                 ),
               );
             }

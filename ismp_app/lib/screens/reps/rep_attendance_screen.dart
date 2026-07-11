@@ -38,15 +38,15 @@ class _PresentStudent {
 }
 
 class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
-  static const Color bg = Color(0xFF0F0F13);
-  static const Color appBarBg = Color(0xFF090A0F);
-  static const Color surface = Color(0xFF12131A);
-  static const Color card = Color(0xFF1C1C23);
-  static const Color primary = Color(0xFF4A3AFF);
-  static const Color primaryLight = Color(0xFF8B78FF);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color error = Color(0xFFF44336);
-  static const Color textGray = Color(0xFF8B8B9B);
+  static const Color bg = Color(0xFF0F0920);
+  static const Color appBarBg = Color(0xFF0F0920);
+  static const Color surface = Color(0xFF0F0920);
+  static const Color card = Color(0xFF1F1635);
+  static const Color primary = Color(0xFFD9278D);
+  static const Color primaryLight = Color(0xFFD9278D);
+  static const Color success = Color(0xFFD9278D);
+  static const Color error = Color(0xFFFF2450);
+  static const Color textGray = Color(0xFFD6A3C4);
 
   late Duration _remaining;
   Timer? _timer;

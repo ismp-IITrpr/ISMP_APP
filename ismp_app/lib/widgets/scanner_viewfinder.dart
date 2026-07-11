@@ -58,9 +58,9 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
         width: double.infinity,
         height: size.height * 0.6,
         decoration: BoxDecoration(
-          color: const Color(0xFF0F0F13).withValues(alpha: 0.95),
+          color: const Color(0xFF0F0920).withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: const Color(0xFF23232D), width: 1.5),
+          border: Border.all(color: const Color(0xFF1F1635), width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),
@@ -88,7 +88,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
               children: [
                 const Icon(
                   Icons.qr_code_scanner,
-                  color: Color(0xFF8B78FF),
+                  color: Color(0xFFD9278D),
                   size: 40,
                 ),
                 const SizedBox(height: 12),
@@ -121,7 +121,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
                       Positioned.fill(
                         child: CustomPaint(
                           painter: ViewfinderCornerPainter(
-                            color: const Color(0xFF4A3AFF),
+                            color: const Color(0xFFD9278D),
                             strokeWidth: 4.0,
                           ),
                         ),
@@ -139,11 +139,11 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
                             child: Container(
                               height: 3,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF3B30),
+                                color: const Color(0xFFFF2450),
                                 borderRadius: BorderRadius.circular(2),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF3B30).withValues(alpha: 0.8),
+                                    color: const Color(0xFFFF2450).withValues(alpha: 0.8),
                                     blurRadius: 10,
                                     spreadRadius: 2,
                                   ),

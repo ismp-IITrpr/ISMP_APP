@@ -61,10 +61,10 @@ class DetailedAttendanceScreen extends StatelessWidget {
 
   // Board accent colors — all in the indigo/violet family
   static const Map<String, Color> boardColors = {
-    'BOSA': Color(0xFF4A3AFF),
-    'BOLA': Color(0xFF6C5DD3),
-    'BOCA': Color(0xFF8B78FF),
-    'BOST': Color(0xFF7A6CF0),
+    'BOSA': Color(0xFFD9278D),
+    'BOLA': Color(0xFFD9278D),
+    'BOCA': Color(0xFFD9278D),
+    'BOST': Color(0xFFD9278D),
   };
 
   // Board full names for display
@@ -109,80 +109,65 @@ class DetailedAttendanceScreen extends StatelessWidget {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);
 
-        return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF2B124C), // Shiny Purple
-                Color(0xFF0F0F13), // Midnight Dark
-                Color(0xFF1E103C), // Deep Indigo
-                Color(0xFF0F0F13), // Midnight Dark
-              ],
-              stops: [0.0, 0.4, 0.7, 1.0],
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            centerTitle: true,
+            title: const Text(
+              'Sticker Collection',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
-              ),
-              centerTitle: true,
-              title: const Text(
-                'Sticker Collection',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Stickers Collected Header ──
-                  _buildStickersHeader(collected)
-                      .animate()
-                      .fadeIn(duration: 600.ms)
-                      .slideY(begin: -0.05),
-                  const SizedBox(height: 20),
+          body: SafeArea(
+            child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Stickers Collected Header ──
+                _buildStickersHeader(collected)
+                    .animate()
+                    .fadeIn(duration: 600.ms)
+                    .slideY(begin: -0.05),
+                const SizedBox(height: 20),
 
-                  // ── Legend ──
-                  _buildLegend()
-                      .animate()
-                      .fadeIn(duration: 600.ms, delay: 100.ms),
-                  const SizedBox(height: 24),
+                // ── Legend ──
+                _buildLegend()
+                    .animate()
+                    .fadeIn(duration: 600.ms, delay: 100.ms),
+                const SizedBox(height: 24),
 
-                  // ── Board Sections ──
-                  ...boardClubs.keys.toList().asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final board = entry.value;
-                    return _buildBoardSection(
-                      board,
-                      boardColors[board]!,
-                      boardClubs[board]!,
-                      records,
-                    ).animate().fadeIn(
-                      duration: 700.ms,
-                      delay: (200 + index * 120).ms,
-                    ).slideY(begin: 0.08);
-                  }),
-                ],
-            ),
+                // ── Board Sections ──
+                ...boardClubs.keys.toList().asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final board = entry.value;
+                  return _buildBoardSection(
+                    board,
+                    boardColors[board]!,
+                    boardClubs[board]!,
+                    records,
+                  ).animate().fadeIn(
+                    duration: 700.ms,
+                    delay: (200 + index * 120).ms,
+                  ).slideY(begin: 0.08);
+                }),
+              ],
           ),
         ),
-      ),
-    );
+                ),
+              );
   });
 }
 
@@ -205,15 +190,15 @@ class DetailedAttendanceScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
+                  color: const Color(0xFFD9278D).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFF4A3AFF).withValues(alpha: 0.3),
+                    color: const Color(0xFFD9278D).withValues(alpha: 0.3),
                   ),
                 ),
                 child: const Icon(
                   Icons.workspace_premium_rounded,
-                  color: Color(0xFF8B78FF),
+                  color: Color(0xFFD9278D),
                   size: 28,
                 ),
               ),
@@ -265,7 +250,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.white.withValues(alpha: 0.06),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B78FF)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD9278D)),
               minHeight: 8,
             ),
           ),
@@ -290,7 +275,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
   Widget _buildLegend() {
     return Row(
       children: [
-        _legendDot(const Color(0xFF4A3AFF), 'Collected'),
+        _legendDot(const Color(0xFFD9278D), 'Collected'),
         const SizedBox(width: 20),
         _legendDot(Colors.grey.shade700, 'Missed'),
         const SizedBox(width: 20),

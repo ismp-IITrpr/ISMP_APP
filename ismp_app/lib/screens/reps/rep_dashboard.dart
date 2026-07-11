@@ -100,7 +100,7 @@ class _RepDashboardState extends State<RepDashboard> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Event posted successfully!'),
-            backgroundColor: Color(0xFF4CAF50),
+            backgroundColor: Color(0xFFD9278D),
           ),
         );
       }
@@ -109,7 +109,7 @@ class _RepDashboardState extends State<RepDashboard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to post event: $e'),
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Color(0xFFFF2450),
           ),
         );
       }
@@ -122,13 +122,13 @@ class _RepDashboardState extends State<RepDashboard> {
   Widget build(BuildContext context) {
     final clubName = FirebaseService.instance.getClubForEmail(_repEmail);
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
         title: const Text(
           'Create Event',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF1C1C23),
+        backgroundColor: const Color(0xFF1F1635),
         elevation: 0,
       ),
       body: _buildEventCreatorTab(),
@@ -222,8 +222,8 @@ class _RepDashboardState extends State<RepDashboard> {
                   child: ChoiceChip(
                     label: Text(degree, style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 13)),
                     selected: isSel,
-                    selectedColor: const Color(0xFF8B78FF),
-                    backgroundColor: const Color(0xFF1C1C23),
+                    selectedColor: const Color(0xFFD9278D),
+                    backgroundColor: const Color(0xFF1F1635),
                     onSelected: (selected) {
                       if (selected) setState(() => _selectedDegree = degree);
                     },
@@ -247,8 +247,8 @@ class _RepDashboardState extends State<RepDashboard> {
                 return FilterChip(
                   label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
                   selected: isSel,
-                  selectedColor: const Color(0xFF8B78FF),
-                  backgroundColor: const Color(0xFF1C1C23),
+                  selectedColor: const Color(0xFFD9278D),
+                  backgroundColor: const Color(0xFF1F1635),
                   checkmarkColor: Colors.white,
                   onSelected: (selected) {
                     setState(() {
@@ -282,7 +282,7 @@ class _RepDashboardState extends State<RepDashboard> {
               child: ElevatedButton(
                 onPressed: _isPostingEvent ? null : _postEvent,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8B78FF),
+                  backgroundColor: const Color(0xFFD9278D),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -329,16 +329,16 @@ class _RepDashboardState extends State<RepDashboard> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.grey[500]),
-        prefixIcon: Icon(icon, color: const Color(0xFF8B78FF)),
+        prefixIcon: Icon(icon, color: const Color(0xFFD9278D)),
         filled: true,
-        fillColor: const Color(0xFF1C1C23),
+        fillColor: const Color(0xFF1F1635),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF8B78FF)),
+          borderSide: const BorderSide(color: Color(0xFFD9278D)),
         ),
       ),
     );
@@ -354,12 +354,12 @@ class _RepDashboardState extends State<RepDashboard> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C23),
+          color: const Color(0xFF1F1635),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B78FF), size: 20),
+            Icon(icon, color: const Color(0xFFD9278D), size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

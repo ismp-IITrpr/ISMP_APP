@@ -20,15 +20,15 @@ class LiveAttendanceScreen extends StatefulWidget {
 }
 
 class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
-  static const Color bg = Color(0xFF0F0F13);
-  static const Color appBarBg = Color(0xFF090A0F);
-  static const Color surface = Color(0xFF12131A);
-  static const Color card = Color(0xFF1C1C23);
-  static const Color primary = Color(0xFF4A3AFF);
-  static const Color primaryLight = Color(0xFF8B78FF);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color error = Color(0xFFF44336);
-  static const Color textGray = Color(0xFF8B8B9B);
+  static const Color bg = Color(0xFF0F0920);
+  static const Color appBarBg = Color(0xFF0F0920);
+  static const Color surface = Color(0xFF0F0920);
+  static const Color card = Color(0xFF1F1635);
+  static const Color primary = Color(0xFFD9278D);
+  static const Color primaryLight = Color(0xFFD9278D);
+  static const Color success = Color(0xFFD9278D);
+  static const Color error = Color(0xFFFF2450);
+  static const Color textGray = Color(0xFFD6A3C4);
 
   bool _isExporting = false;
   bool _isEnding = false;
@@ -59,7 +59,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C23),
+        backgroundColor: const Color(0xFF1F1635),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('End Session?',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -75,7 +75,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('End Session',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Color(0xFFFF2450), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -90,14 +90,14 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Session ended. QR code is now invalid.'),
-            backgroundColor: Colors.orangeAccent,
+            backgroundColor: Color(0xFFD9278D),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Color(0xFFFF2450)),
         );
       }
     } finally {
@@ -109,11 +109,11 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C23),
+        backgroundColor: const Color(0xFF1F1635),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Row(
           children: [
-            Icon(Icons.help_outline_rounded, color: Color(0xFF8B78FF)),
+            Icon(Icons.help_outline_rounded, color: Color(0xFFD9278D)),
             SizedBox(width: 8),
             Text('Submit Attendance',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -131,7 +131,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Submit',
-                style: TextStyle(color: Color(0xFF8B78FF), fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Color(0xFFD9278D), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -151,7 +151,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Attendance submitted and session closed.'),
-            backgroundColor: Color(0xFF4CAF50),
+            backgroundColor: Color(0xFFD9278D),
           ),
         );
         Navigator.pop(context);
@@ -159,7 +159,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Submission failed: $e'), backgroundColor: Color(0xFFFF2450)),
         );
       }
     } finally {
@@ -355,11 +355,11 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                             backgroundColor: Colors.white,
                             eyeStyle: const QrEyeStyle(
                               eyeShape: QrEyeShape.square,
-                              color: Color(0xFF1C1C23),
+                              color: Color(0xFF1F1635),
                             ),
                             dataModuleStyle: const QrDataModuleStyle(
                               dataModuleShape: QrDataModuleShape.square,
-                              color: Color(0xFF1C1C23),
+                              color: Color(0xFF1F1635),
                             ),
                           ),
                         ),
@@ -603,7 +603,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                       alignment: Alignment.topLeft,
                       child: Material(
                         elevation: 4.0,
-                        color: const Color(0xFF1C1C23),
+                        color: const Color(0xFF1F1635),
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           width: 160,
@@ -623,7 +623,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                                   option.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFF8B8B9B), fontSize: 11),
+                                  style: const TextStyle(color: Color(0xFFD6A3C4), fontSize: 11),
                                 ),
                                 onTap: () {
                                   onSelected(option);

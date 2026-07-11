@@ -31,10 +31,10 @@ class CoreTeamScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF15151A),
+          backgroundColor: const Color(0xFF1F1635),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFF00FFCC).withValues(alpha: 0.3)),
+            side: BorderSide(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -60,7 +60,7 @@ class CoreTeamScreen extends StatelessWidget {
                     Text(
                       member.role,
                       style: const TextStyle(
-                        color: Color(0xFF00FFCC),
+                        color: Color(0xFFD9278D),
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                       ),
@@ -83,7 +83,7 @@ class CoreTeamScreen extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Close',
-                style: TextStyle(color: Color(0xFF00FFCC)),
+                style: TextStyle(color: Color(0xFFD9278D)),
               ),
             ),
           ],
@@ -105,7 +105,7 @@ class CoreTeamScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // We will use a Container for the gradient
+      backgroundColor: const Color(0xFF0F0920),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -126,147 +126,95 @@ class CoreTeamScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2B124C), // Shiny Purple
-              Color(0xFF0F0F13), // Midnight Dark
-              Color(0xFF1E103C), // Deep Indigo
-              Color(0xFF0F0F13), // Midnight Dark
-            ],
-            stops: [0.0, 0.4, 0.7, 1.0],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // 1. Creative Glowing Orbs
-            Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 120, 24, 40),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD9278D).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: const Color(0xFFE0B0FF).withValues(alpha: 0.3)),
+                    ),
+                    child: const Text(
+                      'IIT ROPAR ISMP',
+                      style: TextStyle(
+                        color: Color(0xFFE0B0FF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ).animate().fadeIn(duration: 800.ms).slideY(begin: -0.5, curve: Curves.easeOutBack),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Mentorship\nCore Team',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: -0.5,
+                    ),
+                  ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.3, curve: Curves.easeOutExpo),
+                ],
               ),
-            ).animate().fadeIn(duration: 2.seconds).scale(begin: const Offset(0.8, 0.8)),
-          ),
-          Positioned(
-            bottom: 200,
-            left: -150,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF00FFCC).withValues(alpha: 0.1), // ISMP Neon Cyan Accent
-              ),
-            ).animate().fadeIn(duration: 2.seconds, delay: 500.ms).scale(begin: const Offset(0.8, 0.8)),
-          ),
-          // 2. Heavy Blur Filter for Glassmorphism
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-              child: Container(color: Colors.transparent),
             ),
           ),
-          // 3. Main Content
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 120, 24, 40),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4A3AFF).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.3)),
-                        ),
-                        child: const Text(
-                          'IIT ROPAR ISMP',
-                          style: TextStyle(
-                            color: Color(0xFF00FFCC),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ).animate().fadeIn(duration: 800.ms).slideY(begin: -0.5, curve: Curves.easeOutBack),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Mentorship\nCore Team',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 36,
-                          fontWeight: FontWeight.w900,
-                          height: 1.1,
-                          letterSpacing: -0.5,
-                        ),
-                      ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.3, curve: Curves.easeOutExpo),
-                    ],
-                  ),
+
+          // Custom Layout for exactly 7 members
+          if (coreTeamMembers.length >= 7)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    // Row 1: Faculty Advisor
+                    _buildCreativeMemberCard(context, coreTeamMembers[0], 0),
+                    // Student Team (Secretary & Co-Secretaries in rows of 2)
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        double itemWidth = (constraints.maxWidth - 16) / 2;
+                        return Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 16,
+                          runSpacing: 0,
+                          children: [
+                            for (int i = 1; i < coreTeamMembers.length; i++)
+                              SizedBox(
+                                width: itemWidth,
+                                child: _buildCreativeMemberCard(context, coreTeamMembers[i], i, scaleMode: 1),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              
-              // Custom Layout for exactly 7 members
-              if (coreTeamMembers.length >= 7)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        // Row 1: Faculty Advisor
-                        _buildCreativeMemberCard(context, coreTeamMembers[0], 0),
-                        // Student Team (Secretary & Co-Secretaries in rows of 2)
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            double itemWidth = (constraints.maxWidth - 16) / 2; 
-                            return Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 16,
-                              runSpacing: 0,
-                              children: [
-                                for (int i = 1; i < coreTeamMembers.length; i++)
-                                  SizedBox(
-                                    width: itemWidth,
-                                    child: _buildCreativeMemberCard(context, coreTeamMembers[i], i, scaleMode: 1),
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else 
-                // Fallback for different counts
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _buildCreativeMemberCard(context, coreTeamMembers[index], index);
-                      },
-                      childCount: coreTeamMembers.length,
-                    ),
-                  ),
+            )
+          else
+            // Fallback for different counts
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return _buildCreativeMemberCard(context, coreTeamMembers[index], index);
+                  },
+                  childCount: coreTeamMembers.length,
                 ),
+              ),
+            ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 80)),
-            ],
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
-      ),
       ),
     );
   }
@@ -304,8 +252,8 @@ class CoreTeamScreen extends StatelessWidget {
               border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
               boxShadow: [
                 BoxShadow(
-                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.05),
-                  blurRadius: 40,
+                  color: (isSpecial ? const Color(0xFFD9278D) : const Color(0xFFD9278D)).withValues(alpha: 0.05),
+                  blurRadius: 15.0,
                   offset: const Offset(0, 20),
                 ),
               ],
@@ -328,16 +276,16 @@ class CoreTeamScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.1),
+                    color: (isSpecial ? const Color(0xFFD9278D) : const Color(0xFFD9278D)).withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.3),
+                      color: (isSpecial ? const Color(0xFFE0B0FF) : const Color(0xFFE0B0FF)).withValues(alpha: 0.5),
                     ),
                   ),
                   child: Text(
                     member.role.toUpperCase(),
                     style: TextStyle(
-                      color: isSpecial ? const Color(0xFF00FFCC) : const Color(0xFFB4B0FF),
+                      color: isSpecial ? const Color(0xFFE0B0FF) : const Color(0xFFE0B0FF),
                       fontSize: roleFontSize,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2.0,
@@ -355,13 +303,13 @@ class CoreTeamScreen extends StatelessWidget {
                   children: [
                     if (member.instagram != null && member.instagram!.isNotEmpty)
                       _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.instagram, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFB4B0FF)),
+                        icon: FaIcon(FontAwesomeIcons.instagram, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFE0B0FF)),
                         onTap: () => _launchUrl(member.instagram),
                         small: scaleMode > 0,
                       ),
                     if (member.phone != null && member.phone!.isNotEmpty)
                       _SocialButton(
-                        icon: FaIcon(FontAwesomeIcons.whatsapp, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFB4B0FF)),
+                        icon: FaIcon(FontAwesomeIcons.whatsapp, size: scaleMode > 0 ? 24 : 28, color: const Color(0xFFE0B0FF)),
                         onTap: () => _launchPhone(member.phone),
                         small: scaleMode > 0,
                       ),
@@ -394,7 +342,7 @@ class CoreTeamScreen extends StatelessWidget {
                   Text(
                     'Click to view more',
                     style: TextStyle(
-                      color: const Color(0xFF00FFCC).withValues(alpha: 0.8),
+                      color: const Color(0xFFD9278D).withValues(alpha: 0.8),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -412,15 +360,15 @@ class CoreTeamScreen extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: isSpecial
-                    ? [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withValues(alpha: 0.2)]
-                    : [const Color(0xFF4A3AFF), const Color(0xFF00FFCC)],
+                    ? [const Color(0xFFD9278D), const Color(0xFFD9278D).withValues(alpha: 0.2)]
+                    : [const Color(0xFFD9278D), const Color(0xFFD9278D)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isSpecial ? const Color(0xFF00FFCC) : const Color(0xFF4A3AFF)).withValues(alpha: 0.3),
-                  blurRadius: 20,
+                  color: (isSpecial ? const Color(0xFFD9278D) : const Color(0xFFD9278D)).withValues(alpha: 0.3),
+                  blurRadius: 15.0,
                   offset: const Offset(0, 10),
                 ),
               ],
@@ -428,7 +376,7 @@ class CoreTeamScreen extends StatelessWidget {
             child: CircleAvatar(
               radius: avatarRadius,
               backgroundImage: AssetImage(member.image),
-              backgroundColor: const Color(0xFF15151A),
+              backgroundColor: const Color(0xFF1F1635),
             ),
           ).animate().fadeIn(duration: 800.ms, delay: (index * 100 + 200).ms).scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
         ],
@@ -449,8 +397,8 @@ class CoreTeamScreen extends StatelessWidget {
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00FFCC).withValues(alpha: 0.05),
-              blurRadius: 40,
+              color: const Color(0xFFD9278D).withValues(alpha: 0.05),
+              blurRadius: 15.0,
               offset: const Offset(0, 20),
             ),
           ],
@@ -466,14 +414,14 @@ class CoreTeamScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [const Color(0xFF00FFCC), const Color(0xFF00FFCC).withValues(alpha: 0.2)],
+                      colors: [const Color(0xFFD9278D), const Color(0xFFD9278D).withValues(alpha: 0.2)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF00FFCC).withValues(alpha: 0.3),
-                        blurRadius: 20,
+                        color: const Color(0xFFD9278D).withValues(alpha: 0.3),
+                        blurRadius: 15.0,
                         offset: const Offset(0, 10),
                       ),
                     ],
@@ -481,13 +429,13 @@ class CoreTeamScreen extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 64,
                     backgroundImage: AssetImage(member.image),
-                    backgroundColor: const Color(0xFF15151A),
+                    backgroundColor: const Color(0xFF1F1635),
                   ),
                 ),
                 const SizedBox(height: 16),
                 if (member.mail != null && member.mail!.isNotEmpty)
                   _SocialButton(
-                    icon: const Icon(Icons.mail_outline, size: 28, color: Color(0xFFB4B0FF)),
+                    icon: const Icon(Icons.mail_outline, size: 28, color: Color(0xFFE0B0FF)),
                     onTap: () => _launchEmail(member.mail),
                     small: false,
                   ),
@@ -513,16 +461,16 @@ class CoreTeamScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00FFCC).withValues(alpha: 0.1),
+                      color: const Color(0xFFD9278D).withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFF00FFCC).withValues(alpha: 0.3),
+                        color: const Color(0xFFE0B0FF).withValues(alpha: 0.5),
                       ),
                     ),
                     child: Text(
                       member.role.toUpperCase(),
                       style: const TextStyle(
-                        color: Color(0xFF00FFCC),
+                        color: Color(0xFFE0B0FF),
                         fontSize: 8,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2.0,
@@ -555,7 +503,7 @@ class CoreTeamScreen extends StatelessWidget {
                     Text(
                       'Click to view more',
                       style: TextStyle(
-                        color: const Color(0xFF00FFCC).withValues(alpha: 0.8),
+                        color: const Color(0xFFE0B0FF).withValues(alpha: 0.8),
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -587,14 +535,14 @@ class _SocialButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: EdgeInsets.all(small ? 14 : 18),
         decoration: BoxDecoration(
-          color: const Color(0xFF4A3AFF).withValues(alpha: 0.1),
+          color: const Color(0xFFD9278D).withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFF4A3AFF).withValues(alpha: 0.6)),
+          border: Border.all(color: const Color(0xFFE0B0FF).withValues(alpha: 0.6)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4A3AFF).withValues(alpha: 0.5),
-              blurRadius: 10,
-              spreadRadius: 2,
+              color: const Color(0xFFD9278D).withValues(alpha: 0.5),
+              blurRadius: 5.0,
+              spreadRadius: 2.0,
             ),
           ],
         ),

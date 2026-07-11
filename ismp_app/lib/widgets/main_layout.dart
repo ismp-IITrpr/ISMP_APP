@@ -63,10 +63,10 @@ class _MainLayoutState extends State<MainLayout> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF2B124C), // Shiny Purple
-            Color(0xFF0F0F13), // Midnight Dark
-            Color(0xFF1E103C), // Deep Indigo
-            Color(0xFF0F0F13), // Midnight Dark
+            Color(0xFF1F1635), // Shiny Purple
+            Color(0xFF0F0920), // Midnight Dark
+            Color(0xFF1F1635), // Deep Indigo
+            Color(0xFF0F0920), // Midnight Dark
           ],
           stops: [0.0, 0.4, 0.7, 1.0],
         ),

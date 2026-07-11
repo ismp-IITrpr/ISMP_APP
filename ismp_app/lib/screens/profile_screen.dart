@@ -17,13 +17,12 @@ class ProfileScreen extends StatelessWidget {
   static const int TOTAL_STICKERS = 36;
 
   // Colors based on reference images
-  static const Color bgColor = Color(0xFF090A0F); // Very dark navy/black
-  static const Color surfaceColor = Color(0xFF12131A);
-  static const Color iconBgColor = Color(0xFF1C1C23); // Dark background for icons
-  static const Color primaryPurple = Color(0xFF8B78FF); // Vibrant purple for icons/text
-  static const Color textGray = Color(0xFF8B8B9B);
-  static const Color dividerColor = Color(0xFF1A1A24);
-
+  static const Color bgColor = Color(0xFF0F0920);
+  static const Color surfaceColor = Color(0xFF0F0920);
+  static const Color iconBgColor = Color(0xFF1F1635);
+  static const Color primaryPurple = Color(0xFFD9278D);
+  static const Color textGray = Color(0xFFD6A3C4);
+  static const Color dividerColor = Color(0xFF0F0920);
   @override
   Widget build(BuildContext context) {
     final String rollNo = FirebaseService.instance.currentStudentRollNo;
@@ -285,7 +284,7 @@ class ProfileScreen extends StatelessWidget {
               color: iconBgColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: primaryPurple, size: 22),
+            child: Icon(icon, color: Color(0xFFD9278D), size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -426,7 +425,7 @@ class ProfileScreen extends StatelessWidget {
           }
         },
         style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFF44336).withValues(alpha: 0.1),
+          backgroundColor: const Color(0xFFFF2450).withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -434,7 +433,7 @@ class ProfileScreen extends StatelessWidget {
         child: const Text(
           'Log Out',
           style: TextStyle(
-            color: Color(0xFFF44336),
+            color: Color(0xFFFF2450),
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

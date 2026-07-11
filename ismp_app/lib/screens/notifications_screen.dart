@@ -10,28 +10,32 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  bool _initialMarkDone = false;
+
   @override
   void initState() {
     super.initState();
-    _markAllAsRead();
+    _markAllAsReadOnce();
   }
 
-  void _markAllAsRead() {
+  Future<void> _markAllAsReadOnce() async {
+    if (_initialMarkDone) return;
+    _initialMarkDone = true;
     final rollNo = FirebaseService.instance.currentStudentRollNo;
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .where('userRollNo', isEqualTo: rollNo)
-        .where('isRead', isEqualTo: false)
-        .get()
-        .then((snapshot) {
-          final batch = FirebaseFirestore.instance.batch();
-          for (var doc in snapshot.docs) {
-            batch.update(doc.reference, {'isRead': true});
-          }
-          batch.commit().catchError((e) {
-            debugPrint('Error marking notifications as read: $e');
-          });
-        });
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('notifications')
+          .where('userRollNo', isEqualTo: rollNo)
+          .where('isRead', isEqualTo: false)
+          .get();
+      final batch = FirebaseFirestore.instance.batch();
+      for (var doc in snapshot.docs) {
+        batch.update(doc.reference, {'isRead': true});
+      }
+      await batch.commit();
+    } catch (e) {
+      debugPrint('Error marking notifications as read: $e');
+    }
   }
 
   String _formatTimestamp(DateTime dateTime) {
@@ -73,19 +77,74 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         stream: FirebaseFirestore.instance
             .collection('notifications')
             .where('userRollNo', isEqualTo: rollNo)
-            .orderBy('timestamp', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
-          // Trigger mark as read whenever new notifications arrive
-          _markAllAsRead();
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+            );
+          }
 
           final docs = snapshot.data?.docs ?? [];
+
+          // Sort in-memory descending by timestamp (bypasses composite index requirement)
+          final sortedDocs = List<QueryDocumentSnapshot>.from(docs);
+          sortedDocs.sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            final aTime = aData['timestamp'] as Timestamp?;
+            final bTime = bData['timestamp'] as Timestamp?;
+            if (aTime == null && bTime == null) return 0;
+            if (aTime == null) return -1; // New/pending notifications at the top
+            if (bTime == null) return 1;
+            return bTime.compareTo(aTime);
+          });
+
+          // Trigger mark as read whenever new notifications arrive
+          // Removed to prevent infinite rebuild loop
+
+          if (sortedDocs.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_none,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No notifications yet',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
               // Dynamic Firestore Notifications
-              ...docs.map((doc) {
+              ...sortedDocs.map((doc) {
                 final data = doc.data() as Map<String, dynamic>;
                 final title = data['title'] ?? 'Notification';
                 final description = data['description'] ?? '';

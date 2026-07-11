@@ -1,0 +1,4 @@
+.vscode/
+**/node_modules/
+functions/lib/
+ismp_app/functions/lib/

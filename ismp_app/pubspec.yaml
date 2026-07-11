@@ -49,6 +49,9 @@ dependencies:
   share_plus: ^13.2.0
   shared_preferences: ^2.3.0
   syncfusion_flutter_pdfviewer: ^34.1.30
+  firebase_messaging: any
+  flutter_local_notifications: any
+  cloud_functions: ^6.3.3
   
 dev_dependencies:
   flutter_test:

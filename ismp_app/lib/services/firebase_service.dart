@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
@@ -786,6 +787,37 @@ class FirebaseService {
     }
 
     await batch.commit();
+
+    // Send push notifications for all affected students
+    try {
+      final functions = FirebaseFunctions.instance;
+      final allRollNos = presentRollNos.toList();
+      for (var doc in studentsSnapshot.docs) {
+        final rollNo = doc.id.toUpperCase().trim();
+        if (presentRollNos.contains(rollNo)) continue;
+        final data = doc.data();
+        if (event == null ||
+            event.isStudentTargeted(data['degree'] ?? 'B.Tech',
+                data['groupNo'] is int
+                    ? data['groupNo'] as int
+                    : int.tryParse(data['groupNo']?.toString() ?? '') ?? 7)) {
+          allRollNos.add(rollNo);
+        }
+      }
+      for (final rollNo in allRollNos) {
+        try {
+          await functions.httpsCallable('sendAttendancePush').call({
+            'rollNo': rollNo,
+            'title': 'Attendance Marked',
+            'description': 'Your attendance for "$eventName" has been recorded.',
+            'iconType': 'attendance',
+            'notificationType': 'attendance',
+          });
+        } catch (_) {}
+      }
+    } catch (e) {
+      debugPrint('Push notification error: $e');
+    }
 
     // Mark the event as completed in Firestore
     if (eventId.isNotEmpty) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,9 +24,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await GoogleSignIn.instance.initialize(
-    serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
-  );
+  if (!kIsWeb) {
+    await GoogleSignIn.instance.initialize(
+      serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+    );
+  }
   // Run seeding asynchronously so it doesn't block the splash screen if the user is offline
   FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
     debugPrint('Seeding failed: $e');

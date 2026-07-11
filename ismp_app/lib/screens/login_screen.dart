@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
 import '../widgets/rep_main_layout.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,11 +17,90 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSignInSubscription;
 
   @override
   void initState() {
     super.initState();
     FirebaseService.instance.deleteOldEvents();
+    if (kIsWeb) {
+      _googleSignInSubscription = GoogleSignIn.instance.authenticationEvents.listen((GoogleSignInAuthenticationEvent event) {
+        if (event is GoogleSignInAuthenticationEventSignIn) {
+          _handleGoogleSignInAccount(event.user);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _googleSignInSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _handleGoogleSignInAccount(GoogleSignInAccount account) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final user = await FirebaseService.instance.signInWithGoogleAccount(account);
+      if (user != null) {
+        if (mounted) {
+          FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+            debugPrint('Post-login seeding failed: $e');
+          });
+          final isRep = FirebaseService.instance.isClubRep(user.email);
+          await AuthPreferences.saveLogin(user.email ?? '', isRep);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => isRep
+                  ? const RepMainLayout()
+                  : const MainLayout(isRep: false),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        String errorMessage = 'An error occurred during sign-in. Please try again.';
+        if (e.toString().contains('invalid-email-domain')) {
+          errorMessage = 'Access Denied: You are not authorized to access this app.';
+        }
+        
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1F1635),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Color(0xFFFF2450)),
+                SizedBox(width: 8),
+                Text('Sign In Failed', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: Text(
+              '$errorMessage\n\nError details: $e',
+              style: const TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK', style: TextStyle(color: Color(0xFFD9278D), fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _handleGoogleSignIn() async {
@@ -162,44 +245,9 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 30,
             child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleGoogleSignIn,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.black,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/Theme images/G.png',
-                              height: 24,
-                              width: 24,
-                            ),
-                            const SizedBox(width: 20),
-                            const Text(
-                              'Continue with Google',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                buildGoogleSignInButton(
+                  onPressed: _handleGoogleSignIn,
+                  isLoading: _isLoading,
                 ),
                 const SizedBox(height: 16),
                 const Text(

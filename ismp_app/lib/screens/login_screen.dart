@@ -241,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.24,
+            bottom: MediaQuery.of(context).size.height * 0.265,
             left: 30,
             right: 30,
             child: Column(

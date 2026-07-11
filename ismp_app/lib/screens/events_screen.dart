@@ -7,6 +7,7 @@ import '../services/database_service.dart';
 import '../services/rep_access.dart';
 import 'reps/rep_attendance_screen.dart';
 import 'reps/live_attendance_screen.dart';
+import '../theme/app_theme.dart';
 
 class EventsScreen extends StatefulWidget {
   final bool isRep;
@@ -87,9 +88,9 @@ class _EventsScreenState extends State<EventsScreen> {
               margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFD9278D).withValues(alpha: 0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
               ),
             ),
         ],
@@ -120,7 +121,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           _showAllEvents = value;
                         });
                       },
-                      activeColor: const Color(0xFFD9278D),
+                      activeColor: AppColors.primary,
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
                     ),
@@ -154,23 +155,14 @@ class _EventsScreenState extends State<EventsScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
                         gradient: isSelected
-                            ? const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFD9278D),
-                            Color(0xFFD9278D),
-                            Color(0xFFD9278D),
-                          ],
-                          stops: [0.0, 0.5, 1.0],
-                        )
+                            ? AppTheme.selectedDayGradient
                             : null,
                         color: isSelected ? null : Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFFD9278D).withValues(alpha: 0.5),
+                            color: AppColors.primary.withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -230,10 +222,10 @@ class _EventsScreenState extends State<EventsScreen> {
                     future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
+                        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                       }
                       if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Color(0xFFFF2450))));
+                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: AppColors.error)));
                       }
 
                       final allDailyEvents = snapshot.data ?? [];
@@ -356,7 +348,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                           event.type == 'C'
                                               ? event.getFormattedAudience()
                                               : 'General Event',
-                                          const Color(0xFF3A3A4A),
+                                          AppColors.badgeBg,
                                         ),
                                       ],
                                     ),
@@ -400,22 +392,22 @@ class _EventsScreenState extends State<EventsScreen> {
                                               }
                                             }
                                           },
-                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: Color(0xFFD9278D)),
+                                          icon: const Icon(Icons.qr_code_scanner, size: 16, color: AppColors.primary),
                                           label: const Text(
                                             'Start Attendance',
                                             style: TextStyle(
-                                              color: Color(0xFFD9278D),
+                                              color: AppColors.primary,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
                                           ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFFD9278D).withValues(alpha: 0.15),
+                                            backgroundColor: AppColors.primary.withValues(alpha: 0.15),
                                             elevation: 0,
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(8),
-                                              side: BorderSide(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
+                                              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
                                             ),
                                           ),
                                         ),

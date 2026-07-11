@@ -5,6 +5,7 @@ import 'login_screen.dart';
 import '../services/database_service.dart';
 import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
+import '../theme/app_theme.dart';
 
 class ProfileScreen extends StatelessWidget {
   final bool isRep;
@@ -17,12 +18,12 @@ class ProfileScreen extends StatelessWidget {
   static const int TOTAL_STICKERS = 36;
 
   // Colors based on reference images
-  static const Color bgColor = Color(0xFF0F0920);
-  static const Color surfaceColor = Color(0xFF0F0920);
-  static const Color iconBgColor = Color(0xFF1F1635);
-  static const Color primaryPurple = Color(0xFFD9278D);
-  static const Color textGray = Color(0xFFD6A3C4);
-  static const Color dividerColor = Color(0xFF0F0920);
+  static const Color bgColor = AppColors.background;
+  static const Color surfaceColor = AppColors.background;
+  static const Color iconBgColor = AppColors.surface;
+  static const Color primaryPurple = AppColors.primary;
+  static const Color textGray = AppColors.mutedText;
+  static const Color dividerColor = AppColors.background;
   @override
   Widget build(BuildContext context) {
     final String rollNo = FirebaseService.instance.currentStudentRollNo;
@@ -284,7 +285,7 @@ class ProfileScreen extends StatelessWidget {
               color: iconBgColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Color(0xFFD9278D), size: 22),
+            child: Icon(icon, color: AppColors.primary, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -425,7 +426,7 @@ class ProfileScreen extends StatelessWidget {
           }
         },
         style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFFF2450).withValues(alpha: 0.1),
+          backgroundColor: AppColors.error.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -433,7 +434,7 @@ class ProfileScreen extends StatelessWidget {
         child: const Text(
           'Log Out',
           style: TextStyle(
-            color: Color(0xFFFF2450),
+            color: AppColors.error,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

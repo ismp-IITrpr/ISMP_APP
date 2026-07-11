@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../theme/app_theme.dart';
 
 class EventModel {
   final String id;
@@ -86,7 +87,7 @@ class EventModel {
       club: map['club'] ?? '',
       targetAudience: audience,
       description: map['description'] ?? '',
-      dotColor: Color(map['dotColor'] ?? 0xFFD9278D),
+      dotColor: Color(map['dotColor'] ?? AppColors.primary.value),
       startTime: start,
       endTime: end,
       day: map['day'] ?? 0,

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
 import '../screens/reps/live_attendance_screen.dart';
+import '../theme/app_theme.dart';
 
 class ActiveSessionButton extends StatefulWidget {
   final EventModel event;
@@ -78,19 +79,19 @@ class _ActiveSessionButtonState extends State<ActiveSessionButton> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFD9278D).withValues(alpha: 0.12),
+                color: AppColors.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.4)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(widget.defaultIcon, size: 14, color: const Color(0xFFD9278D)),
+                  Icon(widget.defaultIcon, size: 14, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Text(
                     widget.defaultText,
                     style: const TextStyle(
-                      color: Color(0xFFD9278D),
+                      color: AppColors.primary,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -133,19 +134,19 @@ class _ActiveSessionButtonState extends State<ActiveSessionButton> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFD9278D).withValues(alpha: 0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.4)),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.sensor_door_outlined, size: 14, color: Color(0xFFD9278D)),
+                const Icon(Icons.sensor_door_outlined, size: 14, color: AppColors.primary),
                 const SizedBox(width: 6),
                 Text(
                   'Enter $timeString',
                   style: const TextStyle(
-                    color: Color(0xFFD9278D),
+                    color: AppColors.primary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),

@@ -5,6 +5,7 @@ import '../screens/attendance_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/reps/rep_dashboard.dart';
 import '../services/firebase_service.dart';
+import '../theme/app_theme.dart';
 
 class MainLayout extends StatefulWidget {
   final bool isRep;
@@ -59,17 +60,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1F1635), // Shiny Purple
-            Color(0xFF0F0920), // Midnight Dark
-            Color(0xFF1F1635), // Deep Indigo
-            Color(0xFF0F0920), // Midnight Dark
-          ],
-          stops: [0.0, 0.4, 0.7, 1.0],
-        ),
+        gradient: AppTheme.backgroundGradient,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,

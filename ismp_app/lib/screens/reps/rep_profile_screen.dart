@@ -3,16 +3,17 @@ import '../../models/profile_data.dart';
 import '../login_screen.dart';
 import 'rep_dashboard.dart';
 import '../../services/firebase_service.dart';
+import '../../theme/app_theme.dart';
 
 class RepProfileScreen extends StatelessWidget {
   const RepProfileScreen({super.key});
 
-  static const Color bgColor = Color(0xFF0F0920);
-  static const Color surfaceColor = Color(0xFF0F0920);
-  static const Color iconBgColor = Color(0xFF1F1635);
-  static const Color primaryPurple = Color(0xFFD9278D);
-  static const Color textGray = Color(0xFFD6A3C4);
-  static const Color dividerColor = Color(0xFF0F0920);
+  static const Color bgColor = AppColors.background;
+  static const Color surfaceColor = AppColors.background;
+  static const Color iconBgColor = AppColors.surface;
+  static const Color primaryPurple = AppColors.primary;
+  static const Color textGray = AppColors.mutedText;
+  static const Color dividerColor = AppColors.background;
 
   @override
   Widget build(BuildContext context) {
@@ -123,12 +124,12 @@ class RepProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: primaryPurple.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
+              border: Border.all(color: AppColors.secondaryAccent.withValues(alpha: 0.4)),
             ),
             child: const Text(
               'CLUB REPRESENTATIVE',
               style: TextStyle(
-                color: Color(0xFFE0B0FF),
+                color: AppColors.secondaryAccent,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -146,9 +147,9 @@ class RepProfileScreen extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
+                  border: Border.all(color: AppColors.secondaryAccent.withValues(alpha: 0.4)),
                 ),
-                child: const Icon(Icons.email_outlined, color: Color(0xFFE0B0FF), size: 22),
+                child: const Icon(Icons.email_outlined, color: AppColors.secondaryAccent, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -321,11 +322,11 @@ class RepProfileScreen extends StatelessWidget {
               height: 50,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Color(0xFFE0B0FF).withValues(alpha: 0.4)),
+                border: Border.all(color: AppColors.secondaryAccent.withValues(alpha: 0.4)),
               ),
               child: const Icon(
                 Icons.add_circle_outline_rounded,
-                color: Color(0xFFE0B0FF),
+                color: AppColors.secondaryAccent,
                 size: 24,
               ),
             ),
@@ -379,7 +380,7 @@ class RepProfileScreen extends StatelessWidget {
           }
         },
         style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFFF2450).withValues(alpha: 0.1),
+          backgroundColor: AppColors.error.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -387,7 +388,7 @@ class RepProfileScreen extends StatelessWidget {
         child: const Text(
           'Log Out',
           style: TextStyle(
-            color: Color(0xFFFF2450),
+            color: AppColors.error,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

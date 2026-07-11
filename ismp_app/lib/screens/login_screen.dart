@@ -7,6 +7,7 @@ import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
 import '../widgets/rep_main_layout.dart';
 import '../widgets/google_sign_in_button.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -72,11 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1F1635),
+            backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: const Row(
               children: [
-                Icon(Icons.error_outline, color: Color(0xFFFF2450)),
+                Icon(Icons.error_outline, color: AppColors.error),
                 SizedBox(width: 8),
                 Text('Sign In Failed', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ],
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK', style: TextStyle(color: Color(0xFFD9278D), fontWeight: FontWeight.bold)),
+                child: const Text('OK', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -137,11 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1F1635),
+            backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: const Row(
               children: [
-                Icon(Icons.error_outline, color: Color(0xFFFF2450)),
+                Icon(Icons.error_outline, color: AppColors.error),
                 SizedBox(width: 8),
                 Text('Sign In Failed', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ],
@@ -153,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK', style: TextStyle(color: Color(0xFFD9278D), fontWeight: FontWeight.bold)),
+                child: const Text('OK', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -175,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/Theme images/login_bg.png',
+            'assets/Theme images/login_bg_new.jpg',
             fit: BoxFit.cover,
           ),
           Positioned(
@@ -189,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Institute Student',
                     style: TextStyle(
                       fontSize: 26,
-                      color: Color(0xFFD6A3C4),
+                      color: AppColors.mutedText,
                       fontWeight: FontWeight.bold
 
                     ),
@@ -198,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Mentorship Program',
                     style: TextStyle(
                       fontSize: 26,
-                      color: Color(0xFFD6A3C4),
+                      color: AppColors.mutedText,
                       fontWeight: FontWeight.bold
                     ),
                   ),
@@ -207,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'IIT Ropar',
                     style: TextStyle(
                       fontSize: 40,
-                      color: Color(0xFFD6A3C4),
+                      color: AppColors.mutedText,
                       fontWeight: FontWeight.bold
                     ),
                   ),
@@ -234,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               blendMode: BlendMode.dstIn,
               child: Image.asset(
-                'assets/Theme images/college.png',
+                'assets/Theme images/college_new.jpg',
                 fit: BoxFit.fitWidth,
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/attendance.dart';
 import '../services/firebase_service.dart';
+import '../theme/app_theme.dart';
 
 /// Total stickers that can be collected across all clubs.
 const int TOTAL_STICKERS = 36;
@@ -61,10 +62,10 @@ class DetailedAttendanceScreen extends StatelessWidget {
 
   // Board accent colors — all in the indigo/violet family
   static const Map<String, Color> boardColors = {
-    'BOSA': Color(0xFFD9278D),
-    'BOLA': Color(0xFFD9278D),
-    'BOCA': Color(0xFFD9278D),
-    'BOST': Color(0xFFD9278D),
+    'BOSA': AppColors.primary,
+    'BOLA': AppColors.primary,
+    'BOCA': AppColors.primary,
+    'BOST': AppColors.primary,
   };
 
   // Board full names for display
@@ -111,17 +112,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
 
         return Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF1F1635), // Shiny Purple
-                Color(0xFF0F0920), // Midnight Dark
-                Color(0xFF1F1635), // Deep Indigo
-                Color(0xFF0F0920), // Midnight Dark
-              ],
-              stops: [0.0, 0.4, 0.7, 1.0],
-            ),
+            gradient: AppTheme.backgroundGradient,
           ),
           child: Scaffold(
             backgroundColor: Colors.transparent,
@@ -206,15 +197,15 @@ class DetailedAttendanceScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD9278D).withValues(alpha: 0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFD9278D).withValues(alpha: 0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: const Icon(
                   Icons.workspace_premium_rounded,
-                  color: Color(0xFFD9278D),
+                  color: AppColors.primary,
                   size: 28,
                 ),
               ),
@@ -266,7 +257,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.white.withValues(alpha: 0.06),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD9278D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
               minHeight: 8,
             ),
           ),
@@ -291,7 +282,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
   Widget _buildLegend() {
     return Row(
       children: [
-        _legendDot(const Color(0xFFD9278D), 'Collected'),
+        _legendDot(AppColors.primary, 'Collected'),
         const SizedBox(width: 20),
         _legendDot(Colors.grey.shade700, 'Missed'),
         const SizedBox(width: 20),

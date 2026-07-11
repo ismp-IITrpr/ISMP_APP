@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 enum BlogTag { club, academic, sports, tech, campus }
 
@@ -18,35 +19,9 @@ extension BlogTagExtension on BlogTag {
     }
   }
 
-  Color get color {
-    switch (this) {
-      case BlogTag.club:
-        return const Color(0xFFE0B0FF);
-      case BlogTag.academic:
-        return const Color(0xFFE0B0FF);
-      case BlogTag.sports:
-        return const Color(0xFFE0B0FF);
-      case BlogTag.tech:
-        return const Color(0xFFE0B0FF);
-      case BlogTag.campus:
-        return const Color(0xFFE0B0FF);
-    }
-  }
+  Color get color => AppColors.secondaryAccent;
 
-  Color get bgColor {
-    switch (this) {
-      case BlogTag.club:
-        return const Color(0xFFD9278D).withValues(alpha: 0.3);
-      case BlogTag.academic:
-        return const Color(0xFFD9278D).withValues(alpha: 0.3);
-      case BlogTag.sports:
-        return const Color(0xFFD9278D).withValues(alpha: 0.3);
-      case BlogTag.tech:
-        return const Color(0xFFD9278D).withValues(alpha: 0.3);
-      case BlogTag.campus:
-        return const Color(0xFFD9278D).withValues(alpha: 0.3);
-    }
-  }
+  Color get bgColor => AppColors.primaryWith(0.3);
 }
 
 class BlogPost {

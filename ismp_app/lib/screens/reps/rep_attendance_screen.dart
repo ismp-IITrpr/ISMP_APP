@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/events.dart';
+import '../../theme/app_theme.dart';
 
 /// Rep-facing Attendance screen — brand-new file (per Gorish's note, this
 /// stays separate from the student attendance file since the club-id
@@ -38,15 +39,15 @@ class _PresentStudent {
 }
 
 class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
-  static const Color bg = Color(0xFF0F0920);
-  static const Color appBarBg = Color(0xFF0F0920);
-  static const Color surface = Color(0xFF0F0920);
-  static const Color card = Color(0xFF1F1635);
-  static const Color primary = Color(0xFFD9278D);
-  static const Color primaryLight = Color(0xFFD9278D);
-  static const Color success = Color(0xFFD9278D);
-  static const Color error = Color(0xFFFF2450);
-  static const Color textGray = Color(0xFFD6A3C4);
+  static const Color bg = AppColors.background;
+  static const Color appBarBg = AppColors.background;
+  static const Color surface = AppColors.background;
+  static const Color card = AppColors.surface;
+  static const Color primary = AppColors.primary;
+  static const Color primaryLight = AppColors.primary;
+  static const Color success = AppColors.primary;
+  static const Color error = AppColors.error;
+  static const Color textGray = AppColors.mutedText;
 
   late Duration _remaining;
   Timer? _timer;

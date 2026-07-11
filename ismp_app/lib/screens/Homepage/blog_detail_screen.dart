@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/blog.dart';
+import '../../theme/app_theme.dart';
 
 class BlogDetailScreen extends StatelessWidget {
   final BlogPost blog;
@@ -9,7 +10,7 @@ class BlogDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0920),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -64,7 +65,7 @@ class BlogDetailScreen extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 16,
-                  backgroundColor: Color(0xFF1F1635),
+                  backgroundColor: AppColors.surface,
                   child: Icon(Icons.person, size: 18, color: Colors.white54),
                 ),
                 const SizedBox(width: 10),

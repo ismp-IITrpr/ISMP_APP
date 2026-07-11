@@ -7,6 +7,7 @@ import '../../services/firebase_service.dart';
 import '../../services/database_service.dart';
 import 'live_attendance_screen.dart';
 import '../../services/rep_access.dart';
+import '../../theme/app_theme.dart';
 
 class RepEventsScreen extends StatefulWidget {
   const RepEventsScreen({super.key});
@@ -106,23 +107,14 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
                         gradient: isSelected
-                            ? const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFD9278D),
-                            Color(0xFFD9278D),
-                            Color(0xFFD9278D),
-                          ],
-                          stops: [0.0, 0.5, 1.0],
-                        )
+                            ? AppTheme.selectedDayGradient
                             : null,
                         color: isSelected ? null : Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: isSelected
                             ? [
                           BoxShadow(
-                            color: const Color(0xFFD9278D).withValues(alpha: 0.5),
+                            color: AppColors.primary.withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -173,10 +165,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                 future: DatabaseService().getPersistentEventsForDay(_selectedDay),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
+                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Color(0xFFFF2450))));
+                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: AppColors.error)));
                   }
                   final dailyEvents = snapshot.data ?? [];
                   if (dailyEvents.isEmpty) {
@@ -241,7 +233,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                   color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(16),
                                   border: isClubSession
-                                      ? Border.all(color: const Color(0xFFD9278D).withValues(alpha: 0.3), width: 1.5)
+                                      ? Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5)
                                       : Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
                                   boxShadow: [
                                     BoxShadow(
@@ -286,7 +278,7 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                           event.type == 'C'
                                               ? event.getFormattedAudience()
                                               : 'General Event',
-                                          const Color(0xFF3A3A4A),
+                                          AppColors.badgeBg,
                                         ),
                                         const Spacer(),
                                         if (isRepClub)
@@ -297,10 +289,10 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                     vertical: 6,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: const Color(0xFFD9278D).withValues(alpha: 0.12),
+                                                    color: AppColors.primary.withValues(alpha: 0.12),
                                                     borderRadius: BorderRadius.circular(10),
                                                     border: Border.all(
-                                                      color: const Color(0xFFD9278D).withValues(alpha: 0.4),
+                                                      color: AppColors.primary.withValues(alpha: 0.4),
                                                     ),
                                                   ),
                                                   child: const Row(
@@ -309,13 +301,13 @@ class _RepEventsScreenState extends State<RepEventsScreen> {
                                                       Icon(
                                                         Icons.check_circle_outline,
                                                         size: 14,
-                                                        color: Color(0xFFD9278D),
+                                                        color: AppColors.primary,
                                                       ),
                                                       SizedBox(width: 6),
                                                       Text(
                                                         'Completed',
                                                         style: TextStyle(
-                                                          color: Color(0xFFD9278D),
+                                                          color: AppColors.primary,
                                                           fontSize: 12,
                                                           fontWeight: FontWeight.w700,
                                                         ),

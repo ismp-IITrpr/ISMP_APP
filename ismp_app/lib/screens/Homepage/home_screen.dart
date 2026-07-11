@@ -18,6 +18,7 @@ import 'blogs_screen.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 import '../pdf_viewer_screen.dart';
+import '../../theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onNavigateToTab;
@@ -48,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.code,
         bgImage: 'assets/images/carousel/dev_team_poster.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F0920), Color(0xFF0F0920)],
+          colors: [AppColors.background, AppColors.background],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: const Color(0xFFD9278D),
+        color: AppColors.primary,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const DevTeamScreen()),
@@ -64,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.book,
         bgImage: 'assets/Theme images/iitrpr_logo_2.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
+          colors: [AppColors.surface, AppColors.background],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: Color(0xFFD9278D),
+        color: AppColors.primary,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const PdfViewerScreen(
@@ -84,11 +85,11 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.person,
           bgImage: 'assets/images/carousel/mentor_poster.png',
           gradient: const LinearGradient(
-            colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
+            colors: [AppColors.surface, AppColors.background],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          color: const Color(0xFFD9278D),
+          color: AppColors.primary,
           onTap: () {
             if (widget.onNavigateToTab != null) {
               widget.onNavigateToTab!(3);
@@ -108,11 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.event,
         bgImage: 'assets/images/carousel/events_poster.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
+          colors: [AppColors.surface, AppColors.background],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: Color(0xFFD9278D),
+        color: AppColors.primary,
         onTap: () {
           if (widget.onNavigateToTab != null) {
             widget.onNavigateToTab!(1);
@@ -264,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 10,
                         height: 10,
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFF2450),
+                          color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -316,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text(
                 'View all',
                 style: TextStyle(
-                  color: Color(0xFFE0B0FF),
+                  color: AppColors.secondaryAccent,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -341,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
-                    color: Color(0xFFD9278D),
+                    color: AppColors.primary,
                     strokeWidth: 2,
                   ),
                 ),
@@ -349,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             if (snapshot.hasError) {
               return const Center(
-                child: Text('Error', style: TextStyle(color: Color(0xFFFF2450))),
+                child: Text('Error', style: TextStyle(color: AppColors.error)),
               );
             }
             final moments = snapshot.data ?? [];
@@ -435,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text(
                 'View all',
                 style: TextStyle(
-                  color: Color(0xFFE0B0FF),
+                  color: AppColors.secondaryAccent,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -456,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.all(24.0),
-                child: CircularProgressIndicator(color: Color(0xFFD9278D)),
+                child: CircularProgressIndicator(color: AppColors.primary),
               ),
             ),
           );
@@ -533,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Text(
                     'View All →',
                     style: TextStyle(
-                      color: Color(0xFFE0B0FF),
+                      color: AppColors.secondaryAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -593,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _currentCarouselIndex == entry.key
-                      ? const Color(0xFFD9278D)
+                      ? AppColors.primary
                       : Colors.white.withValues(alpha: 0.2),
                 ),
               );
@@ -612,10 +613,10 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1F1635),
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
+            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -641,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       member.role,
                       style: const TextStyle(
-                        color: Color(0xFFD9278D),
+                        color: AppColors.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                       ),
@@ -664,7 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Close',
-                style: TextStyle(color: Color(0xFFD9278D)),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
           ],
@@ -710,7 +711,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     member.role.toUpperCase(),
                     style: TextStyle(
-                      color: const Color(0xFFD9278D),
+                      color: AppColors.primary,
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.0,
@@ -730,12 +731,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 gradient: LinearGradient(
                   colors: isFaculty
                       ? [
-                          const Color(0xFFD9278D),
-                          const Color(0xFFD9278D).withValues(alpha: 0.1),
+                          AppColors.primary,
+                          AppColors.primary.withValues(alpha: 0.1),
                         ]
                       : [
-                          const Color(0xFFD9278D),
-                          const Color(0xFFD9278D).withValues(alpha: 0.5),
+                          AppColors.primary,
+                          AppColors.primary.withValues(alpha: 0.5),
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -744,8 +745,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   BoxShadow(
                     color:
                         (isFaculty
-                                ? const Color(0xFFD9278D)
-                                : const Color(0xFFD9278D))
+                                ? AppColors.primary
+                                : AppColors.primary)
                             .withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
@@ -755,7 +756,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CircleAvatar(
                 radius: 52,
                 backgroundImage: AssetImage(member.image),
-                backgroundColor: const Color(0xFF1F1635),
+                backgroundColor: AppColors.surface,
               ),
             ),
           ],
@@ -823,7 +824,7 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1F1635),
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: const Center(
@@ -851,7 +852,7 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
               height: 6,
               decoration: BoxDecoration(
                 color: _currentPage == i
-                    ? const Color(0xFFD9278D)
+                    ? AppColors.primary
                     : Colors.white.withValues(alpha: 0.22),
                 borderRadius: BorderRadius.circular(3),
               ),
@@ -874,7 +875,7 @@ class _BlogCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1F1635),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: post.tag.color.withValues(alpha: 0.15), width: 1),
         ),
@@ -994,9 +995,9 @@ class _BlogDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0920),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0920),
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -1045,7 +1046,7 @@ class _BlogDetailScreen extends StatelessWidget {
                     Text(
                       post.author,
                       style: const TextStyle(
-                        color: const Color(0xFFE0B0FF),
+                        color: AppColors.secondaryAccent,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1053,7 +1054,7 @@ class _BlogDetailScreen extends StatelessWidget {
                     Text(
                       '${post.date}  ·  ${post.readMinutes} min read',
                       style: TextStyle(
-                        color: const Color(0xFFE0B0FF),
+                        color: AppColors.secondaryAccent,
                         fontSize: 11,
                       ),
                     ),

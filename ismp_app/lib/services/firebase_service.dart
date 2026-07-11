@@ -12,6 +12,7 @@ import '../models/profile_data.dart';
 import '../models/mock_data/blog_mock.dart';
 import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
+import '../theme/app_theme.dart';
 
 class FirebaseService {
   static final FirebaseService instance = FirebaseService._init();
@@ -664,7 +665,7 @@ class FirebaseService {
     final clubName = event?.club ?? '';
     final date = event?.date ?? '';
     final time = event?.time ?? '';
-    final dotColor = event?.dotColor ?? const Color(0xFFD9278D);
+    final dotColor = event?.dotColor ?? AppColors.primary;
 
     final scansSnapshot = await _firestore
         .collection('attendance_sessions')
@@ -913,9 +914,7 @@ class FirebaseService {
     String type = 'E',
     String club = '',
   }) async {
-    final color = type == 'C'
-        ? const Color(0xFFD9278D)
-        : const Color(0xFFD6A3C4);
+    final color = AppTheme.eventDotColor(type);
     await _firestore.collection('events').add({
       'title': title,
       'date': date,

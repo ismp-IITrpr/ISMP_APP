@@ -11,6 +11,7 @@ import 'services/auth_preferences.dart';
 import 'services/notification_service.dart';
 import 'widgets/main_layout.dart';
 import 'widgets/rep_main_layout.dart';
+import 'theme/app_theme.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -66,16 +67,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ISMP App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F0920),
-        primaryColor: const Color(0xFFD9278D),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF1F1635),
-          selectedItemColor: Color(0xFFD9278D),
-          unselectedItemColor: Colors.grey,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       home: const AuthGate(),
     );
   }
@@ -94,9 +86,9 @@ class AuthGate extends StatelessWidget {
         // Show a splash-style loading while checking
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F0920),
+            backgroundColor: AppColors.background,
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFFD9278D)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           );
         }
@@ -113,9 +105,9 @@ class AuthGate extends StatelessWidget {
           builder: (context, repSnapshot) {
             if (repSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                backgroundColor: Color(0xFF0F0920),
+                backgroundColor: AppColors.background,
                 body: Center(
-                  child: CircularProgressIndicator(color: Color(0xFFD9278D)),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               );
             }

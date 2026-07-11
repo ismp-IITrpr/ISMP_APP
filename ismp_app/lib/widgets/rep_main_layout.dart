@@ -4,7 +4,7 @@ import '../screens/reps/rep_events_screen.dart';
 import '../screens/reps/rep_attendance_home_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/reps/rep_profile_screen.dart';
-import '../widgets/rep_main_layout.dart';
+import '../theme/app_theme.dart';
 
 class RepMainLayout extends StatefulWidget {
   const RepMainLayout({super.key});
@@ -31,17 +31,7 @@ class _RepMainLayoutState extends State<RepMainLayout> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1F1635),
-            Color(0xFF0F0920),
-            Color(0xFF1F1635),
-            Color(0xFF0F0920),
-          ],
-          stops: [0.0, 0.4, 0.7, 1.0],
-        ),
+        gradient: AppTheme.backgroundGradient,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -50,8 +40,8 @@ class _RepMainLayoutState extends State<RepMainLayout> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          backgroundColor: const Color(0xFF1F1635),
-          selectedItemColor: const Color(0xFFD9278D),
+          backgroundColor: AppColors.surface,
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

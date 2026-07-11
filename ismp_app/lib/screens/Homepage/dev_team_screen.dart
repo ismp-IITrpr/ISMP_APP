@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/team_member.dart';
+import '../../theme/app_theme.dart';
 
 class DevTeamScreen extends StatelessWidget {
   const DevTeamScreen({super.key});
@@ -31,11 +32,11 @@ class DevTeamScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1F1635),
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(
-                color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
+                color: AppColors.primary.withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -61,7 +62,7 @@ class DevTeamScreen extends StatelessWidget {
                     Text(
                       member.role,
                       style: const TextStyle(
-                        color: Color(0xFFD9278D),
+                        color: AppColors.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                       ),
@@ -84,7 +85,7 @@ class DevTeamScreen extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Close',
-                style: TextStyle(color: Color(0xFFD9278D)),
+                style: TextStyle(color: AppColors.primary),
               ),
             ),
           ],
@@ -106,7 +107,7 @@ class DevTeamScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0920),
+      backgroundColor: AppColors.background,
       // Extremely dark sleek background
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -142,17 +143,17 @@ class DevTeamScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16,
                         vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD9278D).withValues(
+                      color: AppColors.primary.withValues(
                           alpha: 0.15),
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                          color: const Color(0xFFE0B0FF).withValues(
+                          color: AppColors.secondaryAccent.withValues(
                               alpha: 0.3)),
                     ),
                     child: const Text(
                       'IIT ROPAR ISMP',
                       style: TextStyle(
-                        color: Color(0xFFE0B0FF),
+                        color: AppColors.secondaryAccent,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2,
@@ -242,7 +243,7 @@ class DevTeamScreen extends StatelessWidget {
                 border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                 boxShadow: [
                   BoxShadow(
-                    color: (isSpecial ? const Color(0xFFD9278D) : const Color(
+                    color: (isSpecial ? AppColors.primary : const Color(
                         0xFFD9278D)).withValues(alpha: 0.05),
                     blurRadius: 15.0,
                     offset: const Offset(0, 20),
@@ -268,16 +269,16 @@ class DevTeamScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD9278D).withValues(alpha: 0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFFE0B0FF).withValues(alpha: 0.5),
+                        color: AppColors.secondaryAccent.withValues(alpha: 0.5),
                       ),
                     ),
                     child: Text(
                       member.role.toUpperCase(),
                       style: TextStyle(
-                        color: const Color(0xFFE0B0FF),
+                        color: AppColors.secondaryAccent,
                         fontSize: roleFontSize,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2.0,
@@ -298,7 +299,7 @@ class DevTeamScreen extends StatelessWidget {
                         _SocialButton(
                           icon: FaIcon(FontAwesomeIcons.instagram,
                               size: scaleMode > 0 ? 24 : 28,
-                              color: const Color(0xFFE0B0FF)),
+                              color: AppColors.secondaryAccent),
                           onTap: () => _launchUrl(member.instagram),
                           small: scaleMode > 0,
                         ),
@@ -306,7 +307,7 @@ class DevTeamScreen extends StatelessWidget {
                         _SocialButton(
                           icon: FaIcon(FontAwesomeIcons.whatsapp,
                               size: scaleMode > 0 ? 24 : 28,
-                              color: const Color(0xFFE0B0FF)),
+                              color: AppColors.secondaryAccent),
                           onTap: () => _launchPhone(member.phone),
                           small: scaleMode > 0,
                         ),
@@ -339,7 +340,7 @@ class DevTeamScreen extends StatelessWidget {
                     Text(
                       'Click to view more',
                       style: TextStyle(
-                        color: const Color(0xFFD9278D).withValues(alpha: 0.8),
+                        color: AppColors.primary.withValues(alpha: 0.8),
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -361,16 +362,16 @@ class DevTeamScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: isSpecial
                       ? [
-                    const Color(0xFFD9278D),
-                    const Color(0xFFD9278D).withValues(alpha: 0.2)
+                    AppColors.primary,
+                    AppColors.primary.withValues(alpha: 0.2)
                   ]
-                      : [const Color(0xFFD9278D), const Color(0xFFD9278D)],
+                      : [AppColors.primary, AppColors.primary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (isSpecial ? const Color(0xFFD9278D) : const Color(
+                    color: (isSpecial ? AppColors.primary : const Color(
                         0xFFD9278D)).withValues(alpha: 0.3),
                     blurRadius: 15.0,
                     offset: const Offset(0, 10),
@@ -380,7 +381,7 @@ class DevTeamScreen extends StatelessWidget {
               child: CircleAvatar(
                 radius: avatarRadius,
                 backgroundImage: AssetImage(member.image),
-                backgroundColor: const Color(0xFF1F1635),
+                backgroundColor: AppColors.surface,
               ),
             )
                 .animate()
@@ -409,12 +410,12 @@ class _SocialButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: EdgeInsets.all(small ? 14 : 18),
         decoration: BoxDecoration(
-          color: const Color(0xFFD9278D).withValues(alpha: 0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFE0B0FF).withValues(alpha: 0.6)),
+          border: Border.all(color: AppColors.secondaryAccent.withValues(alpha: 0.6)),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD9278D).withValues(alpha: 0.5),
+              color: AppColors.primary.withValues(alpha: 0.5),
               blurRadius: 5.0,
               spreadRadius: 2.0,
             ),

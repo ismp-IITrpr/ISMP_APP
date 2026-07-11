@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class ScannerViewfinder extends StatefulWidget {
   final VoidCallback onScanComplete;
@@ -58,9 +59,9 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
         width: double.infinity,
         height: size.height * 0.6,
         decoration: BoxDecoration(
-          color: const Color(0xFF0F0920).withValues(alpha: 0.95),
+          color: AppColors.background.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: const Color(0xFF1F1635), width: 1.5),
+          border: Border.all(color: AppColors.surface, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),
@@ -88,7 +89,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
               children: [
                 const Icon(
                   Icons.qr_code_scanner,
-                  color: Color(0xFFD9278D),
+                  color: AppColors.primary,
                   size: 40,
                 ),
                 const SizedBox(height: 12),
@@ -121,7 +122,7 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
                       Positioned.fill(
                         child: CustomPaint(
                           painter: ViewfinderCornerPainter(
-                            color: const Color(0xFFD9278D),
+                            color: AppColors.primary,
                             strokeWidth: 4.0,
                           ),
                         ),
@@ -139,11 +140,11 @@ class _ScannerViewfinderState extends State<ScannerViewfinder>
                             child: Container(
                               height: 3,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF2450),
+                                color: AppColors.error,
                                 borderRadius: BorderRadius.circular(2),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF2450).withValues(alpha: 0.8),
+                                    color: AppColors.error.withValues(alpha: 0.8),
                                     blurRadius: 10,
                                     spreadRadius: 2,
                                   ),

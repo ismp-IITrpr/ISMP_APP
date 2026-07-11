@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/attendance_service.dart';
 import '../services/database_service.dart';
+import '../theme/app_theme.dart';
 
 class StudentScannerScreen extends StatefulWidget {
   final String studentId;
@@ -79,7 +80,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       builder: (context) => _buildResultDialog(
         isSuccess: true,
         icon: Icons.check_circle_outline,
-        iconColor: const Color(0xFFD9278D),
+        iconColor: AppColors.primary,
         title: 'Success!',
         message: 'Your attendance has been\nmarked successfully.',
         buttonText: 'Great!',
@@ -94,7 +95,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       builder: (context) => _buildResultDialog(
         isSuccess: false,
         icon: Icons.cancel_outlined,
-        iconColor: const Color(0xFFFF2450),
+        iconColor: AppColors.error,
         title: 'Failed!',
         message: message ?? 'The attendance window for this event has closed (2-minute limit).',
         buttonText: 'Go Back',
@@ -152,7 +153,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
                   Navigator.pop(context); // Go back to attendance screen
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD9278D),
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -195,7 +196,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFD9278D), width: 3),
+                border: Border.all(color: AppColors.primary, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/firebase_service.dart';
+import '../theme/app_theme.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -56,7 +57,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final rollNo = FirebaseService.instance.currentStudentRollNo;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0920),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -94,7 +95,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
@@ -155,14 +156,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 final iconType = data['iconType'] ?? 'info';
 
                 IconData icon = Icons.info_outline;
-                Color iconColor = const Color(0xFFD9278D);
+                Color iconColor = AppColors.primary;
 
                 if (iconType == 'attendance') {
                   icon = Icons.check_circle_outline;
-                  iconColor = const Color(0xFFD9278D);
+                  iconColor = AppColors.primary;
                 } else if (iconType == 'event') {
                   icon = Icons.event;
-                  iconColor = const Color(0xFFFFB020);
+                  iconColor = AppColors.warning;
                 }
 
                 return _buildNotificationCard(
@@ -177,21 +178,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               // // Pre-existing Mock Notifications
               // _buildNotificationCard(
               //   icon: Icons.event,
-              //   iconColor: const Color(0xFFFFB020),
+              //   iconColor: AppColors.warning,
               //   title: 'Upcoming Event: Freshers Meet',
               //   description: 'Don\'t forget! The ISMP Freshers Meet is happening tonight at 6 PM in the main auditorium.',
               //   time: '2 hours ago',
               // ),
               // _buildNotificationCard(
               //   icon: Icons.check_circle_outline,
-              //   iconColor: const Color(0xFFD9278D),
+              //   iconColor: AppColors.primary,
               //   title: 'Attendance Updated',
               //   description: 'Your attendance for the mentoring session on Friday has been marked present.',
               //   time: '1 day ago',
               // ),
               // _buildNotificationCard(
               //   icon: Icons.info_outline,
-              //   iconColor: const Color(0xFFD9278D),
+              //   iconColor: AppColors.primary,
               //   title: 'Welcome to ISMP!',
               //   description: 'We are thrilled to have you here. Check out the app to explore events and your mentor profile.',
               //   time: '2 days ago',
@@ -214,7 +215,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F1635),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),

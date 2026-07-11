@@ -7,17 +7,19 @@ Widget buildGoogleSignInButton({
   required bool isLoading,
 }) {
   final plugin = GoogleSignInPlatform.instance as web.GoogleSignInPlugin;
-  return SizedBox(
-    width: double.infinity,
-    height: 52,
-    child: plugin.renderButton(
-      configuration: web.GSIButtonConfiguration(
-        type: web.GSIButtonType.standard,
-        theme: web.GSIButtonTheme.outline,
-        size: web.GSIButtonSize.large,
-        shape: web.GSIButtonShape.rectangular,
-        text: web.GSIButtonText.continueWith,
-        logoAlignment: web.GSIButtonLogoAlignment.left,
+  return Center(
+    child: SizedBox(
+      height: 52,
+      child: plugin.renderButton(
+        configuration: web.GSIButtonConfiguration(
+          type: web.GSIButtonType.standard,
+          theme: web.GSIButtonTheme.outline,
+          size: web.GSIButtonSize.large,
+          shape: web.GSIButtonShape.pill,
+          text: web.GSIButtonText.continueWith,
+          logoAlignment: web.GSIButtonLogoAlignment.left,
+          minimumWidth: 340,
+        ),
       ),
     ),
   );

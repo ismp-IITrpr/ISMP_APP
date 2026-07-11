@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/Theme images/login_bg_new.jpg',
+            'assets/Theme images/login_bg.png',
             fit: BoxFit.cover,
           ),
           Positioned(
@@ -235,13 +235,13 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               blendMode: BlendMode.dstIn,
               child: Image.asset(
-                'assets/Theme images/college_new.jpg',
+                'assets/Theme images/college.png',
                 fit: BoxFit.fitWidth,
               ),
             ),
           ),
           Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.265,
+            bottom: MediaQuery.of(context).size.height * 0.24,
             left: 30,
             right: 30,
             child: Column(

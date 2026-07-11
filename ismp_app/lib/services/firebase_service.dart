@@ -58,6 +58,15 @@ class FirebaseService {
         return null;
       }
 
+      return await signInWithGoogleAccount(googleUser);
+    } catch (e) {
+      debugPrint('Error during Google Sign-in: $e');
+      rethrow;
+    }
+  }
+
+  Future<User?> signInWithGoogleAccount(GoogleSignInAccount googleUser) async {
+    try {
       final GoogleSignInAuthentication googleAuth =
           googleUser.authentication;
 
@@ -116,7 +125,7 @@ class FirebaseService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error during Google Sign-in: $e');
+      debugPrint('Error during Google Sign-in with account: $e');
       rethrow;
     }
   }

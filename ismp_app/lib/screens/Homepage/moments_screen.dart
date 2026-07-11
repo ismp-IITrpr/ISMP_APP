@@ -8,7 +8,7 @@ class MomentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -33,13 +33,13 @@ class MomentsScreen extends StatelessWidget {
               child: Text(
                 'Something went wrong.\nMake sure Firebase is configured!',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.redAccent),
+                style: TextStyle(color: Color(0xFFFF2450)),
               ),
             );
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+            return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
           }
 
           final moments = snapshot.data ?? [];
@@ -76,7 +76,7 @@ class MomentsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                      colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),

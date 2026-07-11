@@ -54,11 +54,11 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1C1C23),
+            backgroundColor: const Color(0xFF1F1635),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: const Row(
               children: [
-                Icon(Icons.error_outline, color: Colors.redAccent),
+                Icon(Icons.error_outline, color: Color(0xFFFF2450)),
                 SizedBox(width: 8),
                 Text('Sign In Failed', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ],
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK', style: TextStyle(color: Color(0xFF8B78FF), fontWeight: FontWeight.bold)),
+                child: const Text('OK', style: TextStyle(color: Color(0xFFD9278D), fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Institute Student',
                     style: TextStyle(
                       fontSize: 26,
-                      color: Color(0xFFE6E6FA),
+                      color: Color(0xFFD6A3C4),
                       fontWeight: FontWeight.bold
 
                     ),
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Mentorship Program',
                     style: TextStyle(
                       fontSize: 26,
-                      color: Color(0xFFE6E6FA),
+                      color: Color(0xFFD6A3C4),
                       fontWeight: FontWeight.bold
                     ),
                   ),
@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'IIT Ropar',
                     style: TextStyle(
                       fontSize: 40,
-                      color: Color(0xFFE6E6FA),
+                      color: Color(0xFFD6A3C4),
                       fontWeight: FontWeight.bold
                     ),
                   ),

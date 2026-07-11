@@ -5,9 +5,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
 import '../../models/team_member.dart';
-import '../../models/profile_data.dart';
+
 import '../../models/moment.dart';
-import '../../services/database_service.dart';
+
 import 'core_team_screen.dart';
 import '../events_screen.dart';
 import '../profile_screen.dart';
@@ -15,7 +15,7 @@ import 'dev_team_screen.dart';
 import '../notifications_screen.dart';
 import 'moments_screen.dart';
 import 'blogs_screen.dart';
-import '../attendance_screen.dart';
+
 import 'package:flutter_animate/flutter_animate.dart';
 import '../pdf_viewer_screen.dart';
 
@@ -48,11 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.code,
         bgImage: 'assets/images/carousel/dev_team_poster.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF0D3E52), Color(0xFF041923)],
+          colors: [Color(0xFF0F0920), Color(0xFF0F0920)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: const Color(0xFF4A3AFF),
+        color: const Color(0xFFD9278D),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const DevTeamScreen()),
@@ -64,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.book,
         bgImage: 'assets/Theme images/iitrpr_logo_2.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF561541), Color(0xFF27061C)],
+          colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: const Color(0xFFFFB020),
+        color: Color(0xFFD9278D),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const PdfViewerScreen(
@@ -84,11 +84,11 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.person,
           bgImage: 'assets/images/carousel/mentor_poster.png',
           gradient: const LinearGradient(
-            colors: [Color(0xFF2B165C), Color(0xFF140733)],
+            colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          color: const Color(0xFF00FFCC),
+          color: const Color(0xFFD9278D),
           onTap: () {
             if (widget.onNavigateToTab != null) {
               widget.onNavigateToTab!(3);
@@ -108,11 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: Icons.event,
         bgImage: 'assets/images/carousel/events_poster.png',
         gradient: const LinearGradient(
-          colors: [Color(0xFF561541), Color(0xFF27061C)],
+          colors: [Color(0xFF1F1635), Color(0xFF0F0920)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        color: const Color(0xFFFFB020),
+        color: Color(0xFFD9278D),
         onTap: () {
           if (widget.onNavigateToTab != null) {
             widget.onNavigateToTab!(1);
@@ -133,10 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 5.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: link.color.withOpacity(0.3), width: 1.5),
+            border: Border.all(color: link.color.withValues(alpha: 0.3), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: link.color.withOpacity(0.15),
+                color: link.color.withValues(alpha: 0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -156,8 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       colors: [
-                        Colors.black.withOpacity(0.85),
-                        Colors.black.withOpacity(0.3),
+                        Colors.black.withValues(alpha: 0.85),
+                        Colors.black.withValues(alpha: 0.3),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.5, 1.0],
@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           link.subtitle,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 14,
                             height: 1.4,
                           ),
@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 10,
                         height: 10,
                         decoration: const BoxDecoration(
-                          color: Colors.red,
+                          color: Color(0xFFFF2450),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -316,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text(
                 'View all',
                 style: TextStyle(
-                  color: Color(0xFF4A3AFF),
+                  color: Color(0xFFE0B0FF),
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -341,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
-                    color: Color(0xFF4A3AFF),
+                    color: Color(0xFFD9278D),
                     strokeWidth: 2,
                   ),
                 ),
@@ -349,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             if (snapshot.hasError) {
               return const Center(
-                child: Text('Error', style: TextStyle(color: Colors.redAccent)),
+                child: Text('Error', style: TextStyle(color: Color(0xFFFF2450))),
               );
             }
             final moments = snapshot.data ?? [];
@@ -391,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -435,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text(
                 'View all',
                 style: TextStyle(
-                  color: Color(0xFF4A3AFF),
+                  color: Color(0xFFE0B0FF),
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -456,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.all(24.0),
-                child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+                child: CircularProgressIndicator(color: Color(0xFFD9278D)),
               ),
             ),
           );
@@ -492,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               'ISMP is a student-run mentorship program dedicated to helping freshers transition smoothly into campus life. We provide guidance, support, and a welcoming community.',
               style: TextStyle(
-                color: Colors.grey.shade400,
+                color: Colors.white,
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -509,42 +509,42 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                child: Row(
-                  children: [
-                    const Text(
-                      'ISMP Core Team',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const CoreTeamScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'View All →',
-                        style: TextStyle(
-                          color: Color(0xFF4A3AFF),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+            child: Row(
+              children: [
+                const Text(
+                  'ISMP Core Team',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
                 ),
-              )
-              .animate()
-              .fadeIn(duration: 800.ms)
-              .slideX(begin: -0.05, curve: Curves.easeOutQuad),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const CoreTeamScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'View All →',
+                    style: TextStyle(
+                      color: Color(0xFFE0B0FF),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+            .animate()
+            .fadeIn(duration: 800.ms)
+            .slideX(begin: -0.05, curve: Curves.easeOutQuad),
           SizedBox(
             height: 190,
             child: ListView.builder(
@@ -593,8 +593,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _currentCarouselIndex == entry.key
-                      ? const Color(0xFF00FFCC)
-                      : Colors.white.withOpacity(0.2),
+                      ? const Color(0xFFD9278D)
+                      : Colors.white.withValues(alpha: 0.2),
                 ),
               );
             }).toList(),
@@ -612,10 +612,10 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF15151A),
+          backgroundColor: const Color(0xFF1F1635),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: const Color(0xFF00FFCC).withOpacity(0.3)),
+            side: BorderSide(color: const Color(0xFFD9278D).withValues(alpha: 0.3)),
           ),
           contentPadding: const EdgeInsets.all(24),
           title: Row(
@@ -641,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       member.role,
                       style: const TextStyle(
-                        color: Color(0xFF00FFCC),
+                        color: Color(0xFFD9278D),
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                       ),
@@ -664,7 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => Navigator.pop(context),
               child: const Text(
                 'Close',
-                style: TextStyle(color: Color(0xFF00FFCC)),
+                style: TextStyle(color: Color(0xFFD9278D)),
               ),
             ),
           ],
@@ -688,9 +688,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(8, 82, 8, 12),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -710,9 +710,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     member.role.toUpperCase(),
                     style: TextStyle(
-                      color: isFaculty
-                          ? const Color(0xFF00FFCC)
-                          : const Color(0xFFB4B0FF),
+                      color: const Color(0xFFD9278D),
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.0,
@@ -732,12 +730,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 gradient: LinearGradient(
                   colors: isFaculty
                       ? [
-                          const Color(0xFF00FFCC),
-                          const Color(0xFF00FFCC).withOpacity(0.1),
+                          const Color(0xFFD9278D),
+                          const Color(0xFFD9278D).withValues(alpha: 0.1),
                         ]
                       : [
-                          const Color(0xFF4A3AFF),
-                          const Color(0xFF00FFCC).withOpacity(0.5),
+                          const Color(0xFFD9278D),
+                          const Color(0xFFD9278D).withValues(alpha: 0.5),
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -746,9 +744,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   BoxShadow(
                     color:
                         (isFaculty
-                                ? const Color(0xFF00FFCC)
-                                : const Color(0xFF4A3AFF))
-                            .withOpacity(0.3),
+                                ? const Color(0xFFD9278D)
+                                : const Color(0xFFD9278D))
+                            .withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -757,7 +755,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CircleAvatar(
                 radius: 52,
                 backgroundImage: AssetImage(member.image),
-                backgroundColor: const Color(0xFF15151A),
+                backgroundColor: const Color(0xFF1F1635),
               ),
             ),
           ],
@@ -825,7 +823,7 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1C1C23),
+                      color: const Color(0xFF1F1635),
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: const Center(
@@ -853,8 +851,8 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
               height: 6,
               decoration: BoxDecoration(
                 color: _currentPage == i
-                    ? const Color(0xFF4A3AFF)
-                    : Colors.white.withOpacity(0.22),
+                    ? const Color(0xFFD9278D)
+                    : Colors.white.withValues(alpha: 0.22),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -876,9 +874,9 @@ class _BlogCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C23),
+          color: const Color(0xFF1F1635),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: post.tag.color.withOpacity(0.15), width: 1),
+          border: Border.all(color: post.tag.color.withValues(alpha: 0.15), width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18),
@@ -921,7 +919,7 @@ class _BlogCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 13,
-                    backgroundColor: post.tag.color.withOpacity(0.25),
+                    backgroundColor: post.tag.color.withValues(alpha: 0.25),
                     child: Text(
                       post.author[0],
                       style: TextStyle(
@@ -974,7 +972,7 @@ class _TagBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: tag.bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: tag.color.withOpacity(0.4), width: 1),
+        border: Border.all(color: tag.color.withValues(alpha: 0.4), width: 1),
       ),
       child: Text(
         tag.label,
@@ -996,9 +994,9 @@ class _BlogDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F13),
+        backgroundColor: const Color(0xFF0F0920),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -1030,7 +1028,7 @@ class _BlogDetailScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor: post.tag.color.withOpacity(0.25),
+                  backgroundColor: post.tag.color.withValues(alpha: 0.25),
                   child: Text(
                     post.author[0],
                     style: TextStyle(
@@ -1047,7 +1045,7 @@ class _BlogDetailScreen extends StatelessWidget {
                     Text(
                       post.author,
                       style: const TextStyle(
-                        color: Colors.white70,
+                        color: const Color(0xFFE0B0FF),
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1055,7 +1053,7 @@ class _BlogDetailScreen extends StatelessWidget {
                     Text(
                       '${post.date}  ·  ${post.readMinutes} min read',
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: const Color(0xFFE0B0FF),
                         fontSize: 11,
                       ),
                     ),
@@ -1064,7 +1062,7 @@ class _BlogDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            Container(height: 1, color: Colors.white.withOpacity(0.06)),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.06)),
             const SizedBox(height: 24),
             Text(
               post.content,

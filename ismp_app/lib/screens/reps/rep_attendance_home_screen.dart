@@ -4,7 +4,7 @@ import '../../models/events.dart';
 import '../../services/firebase_service.dart';
 import '../reps/live_attendance_screen.dart';
 import '../../widgets/active_session_button.dart';
-import 'rep_access.dart';
+import '../../services/rep_access.dart';
 
 class RepAttendanceHomeScreen extends StatefulWidget {
   const RepAttendanceHomeScreen({super.key});
@@ -30,7 +30,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C23),
+        backgroundColor: const Color(0xFF1F1635),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           'Delete Event?',
@@ -49,7 +49,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text(
               'Delete',
-              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Color(0xFFFF2450), fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -63,14 +63,14 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Event deleted successfully!'),
-              backgroundColor: Color(0xFFF44336),
+              backgroundColor: Color(0xFFFF2450),
             ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+            SnackBar(content: Text('Error: $e'), backgroundColor: Color(0xFFFF2450)),
           );
         }
       }
@@ -118,7 +118,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF1C1C23),
+      backgroundColor: const Color(0xFF1F1635),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -249,8 +249,8 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                             child: ChoiceChip(
                               label: Text(degree, style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 13)),
                               selected: isSel,
-                              selectedColor: const Color(0xFF8B78FF),
-                              backgroundColor: const Color(0xFF1C1C23),
+                              selectedColor: const Color(0xFFD9278D),
+                              backgroundColor: const Color(0xFF1F1635),
                               onSelected: (selected) {
                                 if (selected) setModalState(() => selectedDegree = degree);
                               },
@@ -274,8 +274,8 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                           return FilterChip(
                             label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
                             selected: isSel,
-                            selectedColor: const Color(0xFF8B78FF),
-                            backgroundColor: const Color(0xFF1C1C23),
+                            selectedColor: const Color(0xFFD9278D),
+                            backgroundColor: const Color(0xFF1F1635),
                             checkmarkColor: Colors.white,
                             onSelected: (selected) {
                               setModalState(() {
@@ -335,7 +335,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Event updated successfully!'),
-                                        backgroundColor: Color(0xFF4CAF50),
+                                        backgroundColor: Color(0xFFD9278D),
                                       ),
                                     );
                                   }
@@ -344,14 +344,14 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('Failed to update event: $e'),
-                                        backgroundColor: Colors.redAccent,
+                                        backgroundColor: Color(0xFFFF2450),
                                       ),
                                     );
                                   }
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF8B78FF),
+                                backgroundColor: const Color(0xFFD9278D),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
@@ -389,24 +389,24 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: Icon(icon, color: const Color(0xFF8B78FF)),
+        prefixIcon: Icon(icon, color: const Color(0xFFD9278D)),
         filled: true,
-        fillColor: const Color(0xFF0F0F13),
+        fillColor: const Color(0xFF0F0920),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF8B78FF)),
+          borderSide: const BorderSide(color: Color(0xFFD9278D)),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderSide: const BorderSide(color: Color(0xFFFF2450)),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderSide: const BorderSide(color: Color(0xFFFF2450)),
         ),
       ),
     );
@@ -423,13 +423,13 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F0F13),
+          color: const Color(0xFF0F0920),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B78FF), size: 20),
+            Icon(icon, color: const Color(0xFFD9278D), size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -449,9 +449,9 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
     final String repClub = getRepClubName(email) ?? 'Robotics';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
+      backgroundColor: const Color(0xFF0F0920),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F13),
+        backgroundColor: const Color(0xFF0F0920),
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -462,40 +462,16 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4A3AFF).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF4A3AFF).withOpacity(0.5),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                repClub.toUpperCase(),
-                style: const TextStyle(
-                  color: Color(0xFF8B78FF),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: StreamBuilder<List<EventModel>>(
           stream: FirebaseService.instance.streamEventsForClub(repClub),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: Color(0xFF4A3AFF)));
+              return const Center(child: CircularProgressIndicator(color: Color(0xFFD9278D)));
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+              return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Color(0xFFFF2450))));
             }
             final clubSessions = snapshot.data ?? [];
             if (clubSessions.isEmpty) {
@@ -530,10 +506,10 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                   margin: const EdgeInsets.only(bottom: 14),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C23),
+                    color: const Color(0xFF1F1635),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: const Color(0xFF4A3AFF).withOpacity(0.2),
+                      color: const Color(0xFFD9278D).withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -542,12 +518,12 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A3AFF).withOpacity(0.15),
+                          color: const Color(0xFFD9278D).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(13),
                         ),
                         child: const Icon(
                           Icons.groups_outlined,
-                          color: Color(0xFF8B78FF),
+                          color: Color(0xFFD9278D),
                           size: 22,
                         ),
                       ),
@@ -568,14 +544,14 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                             Text(
                               '${event.date} • ${event.time}',
                               style: const TextStyle(
-                                color: Color(0xFF8B8B9B),
+                                color: Color(0xFFD6A3C4),
                                 fontSize: 12,
                               ),
                             ),
                             Text(
                               event.venue,
                               style: const TextStyle(
-                                color: Color(0xFF8B8B9B),
+                                color: Color(0xFFD6A3C4),
                                 fontSize: 12,
                               ),
                             ),
@@ -605,9 +581,9 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.delete, size: 14, color: Colors.red.shade400),
+                                        Icon(Icons.delete, size: 14, color: Color(0xFFFF2450)),
                                         const SizedBox(width: 4),
-                                        Text('Delete', style: TextStyle(color: Colors.red.shade400, fontSize: 11)),
+                                        Text('Delete', style: TextStyle(color: Color(0xFFFF2450), fontSize: 11)),
                                       ],
                                     ),
                                   ),
@@ -625,10 +601,10 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50).withOpacity(0.12),
+                                color: const Color(0xFFD9278D).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFF4CAF50).withOpacity(0.4),
+                                  color: const Color(0xFFD9278D).withValues(alpha: 0.4),
                                 ),
                               ),
                               child: const Row(
@@ -637,13 +613,13 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                   Icon(
                                     Icons.check_circle_outline,
                                     size: 14,
-                                    color: Color(0xFF4CAF50),
+                                    color: Color(0xFFD9278D),
                                   ),
                                   SizedBox(width: 6),
                                   Text(
                                     'Completed',
                                     style: TextStyle(
-                                      color: Color(0xFF4CAF50),
+                                      color: Color(0xFFD9278D),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -651,13 +627,11 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                 ],
                               ),
                             )
-                          : (event.getFormattedAudience() == 'All Members'
-                              ? const SizedBox()
-                              : ActiveSessionButton(
-                                  event: event,
-                                  defaultText: 'Start',
-                                  defaultIcon: Icons.qr_code_scanner,
-                                )),
+                          : ActiveSessionButton(
+                              event: event,
+                              defaultText: 'Start',
+                              defaultIcon: Icons.qr_code_scanner,
+                            ),
                     ],
                   ),
                 );

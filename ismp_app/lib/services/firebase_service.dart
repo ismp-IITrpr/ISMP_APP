@@ -53,18 +53,12 @@ class FirebaseService {
   // Google Sign-In with Batch 2026/Fresher and Rep restriction
   Future<User?> signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId:
-            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
-      );
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return null; // User cancelled
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -167,10 +161,7 @@ class FirebaseService {
     DatabaseService.clearCache();
     await _auth.signOut();
     try {
-      await GoogleSignIn(
-        clientId:
-            '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
-      ).signOut();
+      await GoogleSignIn.instance.signOut();
     } catch (_) {}
   }
 
@@ -661,7 +652,7 @@ class FirebaseService {
     final clubName = event?.club ?? '';
     final date = event?.date ?? '';
     final time = event?.time ?? '';
-    final dotColor = event?.dotColor ?? const Color(0xFF4A3AFF);
+    final dotColor = event?.dotColor ?? const Color(0xFFD9278D);
 
     final scansSnapshot = await _firestore
         .collection('attendance_sessions')
@@ -911,8 +902,8 @@ class FirebaseService {
     String club = '',
   }) async {
     final color = type == 'C'
-        ? const Color(0xFF8B78FF)
-        : const Color(0xFFB0C4DE);
+        ? const Color(0xFFD9278D)
+        : const Color(0xFFD6A3C4);
     await _firestore.collection('events').add({
       'title': title,
       'date': date,
@@ -1046,7 +1037,7 @@ class FirebaseService {
           .where(FieldPath.documentId, isGreaterThanOrEqualTo: upperQuery)
           .where(
             FieldPath.documentId,
-            isLessThanOrEqualTo: upperQuery + '\uf8ff',
+            isLessThanOrEqualTo: '$upperQuery\uf8ff',
           )
           .limit(5)
           .get();

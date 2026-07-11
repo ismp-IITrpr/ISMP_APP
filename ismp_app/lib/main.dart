@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -22,7 +23,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+  await GoogleSignIn.instance.initialize(
+    serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
+  );
   // Run seeding asynchronously so it doesn't block the splash screen if the user is offline
   FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
     debugPrint('Seeding failed: $e');
@@ -60,11 +63,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F0F13),
-        primaryColor: const Color(0xFF4A3AFF),
+        scaffoldBackgroundColor: const Color(0xFF0F0920),
+        primaryColor: const Color(0xFFD9278D),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF1C1C23),
-          selectedItemColor: Color(0xFF4A3AFF),
+          backgroundColor: Color(0xFF1F1635),
+          selectedItemColor: Color(0xFFD9278D),
           unselectedItemColor: Colors.grey,
         ),
       ),
@@ -86,9 +89,9 @@ class AuthGate extends StatelessWidget {
         // Show a splash-style loading while checking
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF0F0F13),
+            backgroundColor: Color(0xFF0F0920),
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+              child: CircularProgressIndicator(color: Color(0xFFD9278D)),
             ),
           );
         }
@@ -105,9 +108,9 @@ class AuthGate extends StatelessWidget {
           builder: (context, repSnapshot) {
             if (repSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                backgroundColor: Color(0xFF0F0F13),
+                backgroundColor: Color(0xFF0F0920),
                 body: Center(
-                  child: CircularProgressIndicator(color: Color(0xFF4A3AFF)),
+                  child: CircularProgressIndicator(color: Color(0xFFD9278D)),
                 ),
               );
             }

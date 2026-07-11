@@ -79,7 +79,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       builder: (context) => _buildResultDialog(
         isSuccess: true,
         icon: Icons.check_circle_outline,
-        iconColor: const Color(0xFF4CAF50),
+        iconColor: const Color(0xFFD9278D),
         title: 'Success!',
         message: 'Your attendance has been\nmarked successfully.',
         buttonText: 'Great!',
@@ -94,7 +94,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       builder: (context) => _buildResultDialog(
         isSuccess: false,
         icon: Icons.cancel_outlined,
-        iconColor: const Color(0xFFF44336),
+        iconColor: const Color(0xFFFF2450),
         title: 'Failed!',
         message: message ?? 'The attendance window for this event has closed (2-minute limit).',
         buttonText: 'Go Back',
@@ -111,7 +111,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
     required String buttonText,
   }) {
     return Dialog(
-      backgroundColor: const Color(0xFF1C1C23),
+      backgroundColor: const Color(0xFF1F1635),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -152,7 +152,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
                   Navigator.pop(context); // Go back to attendance screen
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A3AFF),
+                  backgroundColor: const Color(0xFFD9278D),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -195,7 +195,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF4A3AFF), width: 3),
+                border: Border.all(color: const Color(0xFFD9278D), width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),

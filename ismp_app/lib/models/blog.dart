@@ -21,30 +21,30 @@ extension BlogTagExtension on BlogTag {
   Color get color {
     switch (this) {
       case BlogTag.club:
-        return const Color(0xFF8B78FF);
+        return const Color(0xFFE0B0FF);
       case BlogTag.academic:
-        return const Color(0xFF2196F3);
+        return const Color(0xFFE0B0FF);
       case BlogTag.sports:
-        return const Color(0xFFFF9800);
+        return const Color(0xFFE0B0FF);
       case BlogTag.tech:
-        return const Color(0xFF4CAF50);
+        return const Color(0xFFE0B0FF);
       case BlogTag.campus:
-        return const Color(0xFFE91E63);
+        return const Color(0xFFE0B0FF);
     }
   }
 
   Color get bgColor {
     switch (this) {
       case BlogTag.club:
-        return const Color(0xFF2E2A4A);
+        return const Color(0xFFD9278D).withValues(alpha: 0.3);
       case BlogTag.academic:
-        return const Color(0xFF1A2E42);
+        return const Color(0xFFD9278D).withValues(alpha: 0.3);
       case BlogTag.sports:
-        return const Color(0xFF3A2800);
+        return const Color(0xFFD9278D).withValues(alpha: 0.3);
       case BlogTag.tech:
-        return const Color(0xFF1A3020);
+        return const Color(0xFFD9278D).withValues(alpha: 0.3);
       case BlogTag.campus:
-        return const Color(0xFF3A1525);
+        return const Color(0xFFD9278D).withValues(alpha: 0.3);
     }
   }
 }

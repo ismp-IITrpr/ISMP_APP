@@ -38,15 +38,15 @@ class _PresentStudent {
 }
 
 class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
-  static const Color bg = Color(0xFF0F0F13);
-  static const Color appBarBg = Color(0xFF090A0F);
-  static const Color surface = Color(0xFF12131A);
-  static const Color card = Color(0xFF1C1C23);
-  static const Color primary = Color(0xFF4A3AFF);
-  static const Color primaryLight = Color(0xFF8B78FF);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color error = Color(0xFFF44336);
-  static const Color textGray = Color(0xFF8B8B9B);
+  static const Color bg = Color(0xFF0F0920);
+  static const Color appBarBg = Color(0xFF0F0920);
+  static const Color surface = Color(0xFF0F0920);
+  static const Color card = Color(0xFF1F1635);
+  static const Color primary = Color(0xFFD9278D);
+  static const Color primaryLight = Color(0xFFD9278D);
+  static const Color success = Color(0xFFD9278D);
+  static const Color error = Color(0xFFFF2450);
+  static const Color textGray = Color(0xFFD6A3C4);
 
   late Duration _remaining;
   Timer? _timer;
@@ -200,7 +200,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
       decoration: BoxDecoration(
         color: card,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -208,7 +208,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: primary.withOpacity(0.15),
+              color: primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(13),
             ),
             child: const Icon(Icons.groups_outlined, color: primaryLight, size: 22),
@@ -246,12 +246,12 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
         color: surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: _qrActive ? primary.withOpacity(0.3) : Colors.white.withOpacity(0.05),
+          color: _qrActive ? primary.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.05),
         ),
         boxShadow: _qrActive
             ? [
           BoxShadow(
-            color: primary.withOpacity(0.15),
+            color: primary.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           )
@@ -300,7 +300,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
               ),
               child: Center(
                 child: _qrActive
-                    ? Icon(Icons.qr_code_2_rounded, size: 140, color: Colors.black.withOpacity(0.85))
+                    ? Icon(Icons.qr_code_2_rounded, size: 140, color: Colors.black.withValues(alpha: 0.85))
                     : const Icon(Icons.qr_code_2_rounded, size: 140, color: Colors.black26),
               ),
             ),
@@ -335,7 +335,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
                   ),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
-                      color: (_qrActive ? error : primaryLight).withOpacity(0.4),
+                      color: (_qrActive ? error : primaryLight).withValues(alpha: 0.4),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -357,7 +357,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
       decoration: BoxDecoration(
         color: card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +393,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
               icon: const Icon(Icons.person_add_alt_1_rounded, size: 18, color: primaryLight),
               label: const Text('Add student', style: TextStyle(color: primaryLight, fontWeight: FontWeight.w600)),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: primaryLight.withOpacity(0.35)),
+                side: BorderSide(color: primaryLight.withValues(alpha: 0.35)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -428,7 +428,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
       decoration: BoxDecoration(
         color: card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,7 +443,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: primary.withOpacity(0.12),
+                  color: primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -459,7 +459,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
                 'No one marked yet — scans and manual adds will show up here.',
-                style: TextStyle(color: textGray.withOpacity(0.8), fontSize: 12),
+                style: TextStyle(color: textGray.withValues(alpha: 0.8), fontSize: 12),
               ),
             )
           else
@@ -497,7 +497,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
               margin: const EdgeInsets.only(right: 6),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
+                color: Colors.white.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text('Manual', style: TextStyle(color: textGray, fontSize: 10)),
@@ -521,7 +521,7 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: primary.withOpacity(0.5),
+          disabledBackgroundColor: primary.withValues(alpha: 0.5),
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),

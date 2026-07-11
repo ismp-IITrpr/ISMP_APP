@@ -165,7 +165,7 @@ class AttendanceService {
         time: event?.time ?? '',
         venue: event?.venue ?? '',
         isPresent: true,
-        iconColor: event?.dotColor ?? const Color(0xFF4A3AFF),
+        iconColor: event?.dotColor ?? const Color(0xFFD9278D),
         markedAt: DateTime.now(),
       );
 

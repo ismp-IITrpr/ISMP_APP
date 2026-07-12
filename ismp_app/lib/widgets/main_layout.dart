@@ -6,6 +6,7 @@ import '../screens/profile_screen.dart';
 import '../screens/reps/rep_dashboard.dart';
 import '../services/firebase_service.dart';
 import '../theme/app_theme.dart';
+import 'chatbot_widget.dart';
 
 class MainLayout extends StatefulWidget {
   final bool isRep;
@@ -62,16 +63,18 @@ class _MainLayoutState extends State<MainLayout> {
       decoration: const BoxDecoration(
         gradient: AppTheme.backgroundGradient,
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          items: _navItems,
+      child: ChatbotWidget(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            items: _navItems,
+          ),
         ),
       ),
     );
   }
-}
+}

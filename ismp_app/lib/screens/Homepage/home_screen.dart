@@ -564,41 +564,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          CarouselSlider(
-                options: CarouselOptions(
-                  height: 180.0,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 4),
-                  enlargeCenterPage: true,
-                  viewportFraction: 0.9,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentCarouselIndex = index;
-                    });
-                  },
-                ),
-                items: _buildCarouselCards(context),
-              )
-              .animate()
-              .fadeIn(duration: 800.ms, delay: 200.ms)
-              .slideY(begin: 0.1),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: _buildCarouselCards(context).asMap().entries.map((entry) {
-              return Container(
-                width: 8.0,
-                height: 8.0,
-                margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _currentCarouselIndex == entry.key
-                      ? AppColors.primary
-                      : Colors.white.withValues(alpha: 0.2),
-                ),
+          StatefulBuilder(
+            builder: (context, setStateLocal) {
+              return Column(
+                children: [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 180.0,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 4),
+                      enlargeCenterPage: true,
+                      viewportFraction: 0.9,
+                      onPageChanged: (index, reason) {
+                        setStateLocal(() {
+                          _currentCarouselIndex = index;
+                        });
+                      },
+                    ),
+                    items: _buildCarouselCards(context),
+                  )
+                  .animate(key: const ValueKey('carousel_animate'))
+                  .fadeIn(duration: 800.ms, delay: 200.ms)
+                  .slideY(begin: 0.1),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _buildCarouselCards(context).asMap().entries.map((entry) {
+                      return Container(
+                        width: 8.0,
+                        height: 8.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentCarouselIndex == entry.key
+                              ? AppColors.primary
+                              : Colors.white.withValues(alpha: 0.2),
+                        ),
+                      );
+                    }).toList(),
+                  ).animate(key: const ValueKey('dots_animate')).fadeIn(duration: 800.ms, delay: 300.ms),
+                ],
               );
-            }).toList(),
-          ).animate().fadeIn(duration: 800.ms, delay: 300.ms),
+            },
+          ),
           const SizedBox(height: 24),
         ],
       ),

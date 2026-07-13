@@ -209,13 +209,10 @@ class FirebaseService {
   // Seeds database with default mock data if empty
   Future<void> seedDatabaseIfNeeded() async {
     try {
-      // 1. Seed Blogs if empty
-      final blogsSnapshot = await _firestore.collection('blogs').limit(1).get();
-      if (blogsSnapshot.docs.isEmpty) {
-        debugPrint('Seeding blogs collection...');
-        for (var post in blogPosts) {
-          await _firestore.collection('blogs').doc(post.id).set(post.toMap());
-        }
+      // 1. Seed & Sync Blogs
+      debugPrint('Syncing blogs collection with local mock data...');
+      for (var post in blogPosts) {
+        await _firestore.collection('blogs').doc(post.id).set(post.toMap());
       }
 
       // 2. Events are now managed through Firebase console only

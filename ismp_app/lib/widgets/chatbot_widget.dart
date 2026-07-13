@@ -168,12 +168,17 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
 
   // ── Chat overlay ──────────────────────────────────────────────────
   Widget _buildChatOverlay(Size screenSize) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final bottomPadding = keyboardHeight > 0 ? (16.0 + keyboardHeight) : 90.0;
+
+    // Calculate a dynamic height so the chat window fits in the available screen space above the keyboard
+    final availableHeight = screenSize.height - keyboardHeight - (keyboardHeight > 0 ? 116.0 : 180.0);
+    final chatHeight = min(availableHeight, 520.0).clamp(250.0, 520.0);
     final chatWidth = min(screenSize.width - 32, 380.0);
-    final chatHeight = min(screenSize.height * 0.65, 520.0);
 
     return Positioned(
       right: 16,
-      bottom: 90,
+      bottom: bottomPadding,
       child: Material(
         color: Colors.transparent,
         child: Container(

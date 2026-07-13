@@ -22,23 +22,26 @@ jobs:
           mkdir -p build/macos/SourcePackages
         working-directory: ./ismp_app
 
-      - name: Force older device_info_plus (no visionOS code)
-        run: |
-          printf '\ndependency_overrides:\n  device_info_plus: "10.1.2"\n' >> pubspec.yaml
-          echo "--- pubspec.yaml tail ---"
-          tail -5 pubspec.yaml
-        working-directory: ./ismp_app
-
       - name: Install dependencies
         run: flutter pub get
         working-directory: ./ismp_app
+
+      - name: Patch device_info_plus visionOS code
+        run: |
+          PLUGIN_FILE=$(find ~/.pub-cache -name "FPPDeviceInfoPlusPlugin.m" -path "*/device_info_plus*" | head -1)
+          echo "=== BEFORE patch (lines 30-38) ==="
+          sed -n '30,38p' "$PLUGIN_FILE"
+          sed -i '' 's/isiOSAppOnVision/isLowPowerModeEnabled/g' "$PLUGIN_FILE"
+          echo "=== AFTER patch (lines 30-38) ==="
+          sed -n '30,38p' "$PLUGIN_FILE"
+          grep -c "isiOSAppOnVision" "$PLUGIN_FILE" && echo "PATCH FAILED" || echo "PATCH OK"
         
       - name: Force iOS Deployment Target to 15.0
         run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/Runner.xcodeproj/project.pbxproj
         working-directory: ./ismp_app
 
       - name: Build iOS App (Unsigned)
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --no-pub
         working-directory: ./ismp_app
 
       - name: Package Application into IPA

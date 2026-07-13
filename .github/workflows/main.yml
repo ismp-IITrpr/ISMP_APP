@@ -1,0 +1,38 @@
+name: Build iOS IPA (Unsigned)
+
+on:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ./ismp_app
+
+      - name: Build iOS App (Unsigned)
+        run: flutter build ios --release --no-codesign
+        working-directory: ./ismp_app
+
+      - name: Package Application into IPA
+        run: |
+          cd ismp_app
+          mkdir -p Payload
+          mv build/ios/iphoneos/Runner.app Payload/
+          zip -qq -r App.ipa Payload
+        
+      - name: Upload IPA as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa-unsigned
+          path: ismp_app/App.ipa

@@ -25,6 +25,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
         working-directory: ./ismp_app
+
+      - name: Fix device_info_plus visionOS compilation
+        run: |
+          PLUGIN_FILE=$(find ~/.pub-cache -name "FPPDeviceInfoPlusPlugin.m" -path "*/device_info_plus*" | head -1)
+          if [ -n "$PLUGIN_FILE" ]; then
+            sed -i '' 's/processInfo.isiOSAppOnVision/NO/g' "$PLUGIN_FILE"
+            echo "Patched: $PLUGIN_FILE"
+          fi
         
       - name: Force iOS Deployment Target to 15.0
         run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/Runner.xcodeproj/project.pbxproj

@@ -74,10 +74,23 @@
 		<false/>
 		<key>FirebaseMessagingAutoInitEnabled</key>
 		<false/>
-		<key>UIBackgroundModes</key>
+				<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
 			<string>remote-notification</string>
+		</array>
+		<key>GIDClientID</key>
+		<string>231730406983-6pa8g33hl525i2etbjv5mvphsth378i2.apps.googleusercontent.com</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>com.googleusercontent.apps.231730406983-6pa8g33hl525i2etbjv5mvphsth378i2</string>
+				</array>
+			</dict>
 		</array>
 	</dict>
 </plist>

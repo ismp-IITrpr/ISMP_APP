@@ -16,16 +16,16 @@ jobs:
         with:
           channel: 'stable'
 
-      # THIS FIXES THE RSYNC FOLDER BUG
-      - name: Pre-create build folder for SPM
-        run: mkdir -p build/ios/SourcePackages
+      - name: Pre-create build folders for SPM
+        run: |
+          mkdir -p build/ios/SourcePackages
+          mkdir -p build/macos/SourcePackages
         working-directory: ./ismp_app
 
       - name: Install dependencies
         run: flutter pub get
         working-directory: ./ismp_app
         
-      # THIS FIXES THE FIREBASE TARGET 13.0 BUG
       - name: Force iOS Deployment Target to 15.0
         run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/Runner.xcodeproj/project.pbxproj
         working-directory: ./ismp_app

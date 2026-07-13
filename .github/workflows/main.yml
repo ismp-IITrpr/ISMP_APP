@@ -1,7 +1,7 @@
 name: Build iOS IPA (Unsigned)
 
 on:
-  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-ios:
@@ -18,6 +18,11 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+        working-directory: ./ismp_app
+        
+      # THIS IS THE NEW FIX: It forces the server's Xcode target to 15.0
+      - name: Force iOS Deployment Target to 15.0
+        run: sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/Runner.xcodeproj/project.pbxproj
         working-directory: ./ismp_app
 
       - name: Build iOS App (Unsigned)

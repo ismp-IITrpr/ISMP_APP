@@ -136,18 +136,15 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF7C3AED),
-                        AppColors.primary,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                    border: Border.all(
+                      color: const Color(0xFFFFC107),
+                      width: 2.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(
+                        color: const Color(0xFFFFC107).withValues(
                           alpha: 0.3 + _pulseController.value * 0.25,
                         ),
                         blurRadius: 16 + _pulseController.value * 8,
@@ -157,7 +154,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                   ),
                   child: Icon(
                     _isChatOpen ? Icons.close : Icons.smart_toy_rounded,
-                    color: Colors.white,
+                    color: const Color(0xFFF0F0F0),
                     size: 28,
                   ),
                 );

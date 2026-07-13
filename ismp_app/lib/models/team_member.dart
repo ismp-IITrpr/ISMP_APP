@@ -127,6 +127,14 @@ final List<TeamMember> devTeamMembers = [
     instagram: 'https://www.instagram.com/deeptiashwani7?igsh=MTJlcnd2eDlmNTl3eA==',
     mail: '2025eeb1319@iitrpr.ac.in',
   ),
+  TeamMember(
+    name: 'Gurnoor Singh',
+    role: 'DEVELOPER',
+    image: 'img/2026/2025CSB1196.jpg',
+    phone: '+91 95015 87214',
+    instagram: 'https://www.instagram.com/singh_gnoor?igsh=enR4MjB6M2E0Mm1p',
+    mail: '2025csb1196@iitrpr.ac.in',
+  ),
     TeamMember(
     name: 'Digvijaya Singh',
     role: 'DEVELOPER',

@@ -32,7 +32,6 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
   static const Color textGray = AppColors.mutedText;
 
   bool _isExporting = false;
-  bool _isEnding = false;
   Timer? _uiTimer;
 
   final TextEditingController _nameController = TextEditingController();
@@ -84,7 +83,6 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
     if (confirm != true) return;
 
-    setState(() => _isEnding = true);
     try {
       await FirebaseService.instance.endSession(widget.sessionId);
       if (mounted) {
@@ -101,8 +99,6 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
           SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
         );
       }
-    } finally {
-      if (mounted) setState(() => _isEnding = false);
     }
   }
 
@@ -185,6 +181,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
       _autocompleteRollController?.clear();
       _rollController.clear();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add: $e')),
       );

@@ -236,7 +236,7 @@ class DatabaseService {
           'time': e.time,
           'venue': e.venue,
           'isPresent': e.isPresent,
-          'iconColor': e.iconColor.value,
+          'iconColor': e.iconColor.toARGB32(),
           'markedAt': e.markedAt?.toIso8601String(),
         };
       }).toList();

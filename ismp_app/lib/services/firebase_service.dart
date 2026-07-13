@@ -21,7 +21,6 @@ class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String? _mockEmail;
   MentorProfile? _cachedMentor;
 
   /// The current user's mentor, loaded after sign-in.
@@ -48,8 +47,8 @@ class FirebaseService {
     }
   }
 
-  // Get current user email (checks mock email first for testing)
-  String? get currentUserEmail => _mockEmail ?? _auth.currentUser?.email;
+  // Get current user email
+  String? get currentUserEmail => _auth.currentUser?.email;
 
   Future<User?> signInWithGoogle() async {
     try {
@@ -86,8 +85,6 @@ class FirebaseService {
         final isStudent = isAllowedStudent(email);
 
         if (isRep || isStudent) {
-          _mockEmail = null; // Clear mock on successful Google Sign-in
-
           if (isStudent && email != null) {
             // Extract roll number (e.g. 2026CSB1123)
             final rollNo = email.split('@')[0].toUpperCase();
@@ -95,7 +92,8 @@ class FirebaseService {
                 .collection('users')
                 .doc(rollNo)
                 .get();
-            if (!userDoc.exists) {
+            final userData = userDoc.data();
+            if (!userDoc.exists || userData == null || !userData.containsKey('name')) {
               debugPrint(
                 'Auto-creating student profile document for $rollNo in Firestore...',
               );
@@ -107,7 +105,7 @@ class FirebaseService {
                 'stickersCollected': 0,
                 'profileUrl': user.photoURL ?? '',
                 'mentorRollNo': '2024MEB1358', // Default mentor Kanika
-              });
+              }, SetOptions(merge: true));
             }
             // Cache the mentor for quick access across screens
             await loadMentor();
@@ -143,33 +141,15 @@ class FirebaseService {
             email: lowerEmail,
             password: cleanPassword,
           );
-      _mockEmail = null;
       return userCredential.user;
     } catch (e) {
       debugPrint('Firebase email login failed: $e');
-
-      // Fallback bypass for the dummy testing account
-      if (lowerEmail == 'repaccess@gmail.com' && cleanPassword == '12345678') {
-        debugPrint('Using mock bypass for tester account repaccess@gmail.com');
-        _mockEmail = 'repaccess@gmail.com';
-
-        // If not authenticated in firebase, sign in anonymously to obtain a valid Firebase session
-        if (_auth.currentUser == null) {
-          try {
-            await _auth.signInAnonymously();
-          } catch (anonError) {
-            debugPrint('Failed anonymous fallback sign-in: $anonError');
-          }
-        }
-        return _auth.currentUser;
-      }
       rethrow;
     }
   }
 
   // Sign out helper
   Future<void> signOut() async {
-    _mockEmail = null;
     _cachedMentor = null;
     DatabaseService.clearCache();
     await _auth.signOut();
@@ -305,7 +285,7 @@ class FirebaseService {
             {'name': 'Coding Club', 'image': 'coding.png'},
             {'name': 'FinCom', 'image': 'fincom.png'},
             {'name': 'CIM', 'image': 'cim.png'},
-            {'name': 'Iota Cluster', 'image': 'BOST.png'},
+            {'name': 'Iota Cluster', 'image': 'iota.png'},
             {'name': 'Automotive', 'image': 'auto.png'},
             {'name': 'Aeromodelling', 'image': 'aero.png'},
           ],
@@ -382,42 +362,41 @@ class FirebaseService {
 
   /// Maps authorized club rep emails to their club name.
   static const Map<String, String> _repEmailToClub = {
-    'act-sports-athletics1@iitrpr.ac.in': 'Athletics Club',
-    'undekha@iitrpr.ac.in': 'UNDEKHA',
-    'act-sports-chess1@iitrpr.ac.in': 'Chess Club',
-    'enarrators@iitrpr.ac.in': 'The Enarrators',
-    'fincom@iitrpr.ac.in': 'FINCOM',
-    'act-sports-cricket1@iitrpr.ac.in': 'Cricket Club',
-    'cimclub@iitrpr.ac.in': 'Cim',
-    'act-sports-basketball1@iitrpr.ac.in': 'Basketball Club',
-    'automotiveclub@iitrpr.ac.in': 'Automotive Club',
+    'act-sports-athletics1@iitrpr.ac.in': 'Athletic',
+    'undekha@iitrpr.ac.in': 'Undekha',
+    'act-sports-chess1@iitrpr.ac.in': 'Chess',
+    'enarrators@iitrpr.ac.in': 'Ennarators',
+    'fincom@iitrpr.ac.in': 'FinCom',
+    'act-sports-cricket1@iitrpr.ac.in': 'Cricket',
+    'cimclub@iitrpr.ac.in': 'CIM',
+    'act-sports-basketball1@iitrpr.ac.in': 'Basketball',
+    'automotiveclub@iitrpr.ac.in': 'Automotive',
     'codingclub@iitrpr.ac.in': 'Coding Club',
-    'act-sports-badminton1@iitrpr.ac.in': 'Badminton Club',
-    'club.iotacluster@iitrpr.ac.in': 'iota Cluster',
-    'danceclub@iitrpr.ac.in': "The D'Cypher",
-    'act-sports-volley1@iitrpr.ac.in': 'Volley Club',
-    'alpha@iitrpr.ac.in': 'Alpha Production',
+    'act-sports-badminton1@iitrpr.ac.in': 'Badminton',
+    'club.iotacluster@iitrpr.ac.in': 'Iota Cluster',
+    'danceclub@iitrpr.ac.in': "D'Cypher",
+    'act-sports-volley1@iitrpr.ac.in': 'Volleyball',
+    'alpha@iitrpr.ac.in': 'Alpha',
     'monochromeclub@iitrpr.ac.in': 'Monochrome',
-    'aeromodelling@iitrpr.ac.in': 'Aeromodelling Club',
+    'aeromodelling@iitrpr.ac.in': 'Aeromodelling',
     'movie.club@iitrpr.ac.in': 'Filmski',
-    'sa.esportz@iitrpr.ac.in': 'ESportZ Club',
+    'sa.esportz@iitrpr.ac.in': 'E-Sportz',
     'alfaaz@iitrpr.ac.in': 'Alfaaz',
-    'act-sports-hockey1@iitrpr.ac.in': 'Hockey Club',
-    'robotics@iitrpr.ac.in': 'Robotics Club',
-    'act-sports-tabletennis1@iitrpr.ac.in': 'Tabletennis Club',
-    'act-sports-lawntennis1@iitrpr.ac.in': 'Lawntennis Club',
-    'act-cultural-epicure@iitrpr.ac.in': 'Culinary Club',
+    'act-sports-hockey1@iitrpr.ac.in': 'Hockey',
+    'robotics@iitrpr.ac.in': 'Robotics',
+    'act-sports-tabletennis1@iitrpr.ac.in': 'Table Tennis',
+    'act-sports-lawntennis1@iitrpr.ac.in': 'Tennis',
+    'act-cultural-epicure@iitrpr.ac.in': 'Epicure',
     'zenithclub@iitrpr.ac.in': 'Zenith',
-    'softcom@iitrpr.ac.in': 'SoftCom',
-    'act-sports-weightlifting1@iitrpr.ac.in': 'Weightlifting Club',
-    'act-sports-football1@iitrpr.ac.in': 'Football Club',
+    'softcom@iitrpr.ac.in': 'Softcom',
+    'act-sports-weightlifting1@iitrpr.ac.in': 'Weightlifting',
+    'act-sports-football1@iitrpr.ac.in': 'Football',
     'panache@iitrpr.ac.in': 'Panache',
     'enigma@iitrpr.ac.in': 'Enigma',
-    'repaccess@gmail.com': 'Test Club',
     'alankar@iitrpr.ac.in': 'Alankar',
     'arturo@iitrpr.ac.in': 'Arturo',
-    'debsoc@iitrpr.ac.in': 'Debsoc',
-    'mun@iitrpr.ac.in': 'MuN',
+    'debsoc@iitrpr.ac.in': 'DebSoc',
+    'mun@iitrpr.ac.in': 'MUN',
     'fineartsclub@iitrpr.ac.in': 'Vibgyor',
     'ismp@iitrpr.ac.in': 'ISMP',
   };

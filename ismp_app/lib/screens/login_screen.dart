@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
           });
           final isRep = FirebaseService.instance.isClubRep(user.email);
           await AuthPreferences.saveLogin(user.email ?? '', isRep);
+          if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -118,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
           });
           final isRep = FirebaseService.instance.isClubRep(user.email);
           await AuthPreferences.saveLogin(user.email ?? '', isRep);
+          if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

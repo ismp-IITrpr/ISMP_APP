@@ -41,7 +41,7 @@ class DetailedAttendanceScreen extends StatelessWidget {
       {'name': 'Coding Club', 'image': 'coding.png'},
       {'name': 'FinCom', 'image': 'fincom.png'},
       {'name': 'CIM', 'image': 'cim.png'},
-      {'name': 'Iota Cluster', 'image': 'BOST.png'},
+      {'name': 'Iota Cluster', 'image': 'iota.png'},
       {'name': 'Automotive', 'image': 'auto.png'},
       {'name': 'Aeromodelling', 'image': 'aero.png'},
     ],
@@ -431,7 +431,6 @@ class DetailedAttendanceScreen extends StatelessWidget {
   ) {
     final bool isPresent = status == 'present';
     final bool isAbsent = status == 'absent';
-    final bool isLocked = status == 'locked';
 
     // Colors based on status
     Color borderColor;

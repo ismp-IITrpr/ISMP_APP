@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../widgets/active_session_button.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/events.dart';
 import '../../services/firebase_service.dart';
 import '../../services/database_service.dart';
-import 'live_attendance_screen.dart';
 import '../../services/rep_access.dart';
 import '../../theme/app_theme.dart';
 

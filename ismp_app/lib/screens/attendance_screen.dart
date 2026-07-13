@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/attendance.dart';
 import '../models/events.dart';
 import '../services/firebase_service.dart';
@@ -45,103 +44,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
 
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _buildResultDialog(
-        isSuccess: true,
-        icon: Icons.check_circle_outline,
-        iconColor: AppColors.primary,
-        title: 'Success!',
-        message: 'Your attendance has been\nmarked successfully.',
-        buttonText: 'Great!',
-      ),
-    );
-  }
-
-  void _showFailedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _buildResultDialog(
-        isSuccess: false,
-        icon: Icons.cancel_outlined,
-        iconColor: AppColors.error,
-        title: 'Failed!',
-        message: 'Unable to mark attendance.\nPlease try again.',
-        buttonText: 'Try Again',
-      ),
-    );
-  }
-
-  Widget _buildResultDialog({
-    required bool isSuccess,
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String message,
-    required String buttonText,
-  }) {
-    return Dialog(
-      backgroundColor: AppColors.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 16),
-            Icon(
-              icon,
-              size: 80,
-              color: iconColor,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildStatItem(String label, String value, Color color) {
     return Column(

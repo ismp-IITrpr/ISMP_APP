@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/firebase_service.dart';
-import 'live_attendance_screen.dart';
-import '../login_screen.dart';
 import '../../theme/app_theme.dart';
 
 class RepDashboard extends StatefulWidget {
@@ -121,7 +119,6 @@ class _RepDashboardState extends State<RepDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final clubName = FirebaseService.instance.getClubForEmail(_repEmail);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(

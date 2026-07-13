@@ -30,7 +30,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentCarouselIndex = 0;
-  BlogTag? _activeTag;
 
   String _getEventsSubtitle() {
     // Default subtitle - will be updated dynamically from Firebase

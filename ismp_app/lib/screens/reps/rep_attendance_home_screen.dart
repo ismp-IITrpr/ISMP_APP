@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/events.dart';
 import '../../services/firebase_service.dart';
-import '../reps/live_attendance_screen.dart';
 import '../../widgets/active_session_button.dart';
 import '../../services/rep_access.dart';
 import '../../theme/app_theme.dart';
@@ -60,7 +59,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
     if (confirm == true) {
       try {
         await FirebaseService.instance.deleteEvent(event.id);
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Event deleted successfully!'),
@@ -69,7 +68,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
           );
         }
       } catch (e) {
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
           );

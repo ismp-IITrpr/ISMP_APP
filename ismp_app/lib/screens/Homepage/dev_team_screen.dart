@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,14 +11,6 @@ class DevTeamScreen extends StatelessWidget {
   Future<void> _launchUrl(String? urlString) async {
     if (urlString == null) return;
     final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url)) {
-      debugPrint('Could not launch $url');
-    }
-  }
-
-  Future<void> _launchEmail(String? email) async {
-    if (email == null) return;
-    final Uri url = Uri.parse('mailto:$email');
     if (!await launchUrl(url)) {
       debugPrint('Could not launch $url');
     }
@@ -216,8 +207,6 @@ class DevTeamScreen extends StatelessWidget {
   // scaleMode: 0 = Full width, 1 = 2 per row, 2 = 3 per row
   Widget _buildCreativeMemberCard(BuildContext context, TeamMember member,
       int index, {int scaleMode = 0}) {
-    bool isSpecial = true; // Everyone gets the green accent
-
     // Dynamic sizing based on row capacity
     double avatarRadius = scaleMode == 0 ? 64 : (scaleMode == 1 ? 64 : 64);
     double nameFontSize = scaleMode == 0 ? 24 : (scaleMode == 1 ? 16 : 13);
@@ -243,8 +232,7 @@ class DevTeamScreen extends StatelessWidget {
                 border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                 boxShadow: [
                   BoxShadow(
-                    color: (isSpecial ? AppColors.primary : const Color(
-                        0xFFD9278D)).withValues(alpha: 0.05),
+                    color: AppColors.primary.withValues(alpha: 0.05),
                     blurRadius: 15.0,
                     offset: const Offset(0, 20),
                   ),
@@ -360,19 +348,16 @@ class DevTeamScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: isSpecial
-                      ? [
+                  colors: [
                     AppColors.primary,
                     AppColors.primary.withValues(alpha: 0.2)
-                  ]
-                      : [AppColors.primary, AppColors.primary],
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (isSpecial ? AppColors.primary : const Color(
-                        0xFFD9278D)).withValues(alpha: 0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 15.0,
                     offset: const Offset(0, 10),
                   ),

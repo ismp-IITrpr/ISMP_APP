@@ -58,10 +58,6 @@ class _RepAttendanceScreenState extends State<RepAttendanceScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _rollController = TextEditingController();
 
-  // TODO (logic owner): replace with the actual rotating QR payload
-  // (e.g. session token signed with club id + timestamp).
-  String get _qrPayload =>
-      'session:${widget.event.id}:${DateTime.now().millisecondsSinceEpoch ~/ 30000}';
 
   @override
   void initState() {

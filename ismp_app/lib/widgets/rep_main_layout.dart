@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/Homepage/home_screen.dart';
 import '../screens/reps/rep_events_screen.dart';
 import '../screens/reps/rep_attendance_home_screen.dart';
-import '../screens/profile_screen.dart';
 import '../screens/reps/rep_profile_screen.dart';
 import '../theme/app_theme.dart';
 import 'chatbot_widget.dart';

@@ -4,8 +4,6 @@ import '../models/events.dart';
 import '../models/profile_data.dart';
 import '../services/firebase_service.dart';
 import '../services/database_service.dart';
-import '../services/rep_access.dart';
-import 'reps/rep_attendance_screen.dart';
 import 'reps/live_attendance_screen.dart';
 import '../theme/app_theme.dart';
 
@@ -121,7 +119,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           _showAllEvents = value;
                         });
                       },
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                       inactiveThumbColor: Colors.grey,
                       inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
                     ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/profile_data.dart';
 import '../login_screen.dart';
 import 'rep_dashboard.dart';
 import '../../services/firebase_service.dart';
@@ -170,102 +169,6 @@ class RepProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClubInfoCard(String clubName, String clubId) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primaryPurple.withValues(alpha: 0.25)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: primaryPurple.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: const Icon(
-                  Icons.groups_outlined,
-                  color: primaryPurple,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Your Club',
-                      style: TextStyle(
-                        color: textGray,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      clubName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: primaryPurple.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: primaryPurple.withValues(alpha: 0.4)),
-                ),
-                child: const Text(
-                  'REP',
-                  style: TextStyle(
-                    color: primaryPurple,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Icon(Icons.badge_outlined, color: primaryPurple, size: 18),
-              const SizedBox(width: 10),
-              const Text(
-                'Club ID',
-                style: TextStyle(color: textGray, fontSize: 13),
-              ),
-              const Spacer(),
-              Text(
-                clubId,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

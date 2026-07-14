@@ -242,7 +242,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        children: ['All', 'B.Tech', 'M.Tech'].map((degree) {
+                        children: ['All', 'B.Tech', 'M.Tech', 'B.Sc'].map((degree) {
                           final isSel = selectedDegree == degree;
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
@@ -252,7 +252,16 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                               selectedColor: AppColors.primary,
                               backgroundColor: AppColors.surface,
                               onSelected: (selected) {
-                                if (selected) setModalState(() => selectedDegree = degree);
+                                if (selected) {
+                                  setModalState(() {
+                                    selectedDegree = degree;
+                                    if (selectedDegree == 'All') {
+                                      selectedGroups.clear();
+                                    } else if (selectedDegree == 'M.Tech' || selectedDegree == 'B.Sc') {
+                                      selectedGroups.removeWhere((g) => g > 1);
+                                    }
+                                  });
+                                }
                               },
                             ),
                           );
@@ -260,36 +269,41 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      const Text(
-                        'Target Groups (Optional - leave empty for all)',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: List.generate(12, (index) {
-                          final group = index + 1;
-                          final isSel = selectedGroups.contains(group);
-                          return FilterChip(
-                            label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
-                            selected: isSel,
-                            selectedColor: AppColors.primary,
-                            backgroundColor: AppColors.surface,
-                            checkmarkColor: Colors.white,
-                            onSelected: (selected) {
-                              setModalState(() {
-                                if (selected) {
-                                  selectedGroups.add(group);
-                                } else {
-                                  selectedGroups.remove(group);
-                                }
-                              });
+                      if (selectedDegree != 'All') ...[
+                        const Text(
+                          'Target Groups (Optional - leave empty for all)',
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: List.generate(
+                            selectedDegree == 'B.Tech' ? 12 : 1,
+                            (index) {
+                              final group = index + 1;
+                              final isSel = selectedGroups.contains(group);
+                              return FilterChip(
+                                label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
+                                selected: isSel,
+                                selectedColor: AppColors.primary,
+                                backgroundColor: AppColors.surface,
+                                checkmarkColor: Colors.white,
+                                onSelected: (selected) {
+                                  setModalState(() {
+                                    if (selected) {
+                                      selectedGroups.add(group);
+                                    } else {
+                                      selectedGroups.remove(group);
+                                    }
+                                  });
+                                },
+                              );
                             },
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 16),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
                       // Description
                       _buildModalField(

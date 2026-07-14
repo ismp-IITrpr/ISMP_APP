@@ -213,7 +213,7 @@ class _RepDashboardState extends State<RepDashboard> {
             ),
             const SizedBox(height: 8),
             Row(
-              children: ['All', 'B.Tech', 'M.Tech'].map((degree) {
+              children: ['All', 'B.Tech', 'M.Tech', 'B.Sc'].map((degree) {
                 final isSel = _selectedDegree == degree;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -223,7 +223,16 @@ class _RepDashboardState extends State<RepDashboard> {
                     selectedColor: AppColors.primary,
                     backgroundColor: AppColors.surface,
                     onSelected: (selected) {
-                      if (selected) setState(() => _selectedDegree = degree);
+                      if (selected) {
+                        setState(() {
+                          _selectedDegree = degree;
+                          if (_selectedDegree == 'All') {
+                            _selectedGroups.clear();
+                          } else if (_selectedDegree == 'M.Tech' || _selectedDegree == 'B.Sc') {
+                            _selectedGroups.removeWhere((g) => g > 1);
+                          }
+                        });
+                      }
                     },
                   ),
                 );
@@ -231,36 +240,41 @@ class _RepDashboardState extends State<RepDashboard> {
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              'Target Groups (Optional - leave empty for all)',
-              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: List.generate(12, (index) {
-                final group = index + 1;
-                final isSel = _selectedGroups.contains(group);
-                return FilterChip(
-                  label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
-                  selected: isSel,
-                  selectedColor: AppColors.primary,
-                  backgroundColor: AppColors.surface,
-                  checkmarkColor: Colors.white,
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedGroups.add(group);
-                      } else {
-                        _selectedGroups.remove(group);
-                      }
-                    });
+            if (_selectedDegree != 'All') ...[
+              const Text(
+                'Target Groups (Optional - leave empty for all)',
+                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: List.generate(
+                  _selectedDegree == 'B.Tech' ? 12 : 1,
+                  (index) {
+                    final group = index + 1;
+                    final isSel = _selectedGroups.contains(group);
+                    return FilterChip(
+                      label: Text('Group $group', style: TextStyle(color: isSel ? Colors.white : Colors.grey, fontSize: 12)),
+                      selected: isSel,
+                      selectedColor: AppColors.primary,
+                      backgroundColor: AppColors.surface,
+                      checkmarkColor: Colors.white,
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedGroups.add(group);
+                          } else {
+                            _selectedGroups.remove(group);
+                          }
+                        });
+                      },
+                    );
                   },
-                );
-              }),
-            ),
-            const SizedBox(height: 16),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // Description
             _buildTextField(

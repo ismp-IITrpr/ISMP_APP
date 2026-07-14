@@ -139,12 +139,12 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                     color: const Color(0xFF1A1A1A),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFFFFC107),
+                      color: AppColors.primary,
                       width: 2.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFC107).withValues(
+                        color: AppColors.primary.withValues(
                           alpha: 0.3 + _pulseController.value * 0.25,
                         ),
                         blurRadius: 16 + _pulseController.value * 8,
@@ -153,8 +153,8 @@ class _ChatbotWidgetState extends State<ChatbotWidget>
                     ],
                   ),
                   child: Icon(
-                    _isChatOpen ? Icons.close : Icons.smart_toy_rounded,
-                    color: const Color(0xFFF0F0F0),
+                    _isChatOpen ? Icons.close : Icons.message_rounded,
+                    color: AppColors.mutedText,
                     size: 28,
                   ),
                 );

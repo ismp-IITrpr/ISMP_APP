@@ -74,7 +74,7 @@
 		<false/>
 		<key>FirebaseMessagingAutoInitEnabled</key>
 		<false/>
-				<key>UIBackgroundModes</key>
+		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
 			<string>remote-notification</string>

@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseService.instance.deleteOldEvents();
     if (kIsWeb) {
       _googleSignInSubscription = GoogleSignIn.instance.authenticationEvents.listen((GoogleSignInAuthenticationEvent event) {
         if (event is GoogleSignInAuthenticationEventSignIn) {

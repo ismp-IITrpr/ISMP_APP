@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'firebase_options.dart';
@@ -80,8 +81,8 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: AuthPreferences.isLoggedIn(),
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         // Show a splash-style loading while checking
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,9 +94,8 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        final isLoggedIn = snapshot.data ?? false;
-
-        if (!isLoggedIn) {
+        final user = snapshot.data;
+        if (user == null) {
           return const LoginScreen();
         }
 

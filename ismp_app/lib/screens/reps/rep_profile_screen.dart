@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../login_screen.dart';
 import 'rep_dashboard.dart';
 import '../../services/firebase_service.dart';
+import '../../services/auth_preferences.dart';
+import '../../services/database_service.dart';
 import '../../theme/app_theme.dart';
 
 class RepProfileScreen extends StatelessWidget {
@@ -273,6 +275,8 @@ class RepProfileScreen extends StatelessWidget {
       height: 56,
       child: TextButton(
         onPressed: () async {
+          await AuthPreferences.clearAll();
+          DatabaseService.clearCache();
           await FirebaseService.instance.signOut();
           if (context.mounted) {
             Navigator.pushAndRemoveUntil(

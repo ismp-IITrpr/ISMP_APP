@@ -32,7 +32,8 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
   static const Color textGray = AppColors.mutedText;
 
   bool _isExporting = false;
-  Timer? _uiTimer;
+  Timer? _qrTimer;
+  int _qrTimeBlock = DateTime.now().millisecondsSinceEpoch ~/ 30000;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _rollController = TextEditingController();
@@ -40,8 +41,9 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    _uiTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _qrTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
       if (mounted) {
+        _qrTimeBlock = DateTime.now().millisecondsSinceEpoch ~/ 30000;
         setState(() {});
       }
     });
@@ -49,7 +51,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
   @override
   void dispose() {
-    _uiTimer?.cancel();
+    _qrTimer?.cancel();
     _nameController.dispose();
     _rollController.dispose();
     super.dispose();
@@ -218,7 +220,9 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
 
         Duration remaining = Duration.zero;
         if (isActive && createdAt != null) {
-          final elapsed = DateTime.now().difference(createdAt.toDate());
+          final sessionStart = createdAt.toDate();
+          final now = DateTime.now();
+          final elapsed = now.difference(sessionStart);
           remaining = const Duration(minutes: 5) - elapsed;
           if (remaining.inSeconds <= 0) {
             remaining = Duration.zero;
@@ -347,7 +351,7 @@ class _LiveAttendanceScreenState extends State<LiveAttendanceScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: QrImageView(
-                            data: '${widget.sessionId}:${DateTime.now().millisecondsSinceEpoch ~/ 30000}',
+                            data: '${widget.sessionId}:$_qrTimeBlock',
                             version: QrVersions.auto,
                             size: 200,
                             backgroundColor: Colors.white,

@@ -66,7 +66,11 @@ class BlogPost {
       content: map['content'] ?? '',
       author: map['author'] ?? '',
       date: map['date'] ?? '',
-      readMinutes: map['readMinutes'] ?? 0,
+      readMinutes: (map['readMinutes'] is int)
+          ? map['readMinutes'] as int
+          : ((map['readMinutes'] is double)
+              ? (map['readMinutes'] as double).toInt()
+              : 0),
       tag: BlogTag.values.firstWhere(
         (t) => t.name == map['tag'],
         orElse: () => BlogTag.club,

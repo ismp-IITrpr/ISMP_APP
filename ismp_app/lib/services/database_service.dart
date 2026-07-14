@@ -166,7 +166,7 @@ class DatabaseService {
 
     // 2. Otherwise (cache expired or first time), fetch from Firebase
     try {
-      final snapshot = await _db.collection('events').get();
+      final snapshot = await _db.collection('events').limit(500).get();
       
       List<EventModel> freshEvents = snapshot.docs
           .map((doc) => EventModel.fromMap(doc.data(), doc.id))

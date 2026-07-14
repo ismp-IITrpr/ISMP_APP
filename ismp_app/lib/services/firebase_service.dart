@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/blog.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
@@ -167,12 +167,12 @@ class FirebaseService {
     if (email != null && email.contains('@')) {
       return email.split('@')[0].toUpperCase();
     }
-    return '24CS1001';
+    return 'UNAUTHENTICATED';
   }
 
   // Stream blog posts from Firestore in real-time
   Stream<List<BlogPost>> streamBlogPosts() {
-    return _firestore.collection('blogs').snapshots().map((snapshot) {
+    return _firestore.collection('blogs').limit(50).snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => BlogPost.fromMap(doc.data(), doc.id))
           .toList();
@@ -187,14 +187,14 @@ class FirebaseService {
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
-              .map((doc) => EventModel.fromMap(doc.data()))
+              .map((doc) => EventModel.fromMap(doc.data(), doc.id))
               .toList();
         });
   }
 
-  // Stream recent attendance records
+  // Stream recent attendance records (legacy, used sparingly)
   Stream<List<AttendanceRecord>> streamRecentAttendance() {
-    return _firestore.collection('attendance').snapshots().map((snapshot) {
+    return _firestore.collection('attendance').limit(100).snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => AttendanceRecord.fromMap(doc.data()))
           .toList();
@@ -768,7 +768,7 @@ class FirebaseService {
 
     await batch.commit();
 
-    // Send push notifications for all affected students
+    // Send push notifications for all affected students (batched via Promise-like pattern)
     try {
       final functions = FirebaseFunctions.instance;
       final allRollNos = presentRollNos.toList();
@@ -784,16 +784,23 @@ class FirebaseService {
           allRollNos.add(rollNo);
         }
       }
-      for (final rollNo in allRollNos) {
-        try {
-          await functions.httpsCallable('sendAttendancePush').call({
-            'rollNo': rollNo,
-            'title': 'Attendance Marked',
-            'description': 'Your attendance for "$eventName" has been recorded.',
-            'iconType': 'attendance',
-            'notificationType': 'attendance',
-          });
-        } catch (_) {}
+      // Send notifications in batches of 10 to avoid timeout
+      final batches = <List<String>>[];
+      for (var i = 0; i < allRollNos.length; i += 10) {
+        batches.add(allRollNos.sublist(i, i + 10 > allRollNos.length ? allRollNos.length : i + 10));
+      }
+      for (final batch in batches) {
+        await Future.wait(batch.map((rollNo) async {
+          try {
+            await functions.httpsCallable('sendAttendancePush').call({
+              'rollNo': rollNo,
+              'title': 'Attendance Marked',
+              'description': 'Your attendance for "$eventName" has been recorded.',
+              'iconType': 'attendance',
+              'notificationType': 'attendance',
+            });
+          } catch (_) {}
+        }));
       }
     } catch (e) {
       debugPrint('Push notification error: $e');
@@ -959,6 +966,7 @@ class FirebaseService {
     return _firestore
         .collection('events')
         .where('type', isEqualTo: 'C')
+        .limit(500)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs.map((doc) {
@@ -992,6 +1000,7 @@ class FirebaseService {
   Stream<List<MomentModel>> streamMoments() {
     return _firestore
         .collection('moments')
+        .limit(100)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
@@ -1066,7 +1075,7 @@ class FirebaseService {
             date: event.date,
             time: event.time,
             venue: event.venue,
-            isPresent: false, // Default status if not marked
+            isPresent: false,
             iconColor: event.dotColor,
           ),
         );
@@ -1076,7 +1085,7 @@ class FirebaseService {
       controller.add(combined);
     }
 
-    sub1 = _firestore.collection('events').snapshots().listen((snapshot) {
+    sub1 = _firestore.collection('events').limit(500).snapshots().listen((snapshot) {
       latestEvents = snapshot.docs
           .map((doc) => EventModel.fromMap(doc.data(), doc.id))
           .toList();
@@ -1098,6 +1107,7 @@ class FirebaseService {
     controller.onCancel = () {
       sub1?.cancel();
       sub2?.cancel();
+      controller.close();
     };
 
     return controller.stream;
@@ -1105,6 +1115,9 @@ class FirebaseService {
 
   /// Resets all testing and attendance data across Firestore and clears local caches
   Future<void> resetTestingData() async {
+    if (!kDebugMode) {
+      throw UnsupportedError('resetTestingData is disabled in production.');
+    }
     debugPrint('Resetting testing data...');
 
     // 1. Delete all users and their attendance subcollections

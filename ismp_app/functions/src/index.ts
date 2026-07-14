@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
@@ -8,7 +8,7 @@ interface EventData {
   date: string;
   time: string;
   venue: string;
-  targetAudience?: string[];
+  targetAudience?: string;
   type?: string;
   club?: string;
 }
@@ -28,9 +28,11 @@ interface SendNotificationData {
   notificationType: string;
 }
 
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
 function parseEventDateTime(date: string, time: string): Date | null {
   try {
-    const [day, month, year] = date.split("/");
+    const [year, month, day] = date.split("-");
     let hours = 0;
     let minutes = 0;
     const timeLower = time.toLowerCase();
@@ -49,7 +51,8 @@ function parseEventDateTime(date: string, time: string): Date | null {
       minutes = parseInt(m || "0");
     }
 
-    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes);
+    const utcDate = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), hours, minutes));
+    return new Date(utcDate.getTime() - IST_OFFSET_MS);
   } catch {
     return null;
   }
@@ -62,24 +65,50 @@ function normalizeDegree(degree: string): string {
 function isStudentTargeted(
   studentDegree: string | undefined,
   studentGroup: number | string | undefined,
-  targetAudience: string[] | undefined
+  targetAudience: string | undefined
 ): boolean {
-  if (!targetAudience || targetAudience.length === 0) return false;
+  if (!targetAudience) return false;
+  const target = targetAudience.trim();
+  if (!target || target === "All Members" || target.toLowerCase() === "all: all") return true;
+
   const sDegree = normalizeDegree(studentDegree || "");
   const sGroup =
     typeof studentGroup === "number"
       ? studentGroup
       : parseInt(studentGroup?.toString() || "0", 10);
 
-  for (const target of targetAudience) {
-    const parts = target.split("-");
-    if (parts.length !== 2) continue;
-    const tDegree = normalizeDegree(parts[0]);
-    const tGroup = parseInt(parts[1], 10);
-    const degreeMatch = tDegree === normalizeDegree("All") || tDegree === sDegree;
-    if (degreeMatch && sGroup === tGroup) return true;
+  let degreeLimit = "All";
+  let targetGroups: number[] = [];
+
+  if (target.includes(":")) {
+    const parts = target.split(":");
+    degreeLimit = parts[0].trim();
+    const groupsPart = parts.slice(1).join(":").trim().toLowerCase();
+    if (groupsPart !== "all" && groupsPart !== "all members" && groupsPart !== "") {
+      targetGroups = groupsPart
+        .split(/[\s,]+/)
+        .map((s) => parseInt(s, 10))
+        .filter((n) => !isNaN(n));
+    }
+  } else {
+    const lower = target.toLowerCase();
+    if (lower !== "all" && lower !== "all members") {
+      targetGroups = target
+        .split(/[\s,]+/)
+        .map((s) => parseInt(s, 10))
+        .filter((n) => !isNaN(n));
+    }
   }
-  return false;
+
+  if (normalizeDegree(degreeLimit) !== "all" && normalizeDegree(degreeLimit) !== sDegree) {
+    return false;
+  }
+
+  if (targetGroups.length > 0 && !targetGroups.includes(sGroup)) {
+    return false;
+  }
+
+  return true;
 }
 
 async function sendCombinedNotification(
@@ -102,7 +131,7 @@ async function sendCombinedNotification(
     notificationType: notificationType || "info",
     eventId: eventId || "",
     eventDateTime: eventDateTime || null,
-    reminderTiming: notificationType === "reminder" ? (iconType === "1hr" ? "1hr" : "15min") : "",
+    reminderTiming: "",
   });
 
   const userDoc = await admin.firestore().collection("users").doc(rollNo).get();
@@ -131,7 +160,10 @@ async function sendCombinedNotification(
 
 // 1. Called from Flutter after attendance submit
 export const sendAttendancePush = functions.https.onCall(
-  async (data: SendData) => {
+  async (data: SendNotificationData, context: functions.https.CallableContext) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+    }
     const { rollNo, title, description, iconType, notificationType } = data;
     await sendCombinedNotification(rollNo, title, description, iconType, notificationType);
     return { success: true };
@@ -159,12 +191,17 @@ export const scheduleEventReminders = functions.firestore
       });
     };
 
-    await scheduleReminder(60, "1hr");
-    await scheduleReminder(15, "15min");
+    await Promise.all([
+      scheduleReminder(60, "1hr"),
+      scheduleReminder(15, "15min"),
+    ]);
   });
 
 // 3. Processes pending reminders (call this via Cloud Scheduler every minute)
-export const processReminders = functions.https.onCall(async () => {
+export const processReminders = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+  }
   const now = admin.firestore.Timestamp.now();
   const snapshot = await admin
     .firestore()
@@ -175,39 +212,48 @@ export const processReminders = functions.https.onCall(async () => {
 
   let processed = 0;
   for (const doc of snapshot.docs) {
-    const task = doc.data();
-    const eventDoc = await admin.firestore().collection("events").doc(task.eventId).get();
-    if (!eventDoc.exists) {
-      await doc.ref.delete();
-      continue;
-    }
-
-    const event = eventDoc.data() as EventData;
-    const timingLabel = task.timing === "1hr" ? "1 hour" : "15 minutes";
-    const eventDate = parseEventDateTime(event.date, event.time);
-
-    const studentsSnapshot = await admin.firestore().collection("users").get();
-    for (const studentDoc of studentsSnapshot.docs) {
-      const student = studentDoc.data() as UserData;
-      if (student.role === "rep") continue;
-
-      if (isStudentTargeted(student.degree, student.groupNo, event.targetAudience)) {
-        await sendCombinedNotification(
-          studentDoc.id.trim().toUpperCase(),
-          `Reminder: ${event.title}`,
-          `${event.title} starts in ${timingLabel} at ${event.venue}`,
-          "event",
-          "reminder",
-          task.eventId,
-          eventDate
-            ? admin.firestore.Timestamp.fromDate(eventDate)
-            : undefined
-        );
+    try {
+      const task = doc.data();
+      const eventDoc = await admin.firestore().collection("events").doc(task.eventId).get();
+      if (!eventDoc.exists) {
+        await doc.ref.delete();
+        continue;
       }
-    }
 
-    await doc.ref.delete();
-    processed++;
+      const event = eventDoc.data() as EventData;
+      const timingLabel = task.timing === "1hr" ? "1 hour" : "15 minutes";
+      const eventDate = parseEventDateTime(event.date, event.time);
+
+      const studentsSnapshot = await admin.firestore().collection("users").limit(1500).get();
+      const notificationPromises: Promise<void>[] = [];
+
+      for (const studentDoc of studentsSnapshot.docs) {
+        const student = studentDoc.data() as UserData;
+        if (student.role === "rep") continue;
+
+        if (isStudentTargeted(student.degree, student.groupNo, event.targetAudience)) {
+          notificationPromises.push(
+            sendCombinedNotification(
+              studentDoc.id.trim().toUpperCase(),
+              `Reminder: ${event.title}`,
+              `${event.title} starts in ${timingLabel} at ${event.venue}`,
+              "event",
+              "reminder",
+              task.eventId,
+              eventDate
+                ? admin.firestore.Timestamp.fromDate(eventDate)
+                : undefined
+            )
+          );
+        }
+      }
+
+      await Promise.all(notificationPromises);
+      await doc.ref.delete();
+      processed++;
+    } catch (e) {
+      console.error("Error processing reminder task:", e);
+    }
   }
 
   return { processed };
@@ -226,36 +272,46 @@ export const scheduledProcessReminders = functions.pubsub
       .get();
 
     for (const doc of snapshot.docs) {
-      const task = doc.data();
-      const eventDoc = await admin.firestore().collection("events").doc(task.eventId).get();
-      if (!eventDoc.exists) {
-        await doc.ref.delete();
-        continue;
-      }
-
-      const event = eventDoc.data() as EventData;
-      const timingLabel = task.timing === "1hr" ? "1 hour" : "15 minutes";
-      const eventDate = parseEventDateTime(event.date, event.time);
-
-      const studentsSnapshot = await admin.firestore().collection("users").get();
-      for (const studentDoc of studentsSnapshot.docs) {
-        const student = studentDoc.data() as UserData;
-        if (student.role === "rep") continue;
-
-        if (isStudentTargeted(student.degree, student.groupNo, event.targetAudience)) {
-          await sendCombinedNotification(
-            studentDoc.id.trim().toUpperCase(),
-            `Reminder: ${event.title}`,
-            `${event.title} starts in ${timingLabel} at ${event.venue}`,
-            "event",
-            "reminder",
-            task.eventId,
-            eventDate
-              ? admin.firestore.Timestamp.fromDate(eventDate)
-              : undefined
-          );
+      try {
+        const task = doc.data();
+        const eventDoc = await admin.firestore().collection("events").doc(task.eventId).get();
+        if (!eventDoc.exists) {
+          await doc.ref.delete();
+          continue;
         }
+
+        const event = eventDoc.data() as EventData;
+        const timingLabel = task.timing === "1hr" ? "1 hour" : "15 minutes";
+        const eventDate = parseEventDateTime(event.date, event.time);
+
+        const studentsSnapshot = await admin.firestore().collection("users").limit(1500).get();
+        const notificationPromises: Promise<void>[] = [];
+
+        for (const studentDoc of studentsSnapshot.docs) {
+          const student = studentDoc.data() as UserData;
+          if (student.role === "rep") continue;
+
+          if (isStudentTargeted(student.degree, student.groupNo, event.targetAudience)) {
+            notificationPromises.push(
+              sendCombinedNotification(
+                studentDoc.id.trim().toUpperCase(),
+                `Reminder: ${event.title}`,
+                `${event.title} starts in ${timingLabel} at ${event.venue}`,
+                "event",
+                "reminder",
+                task.eventId,
+                eventDate
+                  ? admin.firestore.Timestamp.fromDate(eventDate)
+                  : undefined
+              )
+            );
+          }
+        }
+
+        await Promise.all(notificationPromises);
+        await doc.ref.delete();
+      } catch (e) {
+        console.error("Error processing scheduled reminder:", e);
       }
-      await doc.ref.delete();
     }
   });

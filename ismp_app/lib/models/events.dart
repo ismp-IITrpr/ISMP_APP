@@ -77,6 +77,15 @@ class EventModel {
       audience = groupData.toString();
     }
 
+    final dotColorRaw = map['dotColor'];
+    final dotColorValue = (dotColorRaw is int) ? dotColorRaw : AppColors.primary.toARGB32();
+
+    final dayRaw = map['day'];
+    final dayValue = (dayRaw is int) ? dayRaw : ((dayRaw is double) ? dayRaw.toInt() : 0);
+
+    final isCompletedRaw = map['isCompleted'];
+    final isCompletedValue = (isCompletedRaw is bool) ? isCompletedRaw : false;
+
     return EventModel(
       id: docId ?? map['id'] ?? '',
       title: map['title'] ?? '',
@@ -87,11 +96,11 @@ class EventModel {
       club: map['club'] ?? '',
       targetAudience: audience,
       description: map['description'] ?? '',
-      dotColor: Color(map['dotColor'] ?? AppColors.primary.toARGB32()),
+      dotColor: Color(dotColorValue),
       startTime: start,
       endTime: end,
-      day: map['day'] ?? 0,
-      isCompleted: map['isCompleted'] ?? false,
+      day: dayValue,
+      isCompleted: isCompletedValue,
     );
   }
 

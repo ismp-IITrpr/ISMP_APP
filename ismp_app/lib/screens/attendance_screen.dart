@@ -25,17 +25,16 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  final String currentStudentId = "student_123"; // Mock student ID
-
   @override
   void initState() {
     super.initState();
   }
 
   void _openScanner() {
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => StudentScannerScreen(studentId: currentStudentId)),
+      MaterialPageRoute(builder: (context) => StudentScannerScreen(studentId: rollNo)),
     ).then((_) {
       // Refresh the screen when returning from the scanner
       setState(() {}); 

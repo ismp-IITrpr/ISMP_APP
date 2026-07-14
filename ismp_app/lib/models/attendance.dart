@@ -43,6 +43,19 @@ class AttendanceRecord {
   }
 
   factory AttendanceRecord.fromMap(Map<String, dynamic> map) {
+    final iconColorRaw = map['iconColor'];
+    final iconColorValue = (iconColorRaw is int) ? iconColorRaw : 0xFFD9278D;
+
+    final isPresentRaw = map['isPresent'];
+    final isPresentValue = (isPresentRaw is bool) ? isPresentRaw : false;
+
+    DateTime? parsedMarkedAt;
+    if (map['markedAt'] is Timestamp) {
+      parsedMarkedAt = (map['markedAt'] as Timestamp).toDate();
+    } else if (map['markedAt'] != null) {
+      parsedMarkedAt = DateTime.tryParse(map['markedAt'].toString());
+    }
+
     return AttendanceRecord(
       eventId: map['eventId'] ?? '',
       eventType: map['eventType'] ?? '',
@@ -51,11 +64,9 @@ class AttendanceRecord {
       date: map['date'] ?? '',
       time: map['time'] ?? '',
       venue: map['venue'] ?? '',
-      isPresent: map['isPresent'] ?? false,
-      iconColor: Color(map['iconColor'] ?? 0xFFD9278D),
-      markedAt: map['markedAt'] is Timestamp
-          ? (map['markedAt'] as Timestamp).toDate()
-          : (map['markedAt'] != null ? DateTime.tryParse(map['markedAt'].toString()) : null),
+      isPresent: isPresentValue,
+      iconColor: Color(iconColorValue),
+      markedAt: parsedMarkedAt,
     );
   }
 
@@ -90,10 +101,14 @@ class AttendanceScan {
 
   factory AttendanceScan.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    final scannedAtRaw = data['scannedAt'];
+    final scannedAtValue = (scannedAtRaw is Timestamp)
+        ? scannedAtRaw.toDate()
+        : DateTime.now();
     return AttendanceScan(
       rollNo: data['rollNo'] ?? doc.id,
       name: data['name'] ?? '',
-      scannedAt: (data['scannedAt'] as Timestamp).toDate(),
+      scannedAt: scannedAtValue,
       status: data['status'] ?? 'scanned',
     );
   }
@@ -126,12 +141,16 @@ class AttendanceSession {
 
   factory AttendanceSession.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    final createdAtRaw = data['createdAt'];
+    final createdAtValue = (createdAtRaw is Timestamp)
+        ? createdAtRaw.toDate()
+        : DateTime.now();
     return AttendanceSession(
       sessionId: doc.id,
       eventId: data['eventId'] ?? '',
       representativeRollNo: data['representativeRollNo'] ?? '',
       status: data['status'] ?? 'active',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: createdAtValue,
     );
   }
 }

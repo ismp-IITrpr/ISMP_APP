@@ -138,12 +138,11 @@ class AttendanceService {
     // Fetch event details to populate title, date, time, venue, iconColor in the student's record
     EventModel? event;
     try {
-      final eventQuery = await _db.collection('events').where('id', isEqualTo: eventId).limit(1).get();
-      if (eventQuery.docs.isNotEmpty) {
-        event = EventModel.fromMap(eventQuery.docs.first.data());
+      final eventDoc = await _db.collection('events').doc(eventId).get();
+      if (eventDoc.exists) {
+        event = EventModel.fromMap(eventDoc.data()!, eventDoc.id);
       }
     } catch (e) {
-      // Fallback in case of query error
       debugPrint("Error fetching event details: $e");
     }
 

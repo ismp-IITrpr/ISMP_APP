@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/main_layout.dart';
 import '../services/firebase_service.dart';
@@ -47,9 +47,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogleAccount(account);
       if (user != null) {
         if (mounted) {
-          FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
-            debugPrint('Post-login seeding failed: $e');
-          });
+          if (kDebugMode) {
+            FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+              debugPrint('Post-login seeding failed: $e');
+            });
+          }
           final isRep = FirebaseService.instance.isClubRep(user.email);
           await AuthPreferences.saveLogin(user.email ?? '', isRep);
           if (!mounted) return;
@@ -113,9 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await FirebaseService.instance.signInWithGoogle();
       if (user != null) {
         if (mounted) {
-          FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
-            debugPrint('Post-login seeding failed: $e');
-          });
+          if (kDebugMode) {
+            FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+              debugPrint('Post-login seeding failed: $e');
+            });
+          }
           final isRep = FirebaseService.instance.isClubRep(user.email);
           await AuthPreferences.saveLogin(user.email ?? '', isRep);
           if (!mounted) return;

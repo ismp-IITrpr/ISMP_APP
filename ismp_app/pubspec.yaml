@@ -53,6 +53,7 @@ dependencies:
   flutter_local_notifications: any
   cloud_functions: ^6.3.3
   http: ^1.2.1
+  image_picker: ^1.1.2
   
 dev_dependencies:
   flutter_test:

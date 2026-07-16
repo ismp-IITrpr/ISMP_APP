@@ -15,6 +15,7 @@ import 'dev_team_screen.dart';
 import '../notifications_screen.dart';
 import 'moments_screen.dart';
 import 'blogs_screen.dart';
+import '../../widgets/moment_viewer.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
 import '../pdf_viewer_screen.dart';
@@ -367,7 +368,10 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: moments.length,
               itemBuilder: (context, index) {
                 final moment = moments[index];
-                return _momentCard(moment.imageUrl, moment.title);
+                return GestureDetector(
+                  onTap: () => showMomentViewer(context, moment),
+                  child: _momentCard(moment.imageUrl, moment.title),
+                );
               },
             );
           },

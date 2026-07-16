@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../services/firebase_service.dart';
 import '../../models/moment.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/moment_viewer.dart';
+import 'add_moment_screen.dart';
 
 class MomentsScreen extends StatelessWidget {
   const MomentsScreen({super.key});
@@ -25,6 +27,21 @@ class MomentsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          if (FirebaseService.instance.currentUserEmail?.contains('2025') == true)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                icon: const Icon(Icons.add_a_photo, color: Colors.white, size: 22),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddMomentScreen()),
+                  );
+                },
+              ),
+            ),
+        ],
       ),
       body: StreamBuilder<List<MomentModel>>(
         stream: FirebaseService.instance.streamMoments(),
@@ -65,34 +82,37 @@ class MomentsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final moment = moments[index];
 
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: NetworkImage(moment.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              return GestureDetector(
+                onTap: () => showMomentViewer(context, moment),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                    image: DecorationImage(
+                      image: NetworkImage(moment.imageUrl),
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  alignment: Alignment.bottomLeft,
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    moment.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    alignment: Alignment.bottomLeft,
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      moment.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               );

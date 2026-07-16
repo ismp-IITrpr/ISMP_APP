@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,10 +33,12 @@ void main() async {
       serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
     );
   }
-  // Run seeding asynchronously so it doesn't block the splash screen if the user is offline
-  FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
-    debugPrint('Seeding failed: $e');
-  });
+  // Run seeding asynchronously only in debug mode so it doesn't block the splash screen
+  if (kDebugMode) {
+    FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
+      debugPrint('Seeding failed: $e');
+    });
+  }
 
   // Initialize notification service
   final notifService = NotificationService.instance;

@@ -16,6 +16,7 @@ import '../theme/app_theme.dart';
 
 class FirebaseService {
   static final FirebaseService instance = FirebaseService._init();
+  static const String imgbbApiKey = 'fe76419dd65f668bc2043f4aeec2e26b';
   FirebaseService._init();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -1007,6 +1008,29 @@ class FirebaseService {
               .map((doc) => MomentModel.fromMap(doc.data(), doc.id))
               .toList(),
         );
+  }
+
+  /// Adds a new moment to the Firestore database.
+  Future<void> addMoment(String title, String imageUrl) async {
+    try {
+      await _firestore.collection('moments').add({
+        'title': title,
+        'imageUrl': imageUrl,
+      });
+    } catch (e) {
+      debugPrint('Error adding moment: $e');
+      rethrow;
+    }
+  }
+
+  /// Deletes a moment from the Firestore database.
+  Future<void> deleteMoment(String docId) async {
+    try {
+      await _firestore.collection('moments').doc(docId).delete();
+    } catch (e) {
+      debugPrint('Error deleting moment: $e');
+      rethrow;
+    }
   }
 
   /// Streams a student's personal attendance records.

@@ -188,12 +188,6 @@ class _AddMomentScreenState extends State<AddMomentScreen> {
                               : AppColors.primary.withValues(alpha: 0.4),
                           width: 1.5,
                         ),
-                        image: _imageBytes != null
-                            ? DecorationImage(
-                                image: MemoryImage(_imageBytes!),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
                       ),
                       child: _imageBytes == null
                           ? Column(
@@ -223,18 +217,56 @@ class _AddMomentScreenState extends State<AddMomentScreen> {
                                 ),
                               ],
                             )
-                          : Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.black.withValues(alpha: 0.4),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.cached,
-                                  color: Colors.white,
-                                  size: 40,
+                          : Stack(
+                              children: [
+                                // Clean, uncropped image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Center(
+                                    child: Image.memory(
+                                      _imageBytes!,
+                                      fit: BoxFit.contain,
+                                      height: double.infinity,
+                                      width: double.infinity,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                // Floating Edit / Change label in corner
+                                Positioned(
+                                  top: 12,
+                                  right: 12,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.7),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.15),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.edit_outlined,
+                                          color: AppColors.secondaryAccent,
+                                          size: 14,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Change',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                     ),
                   ),

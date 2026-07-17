@@ -66,6 +66,7 @@ class _StudentScannerScreenState extends State<StudentScannerScreen> {
       }
 
       if (success) {
+        await DatabaseService.clearPersistentAttendanceCache(widget.studentId);
         _showSuccessDialog();
       } else {
         _showFailedDialog(errorMessage);

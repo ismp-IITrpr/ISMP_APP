@@ -653,9 +653,73 @@ class FirebaseService {
     final presentRollNos = scansSnapshot.docs
         .map((doc) => doc.id.toUpperCase().trim())
         .toSet();
-    final studentsSnapshot = await _firestore.collection('users').get();
 
-    final batch = _firestore.batch();
+    // Get targeted students list efficiently instead of fetching the whole users collection
+    List<DocumentSnapshot> targetStudents = [];
+    final rawAudience = event?.targetAudience.trim() ?? '';
+    if (rawAudience.isEmpty || rawAudience.toLowerCase() == 'all' || rawAudience.toLowerCase() == 'all members') {
+      final snap = await _firestore.collection('users').get();
+      targetStudents = snap.docs;
+    } else {
+      String degreeLimit = 'All';
+      List<int> targetGroups = [];
+      if (rawAudience.contains(':')) {
+        final parts = rawAudience.split(':');
+        degreeLimit = parts[0].trim();
+        final groupsPart = parts[1].trim().toLowerCase();
+        if (groupsPart != 'all' && groupsPart != 'all members' && groupsPart.isNotEmpty) {
+          targetGroups = groupsPart
+              .split(RegExp(r'[\s,]+'))
+              .map((s) => int.tryParse(s))
+              .whereType<int>()
+              .toList();
+        }
+      } else {
+        targetGroups = rawAudience
+            .split(RegExp(r'[\s,]+'))
+            .map((s) => int.tryParse(s))
+            .whereType<int>()
+            .toList();
+      }
+
+      Query q = _firestore.collection('users');
+      if (degreeLimit != 'All') {
+        q = q.where('degree', isEqualTo: degreeLimit);
+      }
+      
+      if (targetGroups.isNotEmpty) {
+        if (targetGroups.length <= 10) {
+          q = q.where('groupNo', whereIn: targetGroups);
+          final snap = await q.get();
+          targetStudents = snap.docs;
+        } else {
+          final snap = await q.get();
+          targetStudents = snap.docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>?;
+            if (data == null) return false;
+            final gNo = data['groupNo'] is int
+                ? data['groupNo'] as int
+                : (int.tryParse(data['groupNo']?.toString() ?? '') ?? 7);
+            return targetGroups.contains(gNo);
+          }).toList();
+        }
+      } else {
+        final snap = await q.get();
+        targetStudents = snap.docs;
+      }
+    }
+
+    WriteBatch batch = _firestore.batch();
+    int opCount = 0;
+
+    Future<void> commitBatchIfNeeded() async {
+      opCount++;
+      if (opCount >= 400) {
+        await batch.commit();
+        batch = _firestore.batch();
+        opCount = 0;
+      }
+    }
 
     // 1. Mark present for all scanned students
     for (var doc in scansSnapshot.docs) {
@@ -681,6 +745,7 @@ class FirebaseService {
       );
 
       batch.set(attendanceRef, record.toMap());
+      await commitBatchIfNeeded();
 
       // Update stickersCollected if first time attending this club
       if (eventType == 'C' && clubName.isNotEmpty) {
@@ -697,6 +762,7 @@ class FirebaseService {
             batch.update(_firestore.collection('users').doc(rollNo), {
               'stickersCollected': FieldValue.increment(1),
             });
+            await commitBatchIfNeeded();
           }
         } catch (e) {
           debugPrint('Error updating stickersCollected for $rollNo: $e');
@@ -714,76 +780,61 @@ class FirebaseService {
         'isRead': false,
         'iconType': 'attendance',
       });
+      await commitBatchIfNeeded();
     }
 
     // 2. Mark absent for target audience students who did not scan
-    for (var doc in studentsSnapshot.docs) {
+    for (var doc in targetStudents) {
       final rollNo = doc.id.toUpperCase().trim();
       if (presentRollNos.contains(rollNo)) continue;
 
-      final data = doc.data();
-      final studentDegree = data['degree'] ?? 'B.Tech';
-      final studentGroupNo = data['groupNo'] is int
-          ? data['groupNo'] as int
-          : (int.tryParse(data['groupNo']?.toString() ?? '') ?? 7);
+      final attendanceRef = _firestore
+          .collection('users')
+          .doc(rollNo)
+          .collection('attendance')
+          .doc(eventId.isNotEmpty ? eventId : sessionId);
 
-      // Check if student is in the target audience
-      final bool isTarget = event == null
-          ? true
-          : event.isStudentTargeted(studentDegree, studentGroupNo);
+      final record = AttendanceRecord(
+        eventId: eventId.isNotEmpty ? eventId : sessionId,
+        eventType: eventType,
+        title: eventName,
+        club: clubName,
+        date: date,
+        time: time,
+        venue: venue,
+        isPresent: false, // Absent
+        iconColor: dotColor,
+        markedAt: DateTime.now(),
+      );
 
-      if (isTarget) {
-        final attendanceRef = _firestore
-            .collection('users')
-            .doc(rollNo)
-            .collection('attendance')
-            .doc(eventId.isNotEmpty ? eventId : sessionId);
+      batch.set(attendanceRef, record.toMap());
+      await commitBatchIfNeeded();
 
-        final record = AttendanceRecord(
-          eventId: eventId.isNotEmpty ? eventId : sessionId,
-          eventType: eventType,
-          title: eventName,
-          club: clubName,
-          date: date,
-          time: time,
-          venue: venue,
-          isPresent: false, // Absent
-          iconColor: dotColor,
-          markedAt: DateTime.now(),
-        );
-
-        batch.set(attendanceRef, record.toMap());
-
-        // Generate notification for absent student
-        final notifRef = _firestore.collection('notifications').doc();
-        batch.set(notifRef, {
-          'userRollNo': rollNo,
-          'title': 'Attendance Marked Absent',
-          'description': 'You were marked absent for the session "$eventName".',
-          'timestamp': FieldValue.serverTimestamp(),
-          'isRead': false,
-          'iconType': 'attendance',
-        });
-      }
+      // Generate notification for absent student
+      final notifRef = _firestore.collection('notifications').doc();
+      batch.set(notifRef, {
+        'userRollNo': rollNo,
+        'title': 'Attendance Marked Absent',
+        'description': 'You were marked absent for the session "$eventName".',
+        'timestamp': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'iconType': 'attendance',
+      });
+      await commitBatchIfNeeded();
     }
 
-    await batch.commit();
+    if (opCount > 0) {
+      await batch.commit();
+    }
 
     // Send push notifications for all affected students (batched via Promise-like pattern)
     try {
       final functions = FirebaseFunctions.instance;
       final allRollNos = presentRollNos.toList();
-      for (var doc in studentsSnapshot.docs) {
+      for (var doc in targetStudents) {
         final rollNo = doc.id.toUpperCase().trim();
         if (presentRollNos.contains(rollNo)) continue;
-        final data = doc.data();
-        if (event == null ||
-            event.isStudentTargeted(data['degree'] ?? 'B.Tech',
-                data['groupNo'] is int
-                    ? data['groupNo'] as int
-                    : int.tryParse(data['groupNo']?.toString() ?? '') ?? 7)) {
-          allRollNos.add(rollNo);
-        }
+        allRollNos.add(rollNo);
       }
       // Send notifications in batches of 10 to avoid timeout
       final batches = <List<String>>[];

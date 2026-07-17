@@ -12,11 +12,26 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _initialMarkDone = false;
+  Future<QuerySnapshot>? _notificationsFuture;
 
   @override
   void initState() {
     super.initState();
+    _loadNotifications();
     _markAllAsReadOnce();
+  }
+
+  /// One-shot fetch — reads from Firestore's local SQLite cache when available
+  /// (free), only hitting the network when data is genuinely stale.
+  void _loadNotifications() {
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
+    setState(() {
+      _notificationsFuture = FirebaseFirestore.instance
+          .collection('notifications')
+          .where('userRollNo', isEqualTo: rollNo)
+          .limit(50)
+          .get();
+    });
   }
 
   Future<void> _markAllAsReadOnce() async {
@@ -54,7 +69,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rollNo = FirebaseService.instance.currentStudentRollNo;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -73,12 +87,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 22),
+            onPressed: _loadNotifications,
+            tooltip: 'Refresh notifications',
+          ),
+        ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('notifications')
-            .where('userRollNo', isEqualTo: rollNo)
-            .snapshots(),
+      body: FutureBuilder<QuerySnapshot>(
+        future: _notificationsFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(

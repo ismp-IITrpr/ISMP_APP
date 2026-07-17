@@ -153,6 +153,7 @@ class FirebaseService {
   Future<void> signOut() async {
     _cachedMentor = null;
     DatabaseService.clearCache();
+    await DatabaseService.clearBlogsAndMomentsCache();
     await _auth.signOut();
     try {
       await GoogleSignIn.instance.signOut();
@@ -864,6 +865,7 @@ class FirebaseService {
         await _firestore.collection('events').doc(eventId).update({
           'isCompleted': true,
         });
+        await _updateEventsMetadata();
       } catch (e) {
         debugPrint('Error marking event $eventId as completed: $e');
       }
@@ -937,6 +939,16 @@ class FirebaseService {
   // ─── EVENT POSTING ─────────────────────────────────────────────────
 
   /// Posts a new event to the events collection.
+  Future<void> _updateEventsMetadata() async {
+    try {
+      await _firestore.collection('metadata').doc('events_state').set({
+        'lastUpdated': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error updating events metadata: $e');
+    }
+  }
+
   Future<void> postEvent({
     required String title,
     required String date,
@@ -965,6 +977,7 @@ class FirebaseService {
       'groupNo': targetAudience,
       'dotColor': color.toARGB32(),
     });
+    await _updateEventsMetadata();
   }
 
   /// Updates an existing event in the events collection.
@@ -991,11 +1004,13 @@ class FirebaseService {
       'targetAudience': targetAudience,
       'groupNo': targetAudience,
     });
+    await _updateEventsMetadata();
   }
 
   /// Deletes an event from the events collection.
   Future<void> deleteEvent(String eventId) async {
     await _firestore.collection('events').doc(eventId).delete();
+    await _updateEventsMetadata();
   }
 
   /// Streams events specifically for a given club (type 'C').
@@ -1068,6 +1083,7 @@ class FirebaseService {
         'title': title,
         'imageUrl': imageUrl,
       });
+      await DatabaseService.clearBlogsAndMomentsCache();
     } catch (e) {
       debugPrint('Error adding moment: $e');
       rethrow;
@@ -1078,6 +1094,7 @@ class FirebaseService {
   Future<void> deleteMoment(String docId) async {
     try {
       await _firestore.collection('moments').doc(docId).delete();
+      await DatabaseService.clearBlogsAndMomentsCache();
     } catch (e) {
       debugPrint('Error deleting moment: $e');
       rethrow;

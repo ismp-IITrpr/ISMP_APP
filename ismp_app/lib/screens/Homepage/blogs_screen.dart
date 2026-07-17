@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
+import '../../services/database_service.dart';
 import 'blog_detail_screen.dart';
 import '../../theme/app_theme.dart';
 
@@ -17,8 +18,8 @@ class _BlogsScreenState extends State<BlogsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<BlogPost>>(
-      stream: FirebaseService.instance.streamBlogPosts(),
+    return FutureBuilder<List<BlogPost>>(
+      future: DatabaseService().getPersistentBlogs(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

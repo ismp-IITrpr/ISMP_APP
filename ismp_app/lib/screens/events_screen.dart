@@ -30,9 +30,9 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   void initState() {
     super.initState();
-    // Subtract 8 hours so the calendar day rolls over at 8:00 AM instead of midnight.
+    // Subtract 5 hours so the calendar day rolls over at 5:00 AM instead of midnight.
     // This keeps late-night events (e.g. 2:00 AM) visible under the previous day.
-    final logicalNow = DateTime.now().subtract(const Duration(hours: 8));
+    final logicalNow = DateTime.now().subtract(const Duration(hours: 5));
     final today = DateTime(logicalNow.year, logicalNow.month, logicalNow.day);
   
     // Hide past dates by starting the scrollbar at today's date

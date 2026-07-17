@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/attendance.dart';
 import '../services/firebase_service.dart';
+import '../services/database_service.dart';
 import '../theme/app_theme.dart';
 
 /// Total stickers that can be collected across all clubs.
@@ -104,8 +105,8 @@ class DetailedAttendanceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final rollNo = FirebaseService.instance.currentStudentRollNo;
 
-    return StreamBuilder<List<AttendanceRecord>>(
-      stream: FirebaseService.instance.streamStudentAttendance(rollNo),
+    return FutureBuilder<List<AttendanceRecord>>(
+      future: DatabaseService().getPersistentStudentAttendanceRecords(rollNo),
       builder: (context, snapshot) {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);

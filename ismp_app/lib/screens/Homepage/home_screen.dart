@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/blog.dart';
 import '../../services/firebase_service.dart';
+import '../../services/database_service.dart';
 import '../../models/team_member.dart';
-
 import '../../models/moment.dart';
 
 import 'core_team_screen.dart';
@@ -235,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isEqualTo: FirebaseService.instance.currentStudentRollNo,
                 )
                 .where('isRead', isEqualTo: false)
+                .limit(1)
                 .snapshots(),
             builder: (context, snapshot) {
               final hasUnread =
@@ -333,8 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 140,
-        child: StreamBuilder<List<MomentModel>>(
-          stream: FirebaseService.instance.streamMoments(),
+        child: FutureBuilder<List<MomentModel>>(
+          future: DatabaseService().getPersistentMoments(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -452,8 +453,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLatestBlog() {
-    return StreamBuilder<List<BlogPost>>(
-      stream: FirebaseService.instance.streamBlogPosts(),
+    return FutureBuilder<List<BlogPost>>(
+      future: DatabaseService().getPersistentBlogs(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SliverToBoxAdapter(

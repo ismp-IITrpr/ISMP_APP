@@ -299,8 +299,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                 final allEvents = eventsSnapshot.data ?? [];
 
-                return StreamBuilder<List<AttendanceRecord>>(
-                  stream: FirebaseService.instance.streamStudentAttendance(rollNo),
+                return FutureBuilder<List<AttendanceRecord>>(
+                  future: DatabaseService().getPersistentStudentAttendanceRecords(rollNo),
                   builder: (context, attendanceSnapshot) {
                     if (attendanceSnapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator(color: AppColors.primary));
@@ -311,29 +311,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                     final studentRecords = attendanceSnapshot.data ?? [];
 
-                    // Combine persistent events list with live marked student records (filtered by student's target group)
-                    List<AttendanceRecord> records = [];
+                    // Combine marked student records (past events) and upcoming events
+                    List<AttendanceRecord> records = List.from(studentRecords);
                     final studentDegree = profile?.degree ?? 'B.Tech';
                     for (var event in allEvents) {
                       if (event.isStudentTargeted(studentDegree, groupNo)) {
-                        final hasRecord = studentRecords.any((r) => r.eventId == event.id);
-                        if (hasRecord) {
-                          final matchingRecord = studentRecords.firstWhere((r) => r.eventId == event.id);
-                          records.add(matchingRecord);
-                        } else {
-                          if (event.isCompleted) {
-                            records.add(AttendanceRecord(
-                              eventId: event.id,
-                              eventType: event.type,
-                              title: event.title,
-                              club: event.club,
-                              date: event.date,
-                              time: event.time,
-                              venue: event.venue,
-                              isPresent: false,
-                              iconColor: event.dotColor,
-                            ));
-                          }
+                        final alreadyAdded = records.any((r) => r.eventId == event.id);
+                        if (!alreadyAdded) {
+                          records.add(AttendanceRecord(
+                            eventId: event.id,
+                            eventType: event.type,
+                            title: event.title,
+                            club: event.club,
+                            date: event.date,
+                            time: event.time,
+                            venue: event.venue,
+                            isPresent: false,
+                            iconColor: event.dotColor,
+                          ));
                         }
                       }
                     }

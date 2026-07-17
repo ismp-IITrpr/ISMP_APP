@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/firebase_service.dart';
+import '../../services/database_service.dart';
 import '../../models/moment.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/moment_viewer.dart';
@@ -43,8 +44,8 @@ class MomentsScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: StreamBuilder<List<MomentModel>>(
-        stream: FirebaseService.instance.streamMoments(),
+      body: FutureBuilder<List<MomentModel>>(
+        future: DatabaseService().getPersistentMoments(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(

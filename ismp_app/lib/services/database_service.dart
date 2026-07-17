@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/profile_data.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
+import '../models/blog.dart';
+import '../models/moment.dart';
 import 'notification_service.dart';
 
 class DatabaseService {
@@ -114,20 +116,17 @@ class DatabaseService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cached_events');
     await prefs.remove('events_last_fetch_time');
+    await prefs.remove('events_last_metadata_check');
   }
 
   /// Fetches events. Uses SharedPreferences if the cache is still valid.
-  ///
-  /// Cache strategy: keyed to the daily 12:00 noon cutoff.
-  /// - Before noon  → cache is valid if last fetch was after *yesterday's* noon.
-  /// - After noon   → cache is valid only if last fetch was after *today's* noon.
-  /// This guarantees events refresh once per day at noon, picking up any new
-  /// sessions added by admins in the morning.
+  /// Checks metadata timestamp at most once per day after 12:00 Noon.
   Future<List<EventModel>> getPersistentAllEvents() async {
     final prefs = await SharedPreferences.getInstance();
 
     final int? lastFetchTime = prefs.getInt('events_last_fetch_time');
     final String? savedEventsJson = prefs.getString('cached_events');
+    final int? lastMetadataCheck = prefs.getInt('events_last_metadata_check');
 
     final DateTime now = DateTime.now();
     final DateTime todayNoon = DateTime(now.year, now.month, now.day, 12, 0, 0);
@@ -137,47 +136,87 @@ class DatabaseService {
         ? todayNoon
         : todayNoon.subtract(const Duration(days: 1));
 
-    // 1. Cache hit: saved data exists AND was fetched after the most recent noon.
-      if (lastFetchTime != null &&
-          savedEventsJson != null &&
-          DateTime.fromMillisecondsSinceEpoch(lastFetchTime).isAfter(lastNoon)) {
+    bool needsCheck = false;
+    
+    // Check if we need to query metadata (only once per day after 12:00 Noon)
+    if (lastMetadataCheck == null) {
+      needsCheck = true;
+    } else {
+      final DateTime checkTime = DateTime.fromMillisecondsSinceEpoch(lastMetadataCheck);
+      if (!checkTime.isAfter(lastNoon)) {
+        needsCheck = true;
+      }
+    }
+
+    if (savedEventsJson != null && lastFetchTime != null) {
+      if (!needsCheck) {
+        // No metadata check needed yet today (already checked after 12:00 Noon)
+        // Instant load from SharedPreferences (0 reads!)
         try {
           List<dynamic> decodedList = jsonDecode(savedEventsJson);
           final decodedEvents = decodedList.map((item) => EventModel.fromMap(item, item['id'] ?? '')).toList();
-          
-          // Reschedule alarms on boot
           NotificationService.instance.scheduleEventReminders(decodedEvents);
           return decodedEvents;
-        } catch(e) {
+        } catch (e) {
           print("Error parsing cached events: $e");
         }
+      } else {
+        // We are after 12:00 Noon and haven't checked metadata yet today.
+        // Let's do a single metadata read to see if there were changes.
+        try {
+          final doc = await _db.collection('metadata').doc('events_state').get();
+          if (doc.exists) {
+            final Timestamp? remoteLastUpdated = doc.data()?['lastUpdated'] as Timestamp?;
+            final int remoteTimeMs = remoteLastUpdated?.millisecondsSinceEpoch ?? 0;
+
+            // Mark that we performed the metadata check today
+            await prefs.setInt('events_last_metadata_check', now.millisecondsSinceEpoch);
+
+            if (remoteTimeMs <= lastFetchTime) {
+              // Database did not change! Serve from local SharedPreferences cache.
+              List<dynamic> decodedList = jsonDecode(savedEventsJson);
+              final decodedEvents = decodedList.map((item) => EventModel.fromMap(item, item['id'] ?? '')).toList();
+              NotificationService.instance.scheduleEventReminders(decodedEvents);
+              return decodedEvents;
+            }
+          }
+        } catch (e) {
+          print("Error checking events metadata: $e");
+        }
       }
+    }
 
-      // 2. Cache miss (expired or first time) — fetch from Firestore.
-      try {
-        final snapshot = await _db.collection('events').limit(500).get();
-        
-        List<EventModel> freshEvents = snapshot.docs
-            .map((doc) => EventModel.fromMap(doc.data(), doc.id))
-            .toList();
+    // Cache miss (expired, first time, or database changed) — fetch from Firestore.
+    try {
+      // Query ONLY upcoming events (where date is greater than or equal to today)
+      final String todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      
+      final snapshot = await _db.collection('events')
+          .where('date', isGreaterThanOrEqualTo: todayStr)
+          .get();
+      
+      List<EventModel> freshEvents = snapshot.docs
+          .map((doc) => EventModel.fromMap(doc.data(), doc.id))
+          .toList();
 
-        List<Map<String, dynamic>> jsonList = freshEvents.map((e) {
-          var map = e.toMap();
-          map['id'] = e.id; 
-          return map;
-        }).toList();
-        
-        await prefs.setString('cached_events', jsonEncode(jsonList));
-        await prefs.setInt('events_last_fetch_time', now.millisecondsSinceEpoch);
+      List<Map<String, dynamic>> jsonList = freshEvents.map((e) {
+        var map = e.toMap();
+        map['id'] = e.id; 
+        return map;
+      }).toList();
+      
+      final currentTimeMs = now.millisecondsSinceEpoch;
+      await prefs.setString('cached_events', jsonEncode(jsonList));
+      await prefs.setInt('events_last_fetch_time', currentTimeMs);
+      await prefs.setInt('events_last_metadata_check', currentTimeMs);
 
-        // Schedule new alarms
-        NotificationService.instance.scheduleEventReminders(freshEvents);
+      NotificationService.instance.scheduleEventReminders(freshEvents);
 
-        return freshEvents;
-      } catch (e) {
-        print("Error fetching events: $e");
-        return [];
-      }
+      return freshEvents;
+    } catch (e) {
+      print("Error fetching events: $e");
+      return [];
+    }
   }
 
 
@@ -260,11 +299,11 @@ class DatabaseService {
     final allEvents = await getPersistentAllEvents();
     final studentRecords = await getPersistentStudentAttendanceRecords(studentRollNo);
 
-    List<AttendanceRecord> combined = [];
+    List<AttendanceRecord> combined = List.from(studentRecords);
     for (var event in allEvents) {
-      final matchingRecord = studentRecords.firstWhere(
-        (r) => r.eventId == event.id,
-        orElse: () => AttendanceRecord(
+      final alreadyAdded = combined.any((r) => r.eventId == event.id);
+      if (!alreadyAdded) {
+        combined.add(AttendanceRecord(
           eventId: event.id,
           eventType: event.type,
           title: event.title,
@@ -274,11 +313,99 @@ class DatabaseService {
           venue: event.venue,
           isPresent: false,
           iconColor: event.dotColor,
-        ),
-      );
-      combined.add(matchingRecord);
+        ));
+      }
     }
     
     return combined;
+  }
+
+  // ─── PERSISTENT BLOGS & MOMENTS CACHING (7 Days) ───────────────────
+
+  /// Fetches blogs. Uses SharedPreferences if the 7-day cache is valid.
+  Future<List<BlogPost>> getPersistentBlogs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? lastFetchTime = prefs.getInt('blogs_last_fetch_time');
+    final String? savedBlogsJson = prefs.getString('cached_blogs');
+
+    final int currentTime = DateTime.now().millisecondsSinceEpoch;
+    const int cacheDuration = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+    if (lastFetchTime != null && 
+        savedBlogsJson != null && 
+        (currentTime - lastFetchTime) < cacheDuration) {
+      try {
+        List<dynamic> decodedList = jsonDecode(savedBlogsJson);
+        return decodedList.map((item) => BlogPost.fromMap(item, item['id'] ?? '')).toList();
+      } catch (e) {
+        print("Error parsing cached blogs: $e");
+      }
+    }
+
+    try {
+      final snapshot = await _db.collection('blogs').orderBy('date', descending: true).get();
+      List<BlogPost> freshBlogs = snapshot.docs
+          .map((doc) => BlogPost.fromMap(doc.data(), doc.id))
+          .toList();
+
+      List<Map<String, dynamic>> jsonList = freshBlogs.map((e) => e.toMap()).toList();
+      await prefs.setString('cached_blogs', jsonEncode(jsonList));
+      await prefs.setInt('blogs_last_fetch_time', currentTime);
+
+      return freshBlogs;
+    } catch (e) {
+      print("Error fetching blogs: $e");
+      return [];
+    }
+  }
+
+  /// Fetches moments. Uses SharedPreferences if the 7-day cache is valid.
+  Future<List<MomentModel>> getPersistentMoments() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? lastFetchTime = prefs.getInt('moments_last_fetch_time');
+    final String? savedMomentsJson = prefs.getString('cached_moments');
+
+    final int currentTime = DateTime.now().millisecondsSinceEpoch;
+    const int cacheDuration = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+    if (lastFetchTime != null && 
+        savedMomentsJson != null && 
+        (currentTime - lastFetchTime) < cacheDuration) {
+      try {
+        List<dynamic> decodedList = jsonDecode(savedMomentsJson);
+        return decodedList.map((item) => MomentModel.fromMap(item, item['id'] ?? '')).toList();
+      } catch (e) {
+        print("Error parsing cached moments: $e");
+      }
+    }
+
+    try {
+      final snapshot = await _db.collection('moments').get();
+      List<MomentModel> freshMoments = snapshot.docs
+          .map((doc) => MomentModel.fromMap(doc.data(), doc.id))
+          .toList();
+
+      List<Map<String, dynamic>> jsonList = freshMoments.map((e) {
+        var map = e.toMap();
+        map['id'] = e.id;
+        return map;
+      }).toList();
+      await prefs.setString('cached_moments', jsonEncode(jsonList));
+      await prefs.setInt('moments_last_fetch_time', currentTime);
+
+      return freshMoments;
+    } catch (e) {
+      print("Error fetching moments: $e");
+      return [];
+    }
+  }
+
+  /// Force-clears persistent blogs and moments cache
+  static Future<void> clearBlogsAndMomentsCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('cached_blogs');
+    await prefs.remove('blogs_last_fetch_time');
+    await prefs.remove('cached_moments');
+    await prefs.remove('moments_last_fetch_time');
   }
 }

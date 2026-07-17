@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/profile_data.dart';
 import '../models/events.dart';
 import '../models/attendance.dart';
+import 'notification_service.dart';
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -77,38 +78,15 @@ class DatabaseService {
         final String mRollNo = user.mentorRollNo ?? '2024MEB1358';
         user.mentor = await getMentor(mRollNo);
 
-        // Dynamically compute actual stickers collected from their attendance subcollection
-        int actualStickers = 0;
-        try {
-          final attendanceSnapshot = await _db
-              .collection('users')
-              .doc(userRollNo)
-              .collection('attendance')
-              .where('isPresent', isEqualTo: true)
-              .get();
-          
-          final uniqueClubs = attendanceSnapshot.docs
-              .where((doc) {
-                final data = doc.data();
-                final String? type = data['eventType']?.toString();
-                final String? club = data['club']?.toString();
-                return type == 'C' && club != null && club.trim().isNotEmpty;
-              })
-              .map((doc) => doc.data()['club'].toString().trim().toLowerCase())
-              .toSet();
-          actualStickers = uniqueClubs.length;
-        } catch (e) {
-          print("Error computing actual stickers: $e");
-          actualStickers = user.stickersCollected;
-        }
-
+        // stickersCollected is maintained by FieldValue.increment during session submission.
+        // No need to recompute it here — trust the stored counter.
         user = UserProfile(
           name: user.name,
           rollNo: user.rollNo,
           degree: user.degree,
           branch: user.branch,
           groupNo: user.groupNo,
-          stickersCollected: actualStickers,
+          stickersCollected: user.stickersCollected,
           profileUrl: user.profileUrl,
           mentorRollNo: user.mentorRollNo,
           mentor: user.mentor,
@@ -139,54 +117,69 @@ class DatabaseService {
   }
 
   /// Fetches events. Uses SharedPreferences if the cache is still valid.
+  ///
+  /// Cache strategy: keyed to the daily 12:00 noon cutoff.
+  /// - Before noon  → cache is valid if last fetch was after *yesterday's* noon.
+  /// - After noon   → cache is valid only if last fetch was after *today's* noon.
+  /// This guarantees events refresh once per day at noon, picking up any new
+  /// sessions added by admins in the morning.
   Future<List<EventModel>> getPersistentAllEvents() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    // We store the exact time we last fetched events (as milliseconds since epoch)
+
     final int? lastFetchTime = prefs.getInt('events_last_fetch_time');
     final String? savedEventsJson = prefs.getString('cached_events');
 
-    final int currentTime = DateTime.now().millisecondsSinceEpoch;
-    
-    // 4 HOURS IN MILLISECONDS: 4 * 60 * 60 * 1000 = 14,400,000 ms
-    // To change the cache duration, simply change this number
-    const int cacheDuration = 4 * 60 * 60 * 1000; 
+    final DateTime now = DateTime.now();
+    final DateTime todayNoon = DateTime(now.year, now.month, now.day, 12, 0, 0);
 
-    // 1. If we have saved data and it hasn't expired yet, use the cache!
-    if (lastFetchTime != null && 
-        savedEventsJson != null && 
-        (currentTime - lastFetchTime) < cacheDuration) {
-      try {
-        List<dynamic> decodedList = jsonDecode(savedEventsJson);
-        return decodedList.map((item) => EventModel.fromMap(item, item['id'] ?? '')).toList();
-      } catch(e) {
-        print("Error parsing cached events: $e");
+    // "Last noon" = today's noon if we're past it, otherwise yesterday's noon.
+    final DateTime lastNoon = now.isAfter(todayNoon)
+        ? todayNoon
+        : todayNoon.subtract(const Duration(days: 1));
+
+    // 1. Cache hit: saved data exists AND was fetched after the most recent noon.
+      if (lastFetchTime != null &&
+          savedEventsJson != null &&
+          DateTime.fromMillisecondsSinceEpoch(lastFetchTime).isAfter(lastNoon)) {
+        try {
+          List<dynamic> decodedList = jsonDecode(savedEventsJson);
+          final decodedEvents = decodedList.map((item) => EventModel.fromMap(item, item['id'] ?? '')).toList();
+          
+          // Reschedule alarms on boot
+          NotificationService.instance.scheduleEventReminders(decodedEvents);
+          return decodedEvents;
+        } catch(e) {
+          print("Error parsing cached events: $e");
+        }
       }
-    }
 
-    // 2. Otherwise (cache expired or first time), fetch from Firebase
-    try {
-      final snapshot = await _db.collection('events').limit(500).get();
-      
-      List<EventModel> freshEvents = snapshot.docs
-          .map((doc) => EventModel.fromMap(doc.data(), doc.id))
-          .toList();
+      // 2. Cache miss (expired or first time) — fetch from Firestore.
+      try {
+        final snapshot = await _db.collection('events').limit(500).get();
+        
+        List<EventModel> freshEvents = snapshot.docs
+            .map((doc) => EventModel.fromMap(doc.data(), doc.id))
+            .toList();
 
-      List<Map<String, dynamic>> jsonList = freshEvents.map((e) {
-        var map = e.toMap();
-        map['id'] = e.id; 
-        return map;
-      }).toList();
-      
-      await prefs.setString('cached_events', jsonEncode(jsonList));
-      await prefs.setInt('events_last_fetch_time', currentTime); // Save current timestamp
+        List<Map<String, dynamic>> jsonList = freshEvents.map((e) {
+          var map = e.toMap();
+          map['id'] = e.id; 
+          return map;
+        }).toList();
+        
+        await prefs.setString('cached_events', jsonEncode(jsonList));
+        await prefs.setInt('events_last_fetch_time', now.millisecondsSinceEpoch);
 
-      return freshEvents;
-    } catch (e) {
-      print("Error fetching events: $e");
-      return [];
-    }
+        // Schedule new alarms
+        NotificationService.instance.scheduleEventReminders(freshEvents);
+
+        return freshEvents;
+      } catch (e) {
+        print("Error fetching events: $e");
+        return [];
+      }
   }
+
 
   /// Returns events for a specific day index using the persistent cache.
   Future<List<EventModel>> getPersistentEventsForDay(int day) async {
@@ -195,6 +188,16 @@ class DatabaseService {
       final map = e.toMap();
       return map['day'] == day;
     }).toList();
+  }
+
+  /// Returns club-type events for a specific club using the persistent cache.
+  /// Used by the rep's Attendance tab — avoids a live Firestore stream.
+  Future<List<EventModel>> getEventsForClub(String clubName) async {
+    if (clubName.isEmpty) return [];
+    final allEvents = await getPersistentAllEvents();
+    return allEvents
+        .where((e) => e.type == 'C' && e.club == clubName)
+        .toList();
   }
 
   // ─── PERSISTENT ATTENDANCE CACHING (SharedPreferences) ───────────
@@ -207,7 +210,8 @@ class DatabaseService {
     final String? savedJson = prefs.getString('cached_attendance_$studentRollNo');
 
     final int currentTime = DateTime.now().millisecondsSinceEpoch;
-    const int cacheDuration = 4 * 60 * 60 * 1000; 
+    // 24 hours — attendance records only update when a rep submits a session.
+    const int cacheDuration = 24 * 60 * 60 * 1000;
 
     if (lastFetchTime != null && 
         savedJson != null && 

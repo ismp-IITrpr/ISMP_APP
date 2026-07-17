@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -26,6 +27,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // ── Firestore Offline Persistence ──────────────────────────────────────
+  // Reads served from the local SQLite cache are FREE — they don't count
+  // against the 50K/day Firestore quota. The SDK syncs in the background
+  // and serves stale data instantly while a fresh fetch is in-flight.
+  // Skip on web: IndexedDB persistence is already enabled by default there.
+  if (!kIsWeb) {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+  }
+
   if (kIsWeb) {
     await GoogleSignIn.instance.initialize();
   } else {

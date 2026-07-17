@@ -13,6 +13,8 @@ interface Event {
   type?: string;
   club?: string;
   description?: string;
+  targetRollNos?: string[];
+  dotColor?: number;
 }
 
 interface UserProfile {
@@ -22,39 +24,6 @@ interface UserProfile {
   role?: string;
 }
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-function parseEventDateTime(dateStr: string, timeStr: string): { start: Date | null; isValid: boolean } {
-  try {
-    const [year, month, day] = dateStr.split('-');
-    const timeParts = timeStr.split(' ');
-    const timeValue = timeParts[0];
-    const period = timeParts[1];
-
-    let [hoursStr, minutesStr] = timeValue.split(':');
-    let hours = parseInt(hoursStr, 10);
-    const minutes = parseInt(minutesStr, 10);
-
-    if (period?.toLowerCase() === 'pm' && hours !== 12) {
-      hours += 12;
-    } else if (period?.toLowerCase() === 'am' && hours === 12) {
-      hours = 0;
-    }
-
-    const utcDate = new Date(Date.UTC(
-      parseInt(year, 10),
-      parseInt(month, 10) - 1,
-      parseInt(day, 10),
-      hours,
-      minutes
-    ));
-    const istDate = new Date(utcDate.getTime() - IST_OFFSET_MS);
-    return { start: istDate, isValid: true };
-  } catch (error) {
-    console.error('Error parsing date/time:', dateStr, timeStr, error);
-    return { start: null, isValid: false };
-  }
-}
 
 function normalize(val: string): string {
   return val.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -131,6 +100,41 @@ async function sendCombinedNotification(
 
 // === CLOUD FUNCTIONS ===
 
+// 1a. Triggered when an event is created or updated to compute targetRollNos
+export const onEventWrite = functions.firestore
+  .document('events/{eventId}')
+  .onWrite(async (change: functions.Change<functions.firestore.DocumentSnapshot>, context: functions.EventContext) => {
+    const after = change.after.data() as Event | undefined;
+    if (!after) return; // Event deleted
+
+    const before = change.before.data() as Event | undefined;
+
+    // Skip if targeting didn't change and targetRollNos already exists to prevent infinite loops
+    if (before &&
+      before.targetAudience === after.targetAudience &&
+      before.groupNo === after.groupNo &&
+      after.targetRollNos !== undefined) {
+      return;
+    }
+
+    console.log(`Computing targetRollNos for event ${context.params.eventId}`);
+    const studentsSnapshot = await admin.firestore().collection('users').get();
+    const targetRollNos: string[] = [];
+
+    for (const doc of studentsSnapshot.docs) {
+      const student = doc.data() as UserProfile;
+      if (student.role === 'rep') continue;
+
+      if (isTargeted(student, after)) {
+        targetRollNos.push(doc.id.toUpperCase().trim());
+      }
+    }
+
+    await change.after.ref.update({ targetRollNos });
+    console.log(`Saved ${targetRollNos.length} target roll numbers for event ${context.params.eventId}`);
+  });
+
+
 // 1. Triggered when a notification document is created — sends FCM push notification
 export const onNotificationCreated = functions.firestore
   .document('notifications/{notificationId}')
@@ -186,144 +190,123 @@ export const onNotificationCreated = functions.firestore
     }
   });
 
-// 2. Triggered when an event is created — schedules reminders
-export const scheduleEventReminders = functions.firestore
-  .document('events/{eventId}')
-  .onCreate(async (snap: functions.firestore.QueryDocumentSnapshot, context: functions.EventContext) => {
-    const event = snap.data() as Event;
-    const { start, isValid } = parseEventDateTime(event.date, event.time);
-    if (!isValid || !start) return;
 
-    const scheduleAt = async (minutesBefore: number, timing: string) => {
-      const triggerTime = new Date(start.getTime() - minutesBefore * 60 * 1000);
-      const delayMs = triggerTime.getTime() - Date.now();
-      if (delayMs <= 0) return;
-
-      await admin.firestore().collection('reminder_tasks').add({
-        eventId: context.params.eventId,
-        timing,
-        executeAt: admin.firestore.Timestamp.fromDate(triggerTime),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    };
-
-    await Promise.all([
-      scheduleAt(60, '1hr'),
-      scheduleAt(15, '15min'),
-    ]);
-  });
-
-// 3. Processes pending reminders (run via scheduled function or on-demand)
-export const processReminders = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+// 5. Submit session attendance (Cloud Function replaces client-side 1000+ reads)
+export const submitAttendance = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Authentication required.');
   }
 
-  const now = admin.firestore.Timestamp.now();
-  const pendingRef = admin.firestore()
-    .collection('reminder_tasks')
-    .where('executeAt', '<=', now)
-    .limit(50);
+  const sessionId = data.sessionId;
+  if (!sessionId) {
+    throw new functions.https.HttpsError('invalid-argument', 'sessionId is required.');
+  }
 
-  const snapshot = await pendingRef.get();
+  const db = admin.firestore();
+  const sessionDoc = await db.collection('attendance_sessions').doc(sessionId).get();
+  if (!sessionDoc.exists) return { success: false, message: 'Session not found' };
 
-  for (const doc of snapshot.docs) {
-    try {
-      const task = doc.data();
-      const eventDoc = await admin.firestore().collection('events').doc(task.eventId).get();
-      if (!eventDoc.exists) {
-        await doc.ref.delete();
-        continue;
-      }
+  const sessionData = sessionDoc.data()!;
+  const eventId = sessionData.eventId || '';
+  const eventName = sessionData.eventName || '';
+  const venue = sessionData.venue || '';
 
-      const event = eventDoc.data() as Event;
-      const { start } = parseEventDateTime(event.date, event.time);
-      const timingLabel = task.timing === '1hr' ? '1 hour' : '15 minutes';
-
-      const studentsSnapshot = await admin.firestore().collection('users').limit(1500).get();
-      const notificationPromises: Promise<void>[] = [];
-
-      for (const studentDoc of studentsSnapshot.docs) {
-        const student = studentDoc.data() as UserProfile;
-        if (student.role === 'rep') continue;
-        const rollNo = studentDoc.id.trim().toUpperCase();
-
-        if (isTargeted(student, event)) {
-          notificationPromises.push(
-            sendCombinedNotification(
-              rollNo,
-              `Event Reminder: ${event.title}`,
-              `${event.title} starts in ${timingLabel} at ${event.venue}`,
-              'event',
-              'reminder',
-              task.eventId,
-              start ? admin.firestore.Timestamp.fromDate(start) : undefined,
-            )
-          );
-        }
-      }
-
-      await Promise.all(notificationPromises);
-      await doc.ref.delete();
-    } catch (e) {
-      console.error('Error processing reminder task:', e);
+  let event: Event | null = null;
+  if (eventId) {
+    const eventDoc = await db.collection('events').doc(eventId).get();
+    if (eventDoc.exists) {
+      event = eventDoc.data() as Event;
     }
   }
 
-  return { processed: snapshot.docs.length };
-});
+  const eventType = event?.type || 'E';
+  const clubName = event?.club || '';
+  const date = event?.date || '';
+  const time = event?.time || '';
+  const dotColor = event?.dotColor ?? 0xFFD9278D; // Default to AppColors.primary
 
-// 4. Scheduled function that runs every minute to process reminders
-export const scheduledProcessReminders = functions.pubsub
-  .schedule('every 1 minutes')
-  .onRun(async () => {
-    const now = admin.firestore.Timestamp.now();
-    const snapshot = await admin.firestore()
-      .collection('reminder_tasks')
-      .where('executeAt', '<=', now)
-      .limit(50)
-      .get();
+  // Get present students
+  const scansSnapshot = await db.collection('attendance_sessions').doc(sessionId).collection('scans').get();
+  const presentRollNos = new Set(scansSnapshot.docs.map(doc => doc.id.toUpperCase().trim()));
 
-    for (const doc of snapshot.docs) {
-      try {
-        const task = doc.data();
-        const eventDoc = await admin.firestore().collection('events').doc(task.eventId).get();
-        if (!eventDoc.exists) {
-          await doc.ref.delete();
-          continue;
-        }
-
-        const event = eventDoc.data() as Event;
-        const { start } = parseEventDateTime(event.date, event.time);
-        const timingLabel = task.timing === '1hr' ? '1 hour' : '15 minutes';
-
-      const studentsSnapshot = await admin.firestore().collection('users').limit(1500).get();
-        const notificationPromises: Promise<void>[] = [];
-
-        for (const studentDoc of studentsSnapshot.docs) {
-          const student = studentDoc.data() as UserProfile;
-          if (student.role === 'rep') continue;
-          const rollNo = studentDoc.id.trim().toUpperCase();
-
-          if (isTargeted(student, event)) {
-            notificationPromises.push(
-              sendCombinedNotification(
-                rollNo,
-                `Event Reminder: ${event.title}`,
-                `${event.title} starts in ${timingLabel} at ${event.venue}`,
-                'event',
-                'reminder',
-                task.eventId,
-                start ? admin.firestore.Timestamp.fromDate(start) : undefined,
-              )
-            );
-          }
-        }
-
-        await Promise.all(notificationPromises);
-        await doc.ref.delete();
-      } catch (e) {
-        console.error('Error processing scheduled reminder:', e);
+  // Get target students
+  let targetRollNos: string[] = [];
+  if (event?.targetRollNos) {
+    targetRollNos = event.targetRollNos;
+  } else {
+    // Fallback if targetRollNos not computed yet
+    const studentsSnapshot = await db.collection('users').get();
+    for (const doc of studentsSnapshot.docs) {
+      const student = doc.data() as UserProfile;
+      if (student.role !== 'rep' && (!event || isTargeted(student, event))) {
+        targetRollNos.push(doc.id.toUpperCase().trim());
       }
     }
+  }
+
+  const batch = db.batch();
+  const notificationPromises: Promise<void>[] = [];
+
+  // 1. Process Present Students
+  for (const doc of scansSnapshot.docs) {
+    const rollNo = doc.id.toUpperCase().trim();
+    const attendanceRef = db.collection('users').doc(rollNo).collection('attendance').doc(eventId || sessionId);
+
+    batch.set(attendanceRef, {
+      eventId: eventId || sessionId,
+      eventType,
+      title: eventName,
+      club: clubName,
+      date,
+      time,
+      venue,
+      isPresent: true,
+      iconColor: dotColor,
+      markedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Update stickers if club event
+    if (eventType === 'C' && clubName) {
+      const existing = await db.collection('users').doc(rollNo).collection('attendance')
+        .where('club', '==', clubName).where('isPresent', '==', true).limit(1).get();
+      if (existing.empty) {
+        batch.update(db.collection('users').doc(rollNo), {
+          stickersCollected: admin.firestore.FieldValue.increment(1)
+        });
+      }
+    }
+
+    notificationPromises.push(
+      sendCombinedNotification(rollNo, 'Attendance Marked', `Your attendance for the session "${eventName}" has been marked present.`, 'attendance', 'attendance')
+    );
+  }
+
+  // 2. Process Absent Students
+  for (const rollNo of targetRollNos) {
+    if (presentRollNos.has(rollNo)) continue;
+
+    const attendanceRef = db.collection('users').doc(rollNo).collection('attendance').doc(eventId || sessionId);
+    batch.set(attendanceRef, {
+      eventId: eventId || sessionId,
+      eventType,
+      title: eventName,
+      club: clubName,
+      date,
+      time,
+      venue,
+      isPresent: false,
+      iconColor: dotColor,
+      markedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  // End session
+  batch.update(db.collection('attendance_sessions').doc(sessionId), {
+    status: 'ended'
   });
+
+  await batch.commit();
+  await Promise.all(notificationPromises);
+
+  return { success: true, presentCount: presentRollNos.size, absentCount: targetRollNos.length - presentRollNos.size };
+});

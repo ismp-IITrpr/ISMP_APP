@@ -115,26 +115,13 @@ class AuthGate extends StatelessWidget {
           return const LoginScreen();
         }
 
-        // User is logged in — determine their role
-        return FutureBuilder<bool>(
-          future: AuthPreferences.getIsRep(),
-          builder: (context, repSnapshot) {
-            if (repSnapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                backgroundColor: AppColors.background,
-                body: Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                ),
-              );
-            }
-
-            final isRep = repSnapshot.data ?? false;
-            if (isRep) {
-              return const RepMainLayout();
-            }
-            return const MainLayout(isRep: false);
-          },
-        );
+        // User is logged in — determine their role dynamically from their email
+        // to prevent any race condition between Firebase Auth stream and SharedPreferences writes.
+        final isRep = FirebaseService.instance.isClubRep(user.email);
+        if (isRep) {
+          return const RepMainLayout();
+        }
+        return const MainLayout(isRep: false);
       },
     );
   }

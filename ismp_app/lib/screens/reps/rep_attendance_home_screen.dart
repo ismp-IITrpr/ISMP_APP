@@ -242,7 +242,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        children: ['All', 'B.Tech', 'M.Tech', 'B.Sc'].map((degree) {
+                        children: ['All', 'B.Tech', 'M.Tech', 'B.Sc', 'M.Sc'].map((degree) {
                           final isSel = selectedDegree == degree;
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
@@ -257,7 +257,7 @@ class _RepAttendanceHomeScreenState extends State<RepAttendanceHomeScreen> {
                                     selectedDegree = degree;
                                     if (selectedDegree == 'All') {
                                       selectedGroups.clear();
-                                    } else if (selectedDegree == 'M.Tech' || selectedDegree == 'B.Sc') {
+                                    } else if (selectedDegree == 'M.Tech' || selectedDegree == 'B.Sc' || selectedDegree == 'M.Sc') {
                                       selectedGroups.removeWhere((g) => g > 1);
                                     }
                                   });

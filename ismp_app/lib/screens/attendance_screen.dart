@@ -317,7 +317,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     for (var event in allEvents) {
                       if (event.isStudentTargeted(studentDegree, groupNo)) {
                         final alreadyAdded = records.any((r) => r.eventId == event.id);
-                        if (!alreadyAdded) {
+                        if (!alreadyAdded && event.isCompleted) {
                           records.add(AttendanceRecord(
                             eventId: event.id,
                             eventType: event.type,

@@ -213,7 +213,7 @@ class _RepDashboardState extends State<RepDashboard> {
             ),
             const SizedBox(height: 8),
             Row(
-              children: ['All', 'B.Tech', 'M.Tech', 'B.Sc'].map((degree) {
+              children: ['All', 'B.Tech', 'M.Tech', 'B.Sc', 'M.Sc'].map((degree) {
                 final isSel = _selectedDegree == degree;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -228,7 +228,7 @@ class _RepDashboardState extends State<RepDashboard> {
                           _selectedDegree = degree;
                           if (_selectedDegree == 'All') {
                             _selectedGroups.clear();
-                          } else if (_selectedDegree == 'M.Tech' || _selectedDegree == 'B.Sc') {
+                          } else if (_selectedDegree == 'M.Tech' || _selectedDegree == 'B.Sc' || _selectedDegree == 'M.Sc') {
                             _selectedGroups.removeWhere((g) => g > 1);
                           }
                         });

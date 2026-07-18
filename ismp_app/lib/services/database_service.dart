@@ -302,7 +302,7 @@ class DatabaseService {
     List<AttendanceRecord> combined = List.from(studentRecords);
     for (var event in allEvents) {
       final alreadyAdded = combined.any((r) => r.eventId == event.id);
-      if (!alreadyAdded) {
+      if (!alreadyAdded && event.isCompleted) {
         combined.add(AttendanceRecord(
           eventId: event.id,
           eventType: event.type,

@@ -1157,21 +1157,24 @@ class FirebaseService {
       List<AttendanceRecord> combined = [];
 
       for (var event in latestEvents) {
-        final matchingRecord = latestRecords.firstWhere(
-          (r) => r.eventId == event.id,
-          orElse: () => AttendanceRecord(
-            eventId: event.id,
-            eventType: event.type,
-            title: event.title,
-            club: event.club,
-            date: event.date,
-            time: event.time,
-            venue: event.venue,
-            isPresent: false,
-            iconColor: event.dotColor,
-          ),
-        );
-        combined.add(matchingRecord);
+        final hasRecord = latestRecords.any((r) => r.eventId == event.id);
+        if (event.isCompleted || hasRecord) {
+          final matchingRecord = latestRecords.firstWhere(
+            (r) => r.eventId == event.id,
+            orElse: () => AttendanceRecord(
+              eventId: event.id,
+              eventType: event.type,
+              title: event.title,
+              club: event.club,
+              date: event.date,
+              time: event.time,
+              venue: event.venue,
+              isPresent: false,
+              iconColor: event.dotColor,
+            ),
+          );
+          combined.add(matchingRecord);
+        }
       }
 
       controller.add(combined);

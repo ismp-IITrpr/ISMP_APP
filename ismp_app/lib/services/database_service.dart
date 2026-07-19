@@ -40,7 +40,7 @@ class DatabaseService {
   // 1. Fetch Mentor by their Roll Number
   Future<MentorProfile?> getMentor(String mentorRollNo) async {
     try {
-      DocumentSnapshot doc = await _db.collection('mentors').doc(mentorRollNo).get();
+      DocumentSnapshot doc = await _db.collection('mentors').doc(mentorRollNo.trim()).get();
       if (doc.exists) {
         return MentorProfile.fromFirestore(doc);
       }

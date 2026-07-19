@@ -160,6 +160,7 @@ class AttendanceService {
         eventId: eventId,
         eventType: eventType,
         title: event?.title ?? '',
+        club: event?.club ?? '',
         date: event?.date ?? '',
         time: event?.time ?? '',
         venue: event?.venue ?? '',

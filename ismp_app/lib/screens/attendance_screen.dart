@@ -256,8 +256,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Widget _buildStudentView(BuildContext context) {
     final String rollNo = FirebaseService.instance.currentStudentRollNo;
-    return FutureBuilder<UserProfile?>(
-      future: DatabaseService().getUserProfile(rollNo),
+    return StreamBuilder<UserProfile?>(
+      stream: DatabaseService().streamUserProfile(rollNo),
       builder: (context, profileSnapshot) {
         final profile = profileSnapshot.data;
         final int groupNo = profile?.groupNo ?? 7;
@@ -299,8 +299,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                 final allEvents = eventsSnapshot.data ?? [];
 
-                return FutureBuilder<List<AttendanceRecord>>(
-                  future: DatabaseService().getPersistentStudentAttendanceRecords(rollNo),
+                return StreamBuilder<List<AttendanceRecord>>(
+                  stream: DatabaseService().streamPersistentStudentAttendanceRecords(rollNo),
                   builder: (context, attendanceSnapshot) {
                     if (attendanceSnapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator(color: AppColors.primary));

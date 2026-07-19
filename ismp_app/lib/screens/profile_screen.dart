@@ -28,8 +28,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final String rollNo = FirebaseService.instance.currentStudentRollNo;
 
-    return FutureBuilder<UserProfile?>(
-      future: DatabaseService().getUserProfile(rollNo),
+    return StreamBuilder<UserProfile?>(
+      stream: DatabaseService().streamUserProfile(rollNo),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

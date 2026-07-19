@@ -112,6 +112,27 @@ class DatabaseService {
     return null;
   }
 
+  /// Real-time stream of User Profile.
+  /// Updates SharedPreferences and memory cache in the background whenever Firestore updates.
+  Stream<UserProfile?> streamUserProfile(String userRollNo) {
+    return _db.collection('users').doc(userRollNo).snapshots().asyncMap((doc) async {
+      if (doc.exists) {
+        UserProfile user = UserProfile.fromFirestore(doc);
+        final String mRollNo = user.mentorRollNo ?? '2024MEB1358';
+        user.mentor = await getMentor(mRollNo);
+
+        // Update in-memory and persistent cache
+        _cachedProfile = user;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_profile_rollno', userRollNo);
+        await prefs.setString('cached_profile', jsonEncode(user.toMap()));
+
+        return user;
+      }
+      return null;
+    });
+  }
+
   // ─── PERSISTENT EVENTS CACHING (SharedPreferences) ─────────────────
   
   /// Force-clears the persistent cache
@@ -278,6 +299,7 @@ class DatabaseService {
           'eventId': e.eventId,
           'eventType': e.eventType,
           'title': e.title,
+          'club': e.club,
           'date': e.date,
           'time': e.time,
           'venue': e.venue,
@@ -295,6 +317,43 @@ class DatabaseService {
       print("Error fetching attendance: $e");
       return [];
     }
+  }
+
+  /// Real-time stream of student's personal attendance records.
+  /// Updates SharedPreferences cache in the background whenever Firestore updates,
+  /// so that offline/cached loads also get the latest scanned records.
+  Stream<List<AttendanceRecord>> streamPersistentStudentAttendanceRecords(String studentRollNo) {
+    return _db
+        .collection('users')
+        .doc(studentRollNo)
+        .collection('attendance')
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<AttendanceRecord> freshRecords = snapshot.docs
+          .map((doc) => AttendanceRecord.fromFirestore(doc))
+          .toList();
+
+      List<Map<String, dynamic>> jsonList = freshRecords.map((e) {
+        return {
+          'eventId': e.eventId,
+          'eventType': e.eventType,
+          'title': e.title,
+          'club': e.club,
+          'date': e.date,
+          'time': e.time,
+          'venue': e.venue,
+          'isPresent': e.isPresent,
+          'iconColor': e.iconColor.toARGB32(),
+          'markedAt': e.markedAt?.toIso8601String(),
+        };
+      }).toList();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_attendance_$studentRollNo', jsonEncode(jsonList));
+      await prefs.setInt('attendance_last_fetch_time_$studentRollNo', DateTime.now().millisecondsSinceEpoch);
+
+      return freshRecords;
+    });
   }
 
   /// Combines persistent events and persistent student records (showing full schedule to everyone).

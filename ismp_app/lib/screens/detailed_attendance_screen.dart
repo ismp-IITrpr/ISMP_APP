@@ -105,8 +105,8 @@ class DetailedAttendanceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final rollNo = FirebaseService.instance.currentStudentRollNo;
 
-    return FutureBuilder<List<AttendanceRecord>>(
-      future: DatabaseService().getPersistentStudentAttendanceRecords(rollNo),
+    return StreamBuilder<List<AttendanceRecord>>(
+      stream: DatabaseService().streamPersistentStudentAttendanceRecords(rollNo),
       builder: (context, snapshot) {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);

@@ -2,3 +2,10 @@
 **/node_modules/
 functions/lib/
 ismp_app/functions/lib/
+
+# Credentials & Database Seeding Files
+**/serviceAccountKey.json
+**/mentors.csv
+**/mentors.xlsx
+**/mentor_details_script/
+

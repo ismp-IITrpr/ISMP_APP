@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Credentials & Seeding files
+**/serviceAccountKey.json
+**/mentors.csv
+**/mentors.xlsx
+**/mentor_details_script/

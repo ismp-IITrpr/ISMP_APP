@@ -25,9 +25,15 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
+  late final Stream<UserProfile?> _profileStream;
+  late final Stream<List<AttendanceRecord>> _attendanceStream;
+
   @override
   void initState() {
     super.initState();
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
+    _profileStream = DatabaseService().streamUserProfile(rollNo);
+    _attendanceStream = DatabaseService().streamPersistentStudentAttendanceRecords(rollNo);
   }
 
   void _openScanner() {
@@ -257,7 +263,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget _buildStudentView(BuildContext context) {
     final String rollNo = FirebaseService.instance.currentStudentRollNo;
     return StreamBuilder<UserProfile?>(
-      stream: DatabaseService().streamUserProfile(rollNo),
+      stream: _profileStream,
       builder: (context, profileSnapshot) {
         final profile = profileSnapshot.data;
         final int groupNo = profile?.groupNo ?? 7;
@@ -300,7 +306,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 final allEvents = eventsSnapshot.data ?? [];
 
                 return StreamBuilder<List<AttendanceRecord>>(
-                  stream: DatabaseService().streamPersistentStudentAttendanceRecords(rollNo),
+                  stream: _attendanceStream,
                   builder: (context, attendanceSnapshot) {
                     if (attendanceSnapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator(color: AppColors.primary));

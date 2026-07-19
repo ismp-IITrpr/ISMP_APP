@@ -8,8 +8,14 @@ import '../theme/app_theme.dart';
 /// Total stickers that can be collected across all clubs.
 const int TOTAL_STICKERS = 36;
 
-class DetailedAttendanceScreen extends StatelessWidget {
+class DetailedAttendanceScreen extends StatefulWidget {
   const DetailedAttendanceScreen({super.key});
+
+  @override
+  State<DetailedAttendanceScreen> createState() => _DetailedAttendanceScreenState();
+}
+
+class _DetailedAttendanceScreenState extends State<DetailedAttendanceScreen> {
 
   // ── Club data per board ──────────────────────────────────────────────
   // 'image' is the filename inside assets/images/clubs/
@@ -101,12 +107,19 @@ class DetailedAttendanceScreen extends StatelessWidget {
     return count;
   }
 
+  late final Stream<List<AttendanceRecord>> _attendanceStream;
+
+  @override
+  void initState() {
+    super.initState();
+    final rollNo = FirebaseService.instance.currentStudentRollNo;
+    _attendanceStream = DatabaseService().streamPersistentStudentAttendanceRecords(rollNo);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final rollNo = FirebaseService.instance.currentStudentRollNo;
-
     return StreamBuilder<List<AttendanceRecord>>(
-      stream: DatabaseService().streamPersistentStudentAttendanceRecords(rollNo),
+      stream: _attendanceStream,
       builder: (context, snapshot) {
         final records = snapshot.data ?? [];
         final int collected = _countCollectedStickers(records);

@@ -7,7 +7,7 @@ import '../services/firebase_service.dart';
 import '../services/auth_preferences.dart';
 import '../theme/app_theme.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final bool isRep;
 
   const ProfileScreen({
@@ -15,6 +15,11 @@ class ProfileScreen extends StatelessWidget {
     this.isRep = false,
   });
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   static const int TOTAL_STICKERS = 36;
 
   // Colors based on reference images
@@ -24,12 +29,20 @@ class ProfileScreen extends StatelessWidget {
   static const Color primaryPurple = AppColors.primary;
   static const Color textGray = AppColors.mutedText;
   static const Color dividerColor = AppColors.background;
+
+  late final Stream<UserProfile?> _profileStream;
+
+  @override
+  void initState() {
+    super.initState();
+    final String rollNo = FirebaseService.instance.currentStudentRollNo;
+    _profileStream = DatabaseService().streamUserProfile(rollNo);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String rollNo = FirebaseService.instance.currentStudentRollNo;
-
     return StreamBuilder<UserProfile?>(
-      stream: DatabaseService().streamUserProfile(rollNo),
+      stream: _profileStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

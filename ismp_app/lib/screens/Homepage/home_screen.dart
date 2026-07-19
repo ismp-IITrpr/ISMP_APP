@@ -227,54 +227,55 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('notifications')
-                .where(
-                  'userRollNo',
-                  isEqualTo: FirebaseService.instance.currentStudentRollNo,
-                )
-                .where('isRead', isEqualTo: false)
-                .limit(1)
-                .snapshots(),
-            builder: (context, snapshot) {
-              final hasUnread =
-                  snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+          if (!FirebaseService.instance.isClubRep(FirebaseService.instance.currentUserEmail))
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('notifications')
+                  .where(
+                    'userRollNo',
+                    isEqualTo: FirebaseService.instance.currentStudentRollNo,
+                  )
+                  .where('isRead', isEqualTo: false)
+                  .limit(1)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final hasUnread =
+                    snapshot.hasData && snapshot.data!.docs.isNotEmpty;
 
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_none,
-                      color: Colors.white,
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.notifications_none,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationsScreen(),
+                          ),
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  if (hasUnread)
-                    Positioned(
-                      right: 10,
-                      top: 10,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: AppColors.error,
-                          shape: BoxShape.circle,
+                    if (hasUnread)
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            color: AppColors.error,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              );
-            },
-          ),
+                  ],
+                );
+              },
+            ),
         ],
       ),
       body: SafeArea(

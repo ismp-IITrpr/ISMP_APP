@@ -29,9 +29,12 @@ class DatabaseService {
 
   /// Force-clears the persistent attendance cache
   static Future<void> clearPersistentAttendanceCache(String rollNo) async {
+    _cachedProfile = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cached_attendance_$rollNo');
     await prefs.remove('attendance_last_fetch_time_$rollNo');
+    await prefs.remove('cached_profile');
+    await prefs.remove('cached_profile_rollno');
   }
 
   // 1. Fetch Mentor by their Roll Number

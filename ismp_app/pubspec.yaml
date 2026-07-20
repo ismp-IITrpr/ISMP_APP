@@ -76,7 +76,13 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/Theme images/
+    - assets/theme_images/login_bg.png
+    - assets/theme_images/college.png
+    - assets/theme_images/iitrpr_logo.png
+    - assets/theme_images/iitrpr_logo_2.png
+    - assets/theme_images/ismp_logo.png
+    - assets/theme_images/my_logo.png
+    - assets/theme_images/G.png
     - img/2026/
     - assets/images/carousel/
     - assets/images/clubs/

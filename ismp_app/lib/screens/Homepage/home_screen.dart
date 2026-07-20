@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'ISMP Handbook',
         subtitle: 'Start your IIT journey\nwith confidence.',
         icon: Icons.book,
-        bgImage: 'assets/Theme images/iitrpr_logo_2.png',
+        bgImage: 'assets/theme_images/iitrpr_logo_2.png',
         gradient: const LinearGradient(
           colors: [AppColors.surface, AppColors.background],
           begin: Alignment.topLeft,

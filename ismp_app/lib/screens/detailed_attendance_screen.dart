@@ -29,6 +29,7 @@ class _DetailedAttendanceScreenState extends State<DetailedAttendanceScreen> {
       {'name': 'Enigma', 'image': 'enigma.png'},
       {'name': 'Filmski', 'image': 'filmski.png'},
       {'name': 'MUN', 'image': 'mun.png'},
+      {'name': 'Litmates', 'image': 'Litmates.png'}
     ],
     'BOCA': [
       {'name': 'Alankar', 'image': 'alankar.png'},

@@ -28,7 +28,7 @@ Widget buildGoogleSignInButton({
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/Theme images/G.png',
+                'assets/theme_images/G.png',
                 height: 24,
               ),
               const SizedBox(width: 12),

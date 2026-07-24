@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/Theme images/login_bg.png',
+            'assets/theme_images/login_bg.png',
             fit: BoxFit.cover,
           ),
           Positioned(
@@ -230,17 +230,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
+                    Colors.black, // Fades out top (dstOut removes alpha where source is opaque)
+                    Colors.transparent, // Keeps middle opaque
                     Colors.transparent,
-                    Colors.black,
-                    Colors.black,
-                    Colors.transparent
+                    Colors.black // Fades out bottom
                   ],
                   stops: [0.0, 0.3, 0.6, 1.0],
                 ).createShader(bounds);
               },
-              blendMode: BlendMode.dstIn,
+              blendMode: BlendMode.dstOut,
               child: Image.asset(
-                'assets/Theme images/college.png',
+                'assets/theme_images/college.png',
                 fit: BoxFit.fitWidth,
               ),
             ),

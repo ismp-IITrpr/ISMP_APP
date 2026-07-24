@@ -265,6 +265,7 @@ class FirebaseService {
             {'name': 'Enigma', 'image': 'enigma.png'},
             {'name': 'Filmski', 'image': 'filmski.png'},
             {'name': 'MUN', 'image': 'mun.png'},
+            {'name': 'Litmates', 'image': 'Litmates.png'}
           ],
           'BOCA': [
             {'name': 'Alankar', 'image': 'alankar.png'},
@@ -398,6 +399,7 @@ class FirebaseService {
     'mun@iitrpr.ac.in': 'MUN',
     'fineartsclub@iitrpr.ac.in': 'Vibgyor',
     'ismp@iitrpr.ac.in': 'ISMP',
+    'gs.lit@iitrpr.ac.in': 'Litmates'
   };
 
   /// Returns true if the given email belongs to an authorized club rep.

@@ -495,12 +495,55 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'ISMP is a student-run mentorship program dedicated to helping freshers transition smoothly into campus life. We provide guidance, support, and a welcoming community.',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
                 height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 48),
+            Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'made with ',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          fontSize: 11,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.favorite,
+                        color: AppColors.primary,
+                        size: 13,
+                      ),
+                      Text(
+                        ' by collaboration of',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          fontSize: 11,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'ISMP App Dev Team X Softcom X Iota Clusters',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

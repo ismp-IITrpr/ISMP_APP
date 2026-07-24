@@ -101,6 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // ── Logout Button ──
                   _buildLogoutButton(context),
                   const SizedBox(height: 32),
+                  _buildFooterAttribution(),
                 ].animate(interval: 100.ms).fadeIn(duration: 600.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad),
               ),
             ),
@@ -451,6 +452,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterAttribution() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'made with ',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const Icon(
+                  Icons.favorite,
+                  color: primaryPurple,
+                  size: 13,
+                ),
+                const Text(
+                  ' by collaboration of',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'ISMP App Dev Team X Softcom X Iota Clusters',
+              style: TextStyle(
+                color: Colors.white60,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -90,24 +90,43 @@ class FirebaseService {
           if (isStudent && email != null) {
             // Extract roll number (e.g. 2026CSB1123)
             final rollNo = email.split('@')[0].toUpperCase();
-            final userDoc = await _firestore
-                .collection('users')
-                .doc(rollNo)
-                .get();
-            final userData = userDoc.data();
-            if (!userDoc.exists || userData == null || !userData.containsKey('name')) {
-              debugPrint(
-                'Auto-creating student profile document for $rollNo in Firestore...',
-              );
-              await _firestore.collection('users').doc(rollNo).set({
-                'name': user.displayName ?? 'Rohan Sharma',
-                'degree': 'B.Tech',
-                'branch': 'Computer Science & Engineering',
-                'groupNo': 7,
-                'stickersCollected': 0,
-                'profileUrl': user.photoURL ?? '',
-                'mentorRollNo': '2024MEB1358', // Default mentor Kanika
-              }, SetOptions(merge: true));
+            
+            // Resilient retry logic to handle Firestore auth token propagation latency
+            DocumentSnapshot? userDoc;
+            int retries = 3;
+            while (retries > 0) {
+              try {
+                userDoc = await _firestore
+                    .collection('users')
+                    .doc(rollNo)
+                    .get();
+                break;
+              } catch (e) {
+                retries--;
+                if (retries == 0) {
+                  debugPrint('Firestore auth sync failed after retries: $e');
+                  rethrow;
+                }
+                await Future.delayed(const Duration(milliseconds: 600));
+              }
+            }
+
+            if (userDoc != null) {
+              final userData = userDoc.data() as Map<String, dynamic>?;
+              if (!userDoc.exists || userData == null || !userData.containsKey('name')) {
+                debugPrint(
+                  'Auto-creating student profile document for $rollNo in Firestore...',
+                );
+                await _firestore.collection('users').doc(rollNo).set({
+                  'name': user.displayName ?? 'Rohan Sharma',
+                  'degree': 'B.Tech',
+                  'branch': 'Computer Science & Engineering',
+                  'groupNo': 7,
+                  'stickersCollected': 0,
+                  'profileUrl': user.photoURL ?? '',
+                  'mentorRollNo': '2024MEB1358', // Default mentor Kanika
+                }, SetOptions(merge: true));
+              }
             }
             // Cache the mentor for quick access across screens
             await loadMentor();

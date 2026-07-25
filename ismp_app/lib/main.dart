@@ -47,13 +47,6 @@ void main() async {
       serverClientId: '231730406983-ivqk4ir349scpola2l866t9t4pth22kl.apps.googleusercontent.com',
     );
   }
-  // Run seeding asynchronously only in debug mode so it doesn't block the splash screen
-  if (kDebugMode) {
-    FirebaseService.instance.seedDatabaseIfNeeded().catchError((e) {
-      debugPrint('Seeding failed: $e');
-    });
-  }
-
   // Initialize notification service
   final notifService = NotificationService.instance;
   await notifService.initialize();
@@ -115,14 +108,55 @@ class AuthGate extends StatelessWidget {
           return const LoginScreen();
         }
 
-        // User is logged in — determine their role dynamically from their email
-        // to prevent any race condition between Firebase Auth stream and SharedPreferences writes.
-        final isRep = FirebaseService.instance.isClubRep(user.email);
-        if (isRep) {
-          return const RepMainLayout();
-        }
-        return const MainLayout(isRep: false);
+        // Wrap with AuthTransitionGate to delay initialization until Firestore is ready
+        return AuthTransitionGate(user: user);
       },
     );
+  }
+}
+
+class AuthTransitionGate extends StatefulWidget {
+  final User user;
+  const AuthTransitionGate({super.key, required this.user});
+
+  @override
+  State<AuthTransitionGate> createState() => _AuthTransitionGateState();
+}
+
+class _AuthTransitionGateState extends State<AuthTransitionGate> {
+  bool _isReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _waitForFirestoreSync();
+  }
+
+  Future<void> _waitForFirestoreSync() async {
+    // Wait 600ms to guarantee Firestore SDK receives the authentication token from Auth SDK
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (mounted) {
+      setState(() {
+        _isReady = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isReady) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    final isRep = FirebaseService.instance.isClubRep(widget.user.email);
+    if (isRep) {
+      return const RepMainLayout();
+    }
+    return const MainLayout(isRep: false);
   }
 }

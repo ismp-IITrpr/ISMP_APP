@@ -63,13 +63,14 @@ class DefaultFirebaseOptions {
     projectId: 'iit-ropar-ismp-app',
     storageBucket: 'iit-ropar-ismp-app.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDEtOOBzkOrZXn16Qq3TZFFKxS9gdd-FnM',
     appId: '1:231730406983:ios:2bf571bd7d2aa5ff817362',
     messagingSenderId: '231730406983',
     projectId: 'iit-ropar-ismp-app',
     storageBucket: 'iit-ropar-ismp-app.firebasestorage.app',
+    androidClientId: '231730406983-84vqj56u9a836p47so9540rnvn2vj10u.apps.googleusercontent.com',
+    iosClientId: '231730406983-6pa8g33hl525i2etbjv5mvphsth378i2.apps.googleusercontent.com',
     iosBundleId: 'ismp.iitropar.ismpApp',
   );
 }

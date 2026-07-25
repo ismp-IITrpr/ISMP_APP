@@ -13,10 +13,11 @@ import '../models/mock_data/blog_mock.dart';
 import 'database_service.dart';
 import '../models/mock_data/moments_mock.dart';
 import '../theme/app_theme.dart';
+import '../config/keys.dart';
 
 class FirebaseService {
   static final FirebaseService instance = FirebaseService._init();
-  static const String imgbbApiKey = 'fe76419dd65f668bc2043f4aeec2e26b';
+  static const String imgbbApiKey = ApiKeys.imgbbApiKey;
   FirebaseService._init();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

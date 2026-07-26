@@ -6,7 +6,7 @@ import '../services/database_service.dart';
 import '../theme/app_theme.dart';
 
 /// Total stickers that can be collected across all clubs.
-const int TOTAL_STICKERS = 36;
+const int TOTAL_STICKERS = 37;
 
 class DetailedAttendanceScreen extends StatefulWidget {
   const DetailedAttendanceScreen({super.key});

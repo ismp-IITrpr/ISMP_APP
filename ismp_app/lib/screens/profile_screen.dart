@@ -20,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const int TOTAL_STICKERS = 36;
+  static const int TOTAL_STICKERS = 37;
 
   // Colors based on reference images
   static const Color bgColor = AppColors.background;

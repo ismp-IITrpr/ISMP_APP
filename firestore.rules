@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for auth verification
+    function isAuthenticated() {
+      return request.auth != null && request.auth.token.email.lower().matches('.*@iitrpr\\.ac\\.in$');
+    }
+
+    // Checks if the authenticated email matches the roll number prefix (e.g. '2025chb1137' for '2025CHB1137')
+    function isOwner(rollNo) {
+      return request.auth != null && request.auth.token.email.lower() == (rollNo.lower() + '@iitrpr.ac.in');
+    }
+
+    // List of representative and admin emails matched against the database configuration
+    function isRepresentative() {
+      return request.auth != null && (
+        request.auth.token.email.lower() in [
+          'act-sports-athletics1@iitrpr.ac.in', 'undekha@iitrpr.ac.in', 'act-sports-chess1@iitrpr.ac.in', 
+          'enarrators@iitrpr.ac.in', 'fincom@iitrpr.ac.in', 'act-sports-cricket1@iitrpr.ac.in', 
+          'cimclub@iitrpr.ac.in', 'act-sports-basketball1@iitrpr.ac.in', 'automotiveclub@iitrpr.ac.in', 
+          'codingclub@iitrpr.ac.in', 'act-sports-badminton1@iitrpr.ac.in', 'club.iotacluster@iitrpr.ac.in', 
+          'danceclub@iitrpr.ac.in', 'act-sports-volley1@iitrpr.ac.in', 'alpha@iitrpr.ac.in', 
+          'monochromeclub@iitrpr.ac.in', 'aeromodelling@iitrpr.ac.in', 'movie.club@iitrpr.ac.in', 
+          'sa.esportz@iitrpr.ac.in', 'alfaaz@iitrpr.ac.in', 'act-sports-hockey1@iitrpr.ac.in', 
+          'robotics@iitrpr.ac.in', 'act-sports-tabletennis1@iitrpr.ac.in', 'act-sports-lawntennis1@iitrpr.ac.in', 
+          'act-cultural-epicure@iitrpr.ac.in', 'zenithclub@iitrpr.ac.in', 'softcom@iitrpr.ac.in', 
+          'act-sports-weightlifting1@iitrpr.ac.in', 'act-sports-football1@iitrpr.ac.in', 'panache@iitrpr.ac.in', 
+          'enigma@iitrpr.ac.in', 'alankar@iitrpr.ac.in', 'arturo@iitrpr.ac.in', 'debsoc@iitrpr.ac.in', 
+          'mun@iitrpr.ac.in', 'fineartsclub@iitrpr.ac.in', 'ismp@iitrpr.ac.in', 'gs.lit@iitrpr.ac.in',
+          '2025csb1191@iitrpr.ac.in', '2025csb1196@iitrpr.ac.in', '2025csb1199@iitrpr.ac.in', 
+          '2025icb1449@iitrpr.ac.in', '2025chb1137@iitrpr.ac.in', '2025eeb1319@iitrpr.ac.in', 
+          '2025csb1251@iitrpr.ac.in', '2025csb1215@iitrpr.ac.in', '2025csb1188@iitrpr.ac.in', 
+          '2025aib1078@iitrpr.ac.in'
+        ]
+      );
+    }
+
+    // Mentors collection rules
+    match /mentors/{mentorRollNo} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+    }
+
+    // Users collection rules
+    match /users/{rollNo} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(rollNo) || isRepresentative();
+
+      // Subcollection for user attendance
+      match /attendance/{eventId} {
+        allow read: if isOwner(rollNo) || isRepresentative();
+        allow write: if isRepresentative();
+      }
+    }
+
+    // Metadata collection rules
+    match /metadata/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+    }
+
+    // Events collection rules
+    match /events/{eventId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+    }
+
+    // Blogs collection rules
+    match /blogs/{blogId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+    }
+
+    // Moments collection rules
+    match /moments/{momentId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative() || request.auth.token.email.lower().matches('^2025[a-z]{3}[0-9]{4}@iitrpr\\.ac\\.in$');
+    }
+
+    // Notifications collection rules
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+    }
+
+    // Attendance Sessions collection rules
+    match /attendance_sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow write: if isRepresentative();
+
+      // Subcollection for session scans (QR codes & manual entry)
+      match /scans/{studentRollNo} {
+        allow read: if isAuthenticated();
+        allow write: if isRepresentative() || isOwner(studentRollNo);
+      }
+    }
+  }
+}

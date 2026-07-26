@@ -21,6 +21,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   Uint8List? _pdfBytes;
   bool _isLoading = true;
   String? _error;
+  PdfInteractionMode _interactionMode = PdfInteractionMode.pan; // Default to smooth scroll/pan
 
   @override
   void initState() {
@@ -56,6 +57,42 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            if (!_isLoading && _error == null)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  icon: Icon(
+                    _interactionMode == PdfInteractionMode.pan
+                        ? Icons.back_hand // Hand icon for scroll mode
+                        : Icons.text_fields, // Text selection icon
+                    color: Colors.white,
+                  ),
+                  tooltip: _interactionMode == PdfInteractionMode.pan
+                      ? 'Switch to Text Selection'
+                      : 'Switch to Smooth Scroll',
+                  onPressed: () {
+                    setState(() {
+                      _interactionMode = _interactionMode == PdfInteractionMode.pan
+                          ? PdfInteractionMode.selection
+                          : PdfInteractionMode.pan;
+                    });
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          _interactionMode == PdfInteractionMode.pan
+                              ? 'Scroll Mode Activated (Smooth)'
+                              : 'Text Selection Mode Activated',
+                        ),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: AppColors.surface,
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator(color: Colors.white))
@@ -72,6 +109,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                   )
                 : SfPdfViewer.memory(
                     _pdfBytes!,
+                    interactionMode: _interactionMode,
                     canShowScrollHead: false,
                     canShowScrollStatus: false,
                     onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {

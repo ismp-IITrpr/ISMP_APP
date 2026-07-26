@@ -504,48 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 48),
-            Center(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'made with ',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 11,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const Icon(
-                        Icons.favorite,
-                        color: AppColors.primary,
-                        size: 13,
-                      ),
-                      Text(
-                        ' by collaboration of',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 11,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'ISMP App Dev Team X Softcom X Iota Clusters',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildFooterAttribution(),
           ],
         ),
       ),
@@ -818,6 +777,171 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFooterAttribution() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Left overlapping stickers (Softcom + BOST)
+            SizedBox(
+              width: 75,
+              height: 52,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 2,
+                    child: _buildGlowingSticker('assets/images/clubs/softcom.png', const Color(0xFF10B981), size: 44),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 2,
+                    child: _buildGlowingSticker('assets/images/clubs/BOST.png', const Color(0xFFD9278D), size: 42),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Flexible(
+              child: _buildAttributionText(),
+            ),
+            const SizedBox(width: 16),
+            // Right overlapping stickers (Iota + BOST)
+            SizedBox(
+              width: 75,
+              height: 52,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    bottom: 2,
+                    child: _buildGlowingSticker('assets/images/clubs/BOST.png', const Color(0xFFD9278D), size: 42),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 2,
+                    child: _buildGlowingSticker('assets/images/clubs/iota.png', const Color(0xFF00E5FF), size: 44),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlowingSticker(String assetPath, Color glowColor, {double size = 42}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: glowColor.withValues(alpha: 0.4),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: glowColor.withValues(alpha: 0.25),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: glowColor.withValues(alpha: 0.1),
+            blurRadius: 16,
+            spreadRadius: 3,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(4),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(size / 2),
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttributionText() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'made with ',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.35),
+                fontSize: 12.5,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const Icon(
+              Icons.favorite,
+              color: AppColors.primary,
+              size: 14,
+            ),
+            Text(
+              ' by collaboration of',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.35),
+                fontSize: 12.5,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.65),
+              fontSize: 13,
+              letterSpacing: 0.5,
+            ),
+            children: [
+              const TextSpan(
+                text: 'ISMP App Dev Team',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              TextSpan(
+                text: '  X  ',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              const TextSpan(
+                text: 'Softcom',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              TextSpan(
+                text: '  X  ',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              const TextSpan(
+                text: 'Iota Clusters',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

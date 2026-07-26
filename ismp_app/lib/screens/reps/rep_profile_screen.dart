@@ -403,75 +403,69 @@ class _RepProfileScreenState extends State<RepProfileScreen> {
   }
 
   Widget _buildAttributionText() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'made with ',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.35),
-                fontSize: 12.5,
-                letterSpacing: 0.5,
-              ),
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.65),
+          fontSize: 13,
+          letterSpacing: 0.5,
+        ),
+        children: [
+          TextSpan(
+            text: 'made with ',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.35),
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
             ),
-            const Icon(
+          ),
+          const WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Icon(
               Icons.favorite,
               color: AppColors.primary,
-              size: 14,
+              size: 13,
             ),
-            Text(
-              ' by collaboration of',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.35),
-                fontSize: 12.5,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.65),
-              fontSize: 13,
-              letterSpacing: 0.5,
-            ),
-            children: [
-              const TextSpan(
-                text: 'ISMP App Dev Team',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-              TextSpan(
-                text: '  X  ',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const TextSpan(
-                text: 'Softcom',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-              TextSpan(
-                text: '  X  ',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const TextSpan(
-                text: 'Iota Clusters',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ],
           ),
-        ),
-      ],
+          TextSpan(
+            text: ' by collaboration of\n',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.35),
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          const TextSpan(
+            text: 'ISMP App Dev Team',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+          ),
+          TextSpan(
+            text: '  X  ',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontWeight: FontWeight.normal,
+              fontSize: 13,
+            ),
+          ),
+          const TextSpan(
+            text: 'Softcom',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+          ),
+          TextSpan(
+            text: '  X  ',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontWeight: FontWeight.normal,
+              fontSize: 13,
+            ),
+          ),
+          const TextSpan(
+            text: 'Iota Clusters',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+          ),
+        ],
+      ),
     );
   }
 }
